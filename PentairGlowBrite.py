@@ -5,15 +5,15 @@ import argparse
 
 #[{Numer of times it needs to turn on and off}, {Name of the color},{Description}]
 globrite_light_scenes = [
-	[1,'SAm Mode','Cycles through white, magenta, blue and green colors'],
-	[2,'Party Mode','Rapid color changing bulding energy and excitment'],
-	[3,'Romance Mode','Slow color transitions creating a mesmerizing and calming effect'],
+	[1, 'SAm Mode','Cycles through white, magenta, blue and green colors'],
+	[2, 'Party Mode','Rapid color changing bulding energy and excitment'],
+	[3, 'Romance Mode','Slow color transitions creating a mesmerizing and calming effect'],
 	[4, 'Caribbean Mode','Transitions between a variety of blues and greens'],
-	[5,'American Mode','Patriotic red, white and blue transitions'],
-	[6,'California Sunset Mode','Dramatic transitions of orange, red and magenta tones'],
-	[7,'Royal Mode','Richer, deeper color tones'],
-	[8,'Blue','Fixed color'],
-	[9,'Green','Fixed color'],
+	[5, 'American Mode','Patriotic red, white and blue transitions'],
+	[6, 'California Sunset Mode','Dramatic transitions of orange, red and magenta tones'],
+	[7, 'Royal Mode','Richer, deeper color tones'],
+	[8, 'Blue','Fixed color'],
+	[9, 'Green','Fixed color'],
 	[10,'Red','Fixed color'],
 	[11,'White','Fixed color'],
 	[12,'Magenta','Fixed color'],
@@ -37,8 +37,9 @@ class GpioStub:
 		print('cleanup')
 
 class GloBrite:
-	def __init__(self, gpio):	
+	def __init__(self, gpio, delay_in_seconds = .5):	
 		self.gpio = gpio	
+		self.delay = delay_in_seconds
 
 	def setup(self, gpio_pin):
 		self.gpio.setmode(self.gpio.BOARD)
@@ -49,21 +50,26 @@ class GloBrite:
 
 		for switch_flip in range(0,scene[0]):
 			print(f'on')
-			self.gpio.output(gpio_pin, self.gpio.HIGH)
-			sleep(.5)
-			print(f'off')
 			self.gpio.output(gpio_pin, self.gpio.LOW)
-			sleep(.5)
-			print(f'on')
+			sleep(self.delay)
+			print(f'off')
 			self.gpio.output(gpio_pin, self.gpio.HIGH)
+			sleep(self.delay)
+			print(f'on')
+			self.gpio.output(gpio_pin, self.gpio.LOW)
 
 	def destroy(self, gpio_pin):
 		self.gpio.output(gpio_pin, self.gpio.LOW)
 		self.gpio.cleanup()
 
+	#turns the pin off
+	def off(self, gpio_pin):
+		print(f'Turning off {gpio_pin}')
+		self.gpio.output(gpio_pin, self.gpio.HIGH)
+
 if __name__ == '__main__':
-	my_parser  = argparse.ArgumentParser(prog='PentairGlowBrite', description='Changes the scene on a Raspberry pi for the Pentair GlowBrite')
-	my_parser.add_argument('--scene',type=int, default=1, dest='selected_scene', help='scene number 1-14',required=True)
+	my_parser  = argparse.ArgumentParser(prog='PentairGlowBrite', description='Changes the scene on a Raspberry pi for the Pentair GlowBrite. Dont set this to turn the lights off')
+	my_parser.add_argument('--scene',type=int, dest='selected_scene', help='scene number 1-14')
 	my_parser.add_argument('--pin',type=int, default=11, dest='gpio_pin', help='gpio pin number, NOT GPIO #',required=True)
 	my_parser.add_argument('--target',type=str, default='stub', dest='target', help='stub (prints what it does) or pi (actually does pi IO) implementation')
 
@@ -74,11 +80,16 @@ if __name__ == '__main__':
 	else:
 		import RPi.GPIO as GPIO
 
+	GPIO.setwarnings(False)
+
 	gb = GloBrite(GPIO)
 	gb.setup(args.gpio_pin)	
 	
-	try:		
-		gb.main(globrite_light_scenes[args.selected_scene - 1], args.gpio_pin)
-	except KeyboardInterrupt:
-		gb.destroy(args.gpio_pin)
+	if(args.selected_scene == None):
+		gb.off(args.gpio_pin)
+	else:
+		try:		
+			gb.main(globrite_light_scenes[args.selected_scene - 1], args.gpio_pin)
+		except KeyboardInterrupt:
+			gb.destroy(args.gpio_pin)
 
