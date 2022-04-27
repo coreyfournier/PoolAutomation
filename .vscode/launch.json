@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "PentairGlowBrite.py",
-            "args": ["--pin","11","--target","stub"],
+            "args": ["-h"],
             "console": "integratedTerminal",
             "justMyCode": true
         }
