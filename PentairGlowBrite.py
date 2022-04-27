@@ -20,6 +20,11 @@ globrite_light_scenes = [
 	[13,'Hold','Saved the current color effect during a color light show'],
 	[14,'Recall', 'Activate the last saved color effect']
 ]
+scene_description = ''
+for item in range(len(globrite_light_scenes)):
+	scene_description += f'"{globrite_light_scenes[item][0]}" - {globrite_light_scenes[item][2]}'
+	if(item + 1 < len(globrite_light_scenes)):
+		scene_description += '; '
 
 #Class stub of Pi GPIO for doing testing.
 class GpioStub:
@@ -35,6 +40,8 @@ class GpioStub:
 		print(f'pin={pin} output={output}')
 	def cleanup(self):
 		print('cleanup')
+	def setwarnings(self, showWarning):
+		print(f'Show warnings {showWarning}')
 
 class GloBrite:
 	def __init__(self, gpio, delay_in_seconds = .5):	
@@ -46,17 +53,20 @@ class GloBrite:
 		self.gpio.setup(gpio_pin, self.gpio.OUT, initial=self.gpio.LOW)
 
 	def main(self, scene, gpio_pin):
-		print(f'switching {scene[0]} times for scene "{scene[1]}"')
+		print(f'switching {scene[0]} times for scene "{scene[1]}" on pin {gpio_pin}')
 
-		for switch_flip in range(0,scene[0]):
+		iterations = range(0,scene[0]);
+		for switch_flip in iterations:
 			print(f'on')
 			self.gpio.output(gpio_pin, self.gpio.LOW)
 			sleep(self.delay)
 			print(f'off')
 			self.gpio.output(gpio_pin, self.gpio.HIGH)
 			sleep(self.delay)
-			print(f'on')
-			self.gpio.output(gpio_pin, self.gpio.LOW)
+
+		#Always end with on
+		print(f'on')
+		self.gpio.output(gpio_pin, self.gpio.LOW)	
 
 	def destroy(self, gpio_pin):
 		self.gpio.output(gpio_pin, self.gpio.LOW)
@@ -64,12 +74,12 @@ class GloBrite:
 
 	#turns the pin off
 	def off(self, gpio_pin):
-		print(f'Turning off {gpio_pin}')
+		print(f'Turning off pin {gpio_pin}')
 		self.gpio.output(gpio_pin, self.gpio.HIGH)
 
 if __name__ == '__main__':
-	my_parser  = argparse.ArgumentParser(prog='PentairGlowBrite', description='Changes the scene on a Raspberry pi for the Pentair GlowBrite. Dont set this to turn the lights off')
-	my_parser.add_argument('--scene',type=int, dest='selected_scene', help='scene number 1-14')
+	my_parser  = argparse.ArgumentParser(prog='PentairGlowBrite', description='Changes the scene on a Raspberry pi for the Pentair GlowBrite.')
+	my_parser.add_argument('--scene',type=int, dest='selected_scene', help=f'Dont set this to turn the lights off. Options:\n{scene_description}')
 	my_parser.add_argument('--pin',type=int, default=11, dest='gpio_pin', help='gpio pin number, NOT GPIO #',required=True)
 	my_parser.add_argument('--target',type=str, default='stub', dest='target', help='stub (prints what it does) or pi (actually does pi IO) implementation')
 
