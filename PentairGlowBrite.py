@@ -12,11 +12,11 @@ globrite_light_scenes = [
 	[5, 'American Mode','Patriotic red, white and blue transitions'],
 	[6, 'California Sunset Mode','Dramatic transitions of orange, red and magenta tones'],
 	[7, 'Royal Mode','Richer, deeper color tones'],
-	[8, 'Blue','Fixed color'],
-	[9, 'Green','Fixed color'],
-	[10,'Red','Fixed color'],
-	[11,'White','Fixed color'],
-	[12,'Magenta','Fixed color'],
+	[8, 'Blue','Fixed color Blue'],
+	[9, 'Green','Fixed color Green'],
+	[10,'Red','Fixed color Red'],
+	[11,'White','Fixed color White'],
+	[12,'Magenta','Fixed color Magenta'],
 	[13,'Hold','Saved the current color effect during a color light show'],
 	[14,'Recall', 'Activate the last saved color effect']
 ]
