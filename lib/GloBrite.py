@@ -54,5 +54,5 @@ class GloBrite:
 	
 
 	#turns the pin off
-	def off(self, gpio_pin):		
+	def off(self):		
 		self.controller.off()
