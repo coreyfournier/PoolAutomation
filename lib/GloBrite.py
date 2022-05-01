@@ -1,8 +1,11 @@
 
+import threading
+
 class GloBrite:
 	def __init__(self, controller):	
 		self.controller = controller
-	
+		self.lock = threading.Lock()
+
 	@staticmethod
 	def lightScenes():		
 		#[{Numer of times it needs to turn on and off}, {Name of the color},{Description}]
@@ -39,20 +42,24 @@ class GloBrite:
 		globrite_light_scenes = GloBrite.lightScenes()
 		selected_scene = globrite_light_scenes[scene_index]
 
-		print(f'switching {selected_scene[0]} times for scene "{selected_scene[1]}"')
+		#ensure only one person can change the scene at a time
+		with self.lock:
+			print(f'switching {selected_scene[0]} times for scene "{selected_scene[1]}"')
 
-		iterations = range(0,selected_scene[0]);
-		for switch_flip in iterations:
-			print(f'on') 
-			self.controller.on()			
-			print(f'off')
-			self.controller.off()			
+			iterations = range(0,selected_scene[0])
+			
+			for switch_flip in iterations:
+				print(f'on') 
+				self.controller.on()			
+				print(f'off')
+				self.controller.off()			
 
-		#Always end with on
-		print(f'on')
-		self.controller.on()	
+			#Always end with on
+			print(f'on')
+			self.controller.on()	
 	
 
 	#turns the pin off
 	def off(self):		
-		self.controller.off()
+		with self.lock:
+			self.controller.off()

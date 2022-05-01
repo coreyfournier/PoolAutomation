@@ -1,0 +1,62 @@
+<!DOCTYPE html >
+<html>
+    <script
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
+   <head>
+      <title>Sample</title>
+   </head>
+	
+   <body class = "index">
+      <div id = "header">
+         <h1>Sample Application</h1>
+      </div>
+		
+      <p>Welcome!</p>
+      <select name="scene" id="scene"><option value="-1">-</option>></select>
+      <button onclick="change()">Change</button>
+      <br>
+      <br>
+      <button onclick="off()">Off</button>
+		
+      <div id = "footer">
+         <hr>
+      </div>
+		
+   </body>
+	<script>
+        $(document).ready(function(){
+
+            $.getJSON("/descriptions", function(result) {
+                var options = $("#scene");
+                //don't forget error handling!
+                $.each(result, function(index) {
+                    options.append($("<option />").val(index).text(this[1] + ' - ' + this[2]));
+                });
+            });
+        });
+        function change(){
+            var selectedValue = $('#scene option').filter(":selected").val();
+
+            if(selectedValue >= 0)
+            {
+                $.ajax({
+                    url: '/change?sceneIndex=' + selectedValue,
+                    success: function(){
+                        alert('changed scene');
+                    }
+                    });
+            }
+        }
+
+        function off(){
+            $.ajax({
+                url: '/off',
+                success: function(){
+                    alert('turned off');
+                }
+                });
+        }
+    </script>
+</html>

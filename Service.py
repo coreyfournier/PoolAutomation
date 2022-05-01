@@ -10,12 +10,16 @@ import argparse
 class GlowBriteService:
     def __init__(self, controller):	
         self.gb = GloBrite(controller)
+    
+    @cherrypy.expose
+    def index(self):
+        return open("index.html")
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def change(self, sceneIndex):
         cherrypy.response.headers['Content-Type'] = 'application/json'
-        self.gb.change(int(sceneIndex) - 1)
+        self.gb.change(int(sceneIndex))
 
         return "OK"
 
@@ -43,7 +47,7 @@ if __name__ == '__main__':
 
     #controller_target = os.environ.get('CONTROLLER_TARGET')
     controller_target = args.target
-    gpio_pin = os.environ.get('GPIO_PIN')
+    gpio_pin = args.gpio_pin
 
     if(controller_target == 'stub'):
         GPIO = GpioStub()
