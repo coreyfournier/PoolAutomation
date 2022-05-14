@@ -1,3 +1,4 @@
+from pickle import TRUE
 import cherrypy
 import os
 from lib.GloBrite import GloBrite 
@@ -7,7 +8,7 @@ from lib.GpioController import GpioController
 import argparse
 
 
-class GlowBriteService:
+class Service:
     def __init__(self, controller):	
         self.gb = GloBrite(controller)
     
@@ -36,25 +37,3 @@ class GlowBriteService:
     @cherrypy.expose
     def stop(self):
         cherrypy.engine.exit()
-
-
-if __name__ == '__main__':
-    my_parser = argparse.ArgumentParser(prog='Service', description='Changes the scene on a Raspberry pi for the Pentair GlowBrite.')
-    my_parser.add_argument('--pin',type=int, default=11, dest='gpio_pin', help='gpio pin number, NOT GPIO #',required=True)
-    my_parser.add_argument('--target',type=str, default='stub', dest='target', help='stub (prints what it does) or pi (actually does pi IO) implementation')
-
-    args = my_parser.parse_args()
-
-    #controller_target = os.environ.get('CONTROLLER_TARGET')
-    controller_target = args.target
-    gpio_pin = args.gpio_pin
-
-    if(controller_target == 'stub'):
-        GPIO = GpioStub()
-    else:
-        import RPi.GPIO as GPIO
-
-
-
-    cherrypy.config.update({'server.socket_host': '0.0.0.0'})
-    cherrypy.quickstart(GlowBriteService(GpioController(GPIO, gpio_pin)))           
