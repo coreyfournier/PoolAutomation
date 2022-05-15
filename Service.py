@@ -9,12 +9,12 @@ import argparse
 
 
 class Service:
-    def __init__(self, controller):	
+    def __init__(self, controller, rootFolder):	
         self.gb = GloBrite(controller)
-    
+        self.rootFolder = rootFolder
     @cherrypy.expose
     def index(self):
-        return open("index.html")
+        return open(os.path.join(self.rootFolder, "index.html"))
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
