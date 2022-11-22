@@ -9,8 +9,8 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "PentairGlowBrite.py",
-            "args": ["--scene","2","--pin","11","--target","stub"],
+            "program": "PumpApp.py",
+            "args": ["--speed","SPEED_2","--pin","11","--target","stub"],
             "console": "integratedTerminal",
             "justMyCode": true
         }

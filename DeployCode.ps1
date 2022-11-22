@@ -18,3 +18,4 @@ Invoke-Expression -Command "pscp -r -pw $($password) *.py  $($computer):$($targe
 Invoke-Expression -Command "pscp -r -pw $($password) *.txt  $($computer):$($targetPath)"
 Invoke-Expression -Command "pscp -r -pw $($password) *.html $($computer):$($targetPath)"
 Invoke-Expression -Command "pscp -r -pw $($password) lib\*.py  $($computer):$($targetPath)lib"
+Invoke-Expression -Command "pscp -r -pw $($password) Pumps\*.py  $($computer):$($targetPath)Pumps"

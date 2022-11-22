@@ -2,7 +2,14 @@ from time import sleep
 
 #Controller as an implementation interface to the target
 class GpioController:
-	def __init__(self, gpio, gpio_pin, delay_in_seconds = .5):	
+	def __init__(self, gpio, gpio_pin:int, delay_in_seconds:float = .5):	
+		"""Interface to flip pins on the pie
+
+		Args:
+			gpio (_type_): pi gpio controller
+			gpio_pin (int): pin to trigger
+			delay_in_seconds (float, optional): Set to 0 to disable. Defaults to .5.
+		"""
 		self.gpio = gpio	
 		self.gpio_pin = gpio_pin
 		self.delay = delay_in_seconds
@@ -11,20 +18,25 @@ class GpioController:
 		self.gpio.setwarnings(False)
 		#using pin numbers and not GPIO numbers
 		self.gpio.setmode(self.gpio.BOARD)
-		self.gpio.setup(self.gpio_pin, self.gpio.OUT, initial=self.gpio.LOW)	
+		self.gpio.setup(self.gpio_pin, self.gpio.OUT) #, initial=self.gpio.LOW	
 
 	def on(self):
 		print(f'Turning on pin {self.gpio_pin}')
-		self.gpio.output(self.gpio_pin, self.gpio.LOW)	
+		self.gpio.output(self.gpio_pin, self.gpio.HIGH)	
 
-		sleep(self.delay)
+		if(self.delay > 0):
+			sleep(self.delay)	
 
 	def off(self):
 		print(f'Turning off pin {self.gpio_pin}')
-		self.gpio.output(self.gpio_pin, self.gpio.HIGH)
+		self.gpio.output(self.gpio_pin, self.gpio.LOW)
 
-		sleep(self.delay)
+		if(self.delay > 0):
+			sleep(self.delay)	
 
 	def destroy(self):
 		self.gpio.output(self.gpio_pin, self.gpio.LOW)
 		self.gpio.cleanup()
+
+	def isOn(self):
+		return self.gpio.input(self.gpio_pin)
