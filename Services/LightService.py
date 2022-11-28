@@ -2,19 +2,12 @@ from pickle import TRUE
 import cherrypy
 import os
 from lib.GloBrite import GloBrite 
-#stub class for testing and dry runs
-from lib.GpioStub import GpioStub
-from lib.GpioController import GpioController
-import argparse
+import DependencyContainer
 
 
-class Service:
-    def __init__(self, controller, rootFolder):	
-        self.gb = GloBrite(controller)
-        self.rootFolder = rootFolder
-    @cherrypy.expose
-    def index(self):
-        return open(os.path.join(self.rootFolder, "index.html"))
+class LightService:
+    def __init__(self):	
+        self.gb:GloBrite = DependencyContainer.light
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -34,6 +27,4 @@ class Service:
         self.gb.off()
         return "OK"
 
-    @cherrypy.expose
-    def stop(self):
-        cherrypy.engine.exit()
+

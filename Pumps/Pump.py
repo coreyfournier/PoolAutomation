@@ -7,7 +7,8 @@ class Speed(Enum):
     SPEED_3 = 3
     SPEED_4 = 4
 
-class Pump:    
+class Pump:        
+    #Pump Interface
 
     def on(self, speed:Speed):
         pass
