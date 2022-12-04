@@ -82,13 +82,13 @@ class BasePlugin:
             #Domoticz.Device(Name="Power", Unit=1, TypeName="Switch",  Image=5).Create()
             Domoticz.Log("Adding Pump")
             device = Domoticz.Device(
-                Name="Pump Relay", 
-                Unit=BasePlugin.PumpIndex, 
-                TypeName="Selector Switch", 
+                Name = "Pump Relay", 
+                Unit = BasePlugin.PumpIndex, 
+                TypeName = "Selector Switch", 
                 #18 = Selector
                 Switchtype = 18, 
                 Image = 5, 
-                Options=self.SourceOptions
+                Options = self.SourceOptions
                 )
             Domoticz.Log("Creating Pump")
             device.Create()
@@ -109,10 +109,27 @@ class BasePlugin:
         #Domoticz.Log("onCommand called for '" + str(self.Name)+ "': Parameters '" + str(Command) + "', Level: " + str(Level))
 
         if(Unit == BasePlugin.PumpIndex):
+            selectedSpeed:Speed = None            
+            device = Devices[DeviceId]
+            deviceUnit = device.Units[Unit]
+            
             if(Level == 0):
-                Domoticz.Log(f"Switching to: {self.speeds[0]}")
+                selectedSpeed = self.speeds[0]
+                deviceUnit.nValue = 0
             else:#For some reason the numbers have a zero after it
-                Domoticz.Log(f"Switching to: {self.speeds[int(Level/10)]}")
+                selectedSpeed = self.speeds[int(Level/10)]
+                deviceUnit.nValue = int(Level/10)
+
+            Domoticz.Log(f"Switching to: {selectedSpeed.name}")
+
+            Domoticz.Log(f"LastLevel:{deviceUnit.LastLevel} sValue:{deviceUnit.sValue} nValue:{deviceUnit.nValue}")
+            deviceUnit.sValue = selectedSpeed.name            
+            deviceUnit.nValue = 3
+            #must be an integer
+            #deviceUnit.LastLevel = selectedSpeed.name
+            #persist the selected speed for the pump
+                                                
+            deviceUnit.Update(Log=True)
 
     def onNotification(self, Name, Subject, Text, Status, Priority, Sound, ImageFile):
         Domoticz.Log("Notification: " + Name + "," + Subject + "," + Text + "," + Status + "," + str(Priority) + "," + Sound + "," + ImageFile)
