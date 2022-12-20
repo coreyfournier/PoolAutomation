@@ -4,6 +4,8 @@ from lib.GpioController import GpioController
 class RelayPump(Pump):
     def __init__(self, speedToGpio:"dict[int,GpioController]"):
         self.speedToGpio:"dict[int,GpioController]" = speedToGpio
+        self.allSpeeds = [Speed.OFF.name]
+        self.allSpeeds.extend(list([x.name for x in self.speedToGpio.keys()]))
 
     def on(self, speed:Speed):
         if(speed in self.speedToGpio):
@@ -16,3 +18,6 @@ class RelayPump(Pump):
         """
         for key, value in self.speedToGpio:
             self.speedToGpio[key].off()
+    
+    def speeds(self) ->"list[str]":        
+        return self.allSpeeds

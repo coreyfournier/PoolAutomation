@@ -15,3 +15,6 @@ class Pump:
 
     def off(self):
         pass
+
+    def speeds(self) ->"list[str]":
+        pass

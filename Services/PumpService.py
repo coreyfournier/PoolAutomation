@@ -9,9 +9,12 @@ class PumpService:
 
         index:int = 0
         for x in self.pumps:
+            speeds = x[1].speeds()
+            print(f"speeds: {speeds}")
             self.display.append({
                 "index": index,
-                "description": x[0]
+                "description": x[0],
+                "speeds": speeds
             })
             index += 1
 
@@ -25,7 +28,7 @@ class PumpService:
     
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def pumps(self):
+    def descriptions(self):
         #Gets the number of the pumps. 
 
         return self.display
