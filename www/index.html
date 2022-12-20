@@ -29,7 +29,7 @@
 	<script>
         $(document).ready(function(){
 
-            $.getJSON("/descriptions", function(result) {
+            $.getJSON("/light/descriptions", function(result) {
                 var options = $("#scene");
                 //don't forget error handling!
                 $.each(result, function(index) {
@@ -43,7 +43,7 @@
             if(selectedValue >= 0)
             {
                 $.ajax({
-                    url: '/change?sceneIndex=' + selectedValue,
+                    url: '/light/change?sceneIndex=' + selectedValue,
                     success: function(){
                         alert('changed scene');
                     }
