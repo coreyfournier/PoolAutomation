@@ -1,4 +1,5 @@
 from enum import Enum
+from dataclasses import dataclass
 
 class Speed(Enum):
     OFF = 0
@@ -6,6 +7,12 @@ class Speed(Enum):
     SPEED_2 = 2
     SPEED_3 = 3
     SPEED_4 = 4
+
+@dataclass
+class SpeedDisplay:
+    name:str
+    isActive:bool
+
 
 class Pump:        
     #Pump Interface
@@ -16,5 +23,5 @@ class Pump:
     def off(self):
         pass
 
-    def speeds(self) ->"list[str]":
+    def speeds(self) ->"list[SpeedDisplay]":
         pass

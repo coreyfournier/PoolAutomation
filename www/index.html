@@ -6,21 +6,31 @@
   integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
   crossorigin="anonymous"></script>
    <head>
-      <title>GloBrite Color Changer</title>
+      <title>Pool Controls</title>
    </head>
 	
-   <body class = "index">
-      <div id = "header">
-         <h1>GloBrite Color Changer</h1>
-      </div>
-		
-      <p>Choose A Scene</p>
-      <select name="scene" id="scene" style="width: 250px;"><option value="-1">-</option>></select>
-      <button onclick="change()">Change</button>
-      <br>
-      <br>
-      <button onclick="off()">Off</button>
-		
+   <body class="index">
+    <table>
+        <tr>
+            <td valign="top">
+                <div id="header">
+                    <h1>GloBrite Color Changer</h1>
+                </div>
+                    
+                <p>Choose A Scene</p>
+                <select name="scene" id="scene" style="width: 250px;"><option value="-1">-</option>></select>
+                <button onclick="change()">Change</button>
+                <br>
+                <br>
+                <button onclick="off()">Off</button>
+            </td>
+            <td valign="top">
+                <div id="header">
+                    <h1>Pump</h1>
+                </div>
+                <select name="speed" id="speed" style="width: 250px;"></select>
+            </td>
+        </tr>
       <div id = "footer">
          <hr>
       </div>
@@ -34,6 +44,17 @@
                 //don't forget error handling!
                 $.each(result, function(index) {
                     options.append($("<option />").val(index).text(this[1] + ' - ' + this[2]));
+                });
+            });
+
+            $.getJSON("/pump/descriptions", function(result) {
+                var options = $("#speed");
+                //don't forget error handling!
+                $.each(result, function(pumpIndex, pump) {
+                    console.log("pump=" + pump.description)
+                    $.each(pump.speeds, function(speedIndex, speed){
+                        options.append($("<option id='pump_" + pump.index + "_" + speed.name + "' />").text(speed.name));
+                    });
                 });
             });
         });

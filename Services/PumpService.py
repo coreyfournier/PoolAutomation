@@ -1,6 +1,7 @@
 import cherrypy
 from Pumps.Pump import *
 import DependencyContainer
+import dataclasses
 
 class PumpService:
     def __init__(self):	
@@ -9,7 +10,8 @@ class PumpService:
 
         index:int = 0
         for x in self.pumps:
-            speeds = x[1].speeds()
+            #It's seralizable unless converted to a dictionary
+            speeds = [dataclasses.asdict(item) for item in x[1].speeds()]
             print(f"speeds: {speeds}")
             self.display.append({
                 "index": index,
