@@ -1,4 +1,5 @@
 from time import sleep
+import logging
 
 #Controller as an implementation interface to the target
 class GpioController:
@@ -21,14 +22,14 @@ class GpioController:
 		self.gpio.setup(self.gpio_pin, self.gpio.OUT) #, initial=self.gpio.LOW	
 
 	def on(self):
-		print(f'Turning on pin {self.gpio_pin}')
+		logging.debug(f'Turning on pin {self.gpio_pin}')
 		self.gpio.output(self.gpio_pin, self.gpio.HIGH)	
 
 		if(self.delay > 0):
 			sleep(self.delay)	
 
 	def off(self):
-		print(f'Turning off pin {self.gpio_pin}')
+		logging.debug(f'Turning off pin {self.gpio_pin}')
 		self.gpio.output(self.gpio_pin, self.gpio.LOW)
 
 		if(self.delay > 0):
@@ -38,5 +39,5 @@ class GpioController:
 		self.gpio.output(self.gpio_pin, self.gpio.LOW)
 		self.gpio.cleanup()
 
-	def isOn(self):
+	def isOn(self)-> bool:
 		return self.gpio.input(self.gpio_pin)

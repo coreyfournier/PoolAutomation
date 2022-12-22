@@ -1,3 +1,5 @@
+import logging
+
 #Class stub of Pi GPIO for doing testing.
 class GpioStub():
 	BOARD = 'board'
@@ -9,7 +11,7 @@ class GpioStub():
 		self.pinState:"dict[int,bool]" = {}	
 
 	def setmode(self, input):
-		print(f'setmode={input}')
+		logging.debug(f'setmode={input}')
 
 	def setup(self, pins:"int|list[int]", io_direction, initial = 0):
 		self.initial = initial
@@ -21,17 +23,17 @@ class GpioStub():
 			for pin in pins:
 				self.pinState[pin] = initial
 		
-		print(f'pins={pins} io_direction={io_direction} initial={initial}')
+		logging.debug(f'pins={pins} io_direction={io_direction} initial={initial}')
 
 	def output(self, pin, output) :
-		self.pinState[pin] = self.initial == output
-		print(f'pin={pin} output={output}')
+		self.pinState[pin] = (self.initial == output)
+		logging.debug(f'pin={pin} output={output}')
 
 	def cleanup(self):
-		print('cleanup')
+		logging.debug('cleanup')
 
 	def setwarnings(self, showWarning):
-		print(f'Show warnings {showWarning}')
+		logging.debug(f'Show warnings {showWarning}')
 
 	def input(self, pin):
 		if(pin in self.pinState):

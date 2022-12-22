@@ -19,16 +19,16 @@
                     
                 <p>Choose A Scene</p>
                 <select name="scene" id="scene" style="width: 250px;"><option value="-1">-</option>></select>
-                <button onclick="change()">Change</button>
+                <button onclick="sceneChange()">Change</button>
                 <br>
                 <br>
-                <button onclick="off()">Off</button>
+                <button onclick="lightOff()">Off</button>
             </td>
             <td valign="top">
                 <div id="header">
                     <h1>Pump</h1>
                 </div>
-                <select name="speed" id="speed" style="width: 250px;"></select>
+                <select name="speed" id="speed" style="width: 250px;" onchange="speedChange(this)"></select>
             </td>
         </tr>
       <div id = "footer">
@@ -58,7 +58,19 @@
                 });
             });
         });
-        function change(){
+        
+        function speedChange(control)
+        {
+            console.log($(control).val());
+            $.ajax({
+                    url: '/pump/on?pumpIndex=0&speed=' + $(control).val(),
+                    success: function(){
+                        alert('changed speed to ' + $(control).val());
+                    }
+            });
+        }
+
+        function sceneChange(){
             var selectedValue = $('#scene option').filter(":selected").val();
 
             if(selectedValue >= 0)
@@ -72,7 +84,7 @@
             }
         }
 
-        function off(){
+        function lightOff(){
             $.ajax({
                 url: '/off',
                 success: function(){

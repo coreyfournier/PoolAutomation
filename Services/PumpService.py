@@ -21,12 +21,15 @@ class PumpService:
             index += 1
 
     @cherrypy.expose
-    def on(self, pumpIndex:int, speed:Speed):
-        self.pumps[pumpIndex].on(speed)
+    def on(self, pumpIndex:int, speed:str):
+        tuple = self.pumps[int(pumpIndex)]
+
+        tuple[1].on(Speed[speed])
     
     @cherrypy.expose
     def off(self, pumpIndex:int):
-        self.pumps[pumpIndex].off()
+        tuple = self.pumps[int(pumpIndex)]
+        tuple[1].off()
     
     @cherrypy.expose
     @cherrypy.tools.json_out()

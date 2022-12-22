@@ -39,6 +39,10 @@ if("PUMP_GPIO_PINS" not in os.environ):
 else:
     pumpPins = [int(x) for x in os.environ["PUMP_GPIO_PINS"].split(",")]
 
+def pumpChange(newSpeed:Speed):
+    print(f"Pump change callback. Speed changed: {newSpeed}")
+    return True
+
 DependencyContainer.light = GloBrite(GpioController(GPIO, int(gpio_pin)))
 DependencyContainer.pumps = [("Main", RelayPump(
     {
@@ -46,7 +50,8 @@ DependencyContainer.pumps = [("Main", RelayPump(
         Speed.SPEED_2: GpioController(GPIO, pumpPins[1], 0),
         Speed.SPEED_3: GpioController(GPIO, pumpPins[2], 0),
         Speed.SPEED_4: GpioController(GPIO, pumpPins[3], 0)
-    }))]
+    },
+    pumpChange))]
 
 # before mounting anything
 #Only execute this if you are running in linux and as a service.
