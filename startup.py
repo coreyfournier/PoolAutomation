@@ -12,12 +12,12 @@ from Index import Index
 from Pumps.Pump import Pump
 from Pumps.RelayPump import *
 import DependencyContainer
-import logging
+logger = DependencyContainer.get_logger(__name__)
 
 #check to see if the environment variable is there or if its set to stub.
 if("POOL_TARGET" not in os.environ or os.environ["POOL_TARGET"] == "stub"):
     GPIO = GpioStub()
-    logging.info("Using GPIO Stub")
+    logger.info("Using GPIO Stub")
 else:
     import RPi.GPIO as GPIO
 
@@ -33,19 +33,19 @@ app_conf = { '/': config_root }
 cherrypy.config.update({'server.socket_host': '0.0.0.0',  'server.socket_port' : 8080})
 
 if("LIGHT_GPIO_PIN" not in os.environ):
-    logging.warn("GPIO pin not set for light in environment variable 'LIGHT_GPIO_PIN'. Defaulting to zero")
+    logger.warning("GPIO pin not set for light in environment variable 'LIGHT_GPIO_PIN'. Defaulting to zero")
     gpio_pin = 0
 else:
     gpio_pin = os.environ.get("LIGHT_GPIO_PIN")
 
 if("PUMP_GPIO_PINS" not in os.environ):
-    logging.warn("GPIO pins not set for the pump, defaulting to 1,2,3,4")
+    logger.warning("GPIO pins not set for the pump, defaulting to 1,2,3,4")
     pumpPins = [1,2,3,4]
 else:
     pumpPins = [int(x) for x in os.environ["PUMP_GPIO_PINS"].split(",")]
 
 def pumpChange(newSpeed:Speed):
-    print(f"Pump change callback. Speed changed: {newSpeed}")
+    logger.info(f"Pump change callback. Speed changed: {newSpeed}")
     return True
 
 DependencyContainer.light = GloBrite(GpioController(GPIO, int(gpio_pin)))

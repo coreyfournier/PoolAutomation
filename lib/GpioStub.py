@@ -1,4 +1,5 @@
-import logging
+import DependencyContainer
+logger = DependencyContainer.get_logger(__name__)
 
 #Class stub of Pi GPIO for doing testing.
 class GpioStub():
@@ -11,7 +12,7 @@ class GpioStub():
 		self.pinState:"dict[int,bool]" = {}	
 
 	def setmode(self, input):
-		logging.debug(f'setmode={input}')
+		logger.debug(f'setmode={input}')
 
 	def setup(self, pins:"int|list[int]", io_direction, initial = 0):
 		self.initial = initial
@@ -23,21 +24,21 @@ class GpioStub():
 			for pin in pins:
 				self.pinState[pin] = initial
 		
-		logging.debug(f'pins={pins} io_direction={io_direction} initial={initial}')
+		logger.debug(f'pins={pins} io_direction={io_direction} initial={initial}')
 
 	def output(self, pin, output) :
-		self.pinState[pin] = (self.initial == output)
-		logging.debug(f'pin={pin} output={output}')
+		self.pinState[pin] = output
+		logger.debug(f'pin={pin} output={output}')
 
 	def cleanup(self):
-		logging.debug('cleanup')
+		logger.debug('cleanup')
 
 	def setwarnings(self, showWarning):
-		logging.debug(f'Show warnings {showWarning}')
+		logger.debug(f'Show warnings {showWarning}')
 
 	def input(self, pin):
 		if(pin in self.pinState):
-			return self.pinState[pin] == self.initial
+			return self.pinState[pin]
 		else:
 			raise Exception(f"Pin {pin} isn't being tracked")
 

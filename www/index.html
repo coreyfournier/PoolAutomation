@@ -50,7 +50,7 @@
                 $.each(result, function(pumpIndex, pump) {
                     console.log("pump=" + pump.description)
                     $.each(pump.speeds, function(speedIndex, speed){
-                        options.append($("<option id='pump_" + pump.index + "_" + speed.name + "' />").text(speed.name));
+                        options.append($("<option id='pump_" + pump.index + "_" + speed.name + "' "+ (speed.isActive? "selected":"") +" />").text(speed.name));
                     });
                 });
             });

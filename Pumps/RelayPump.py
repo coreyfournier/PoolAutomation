@@ -1,6 +1,7 @@
 from Pumps.Pump import *
 from lib.GpioController import GpioController
-import logging
+import DependencyContainer
+logger = DependencyContainer.get_logger(__name__)
 
 class RelayPump(Pump):
     def __init__(self, speedToGpio:"dict[int,GpioController]", changeListner:Callable = None):
@@ -24,16 +25,21 @@ class RelayPump(Pump):
                     if(speed != key):
                         self.speedToGpio[key].off()
 
+                #Make sure off is not shown as active, when another speed is set
+                if(speed != Speed.OFF):
+                    self.__setOffSpeedStatus(False)
+
                 #Now turn on the pin to trigger the speed        
-                self.speedToGpio[speed].on()
+                self.speedToGpio[speed].on()               
             else:
-                logging.debug("Pump not allowed to change speed by callback")
+                logger.debug("Pump not allowed to change speed by callback")
         else:
             raise Exception(f"No mapped speed for '{speed.name}'")         
 
     def off(self):
         """Ensures that the pump is completely off by switching off all relays for the pump
-        """
+        """        
+        self.__setOffSpeedStatus(True)
         self.on(Speed.OFF)
     
     def speeds(self) ->"list[SpeedDisplay]":
@@ -43,15 +49,34 @@ class RelayPump(Pump):
         for item in self.allSpeeds:
             #off doesn't have it's own pin, it's just all pins turned off
             if(item.name != Speed.OFF.name):
-                item.isActive = self.speedToGpio[Speed[item.name]].isOn()
+                controller = self.speedToGpio[Speed[item.name]]
+                item.isActive = controller.isOn()
+                logger.debug(f"pin={controller.gpio_pin} State={item.isActive}")
                 if(item.isActive):
                     areAnyOn = True
         
+        logger.debug(f"areAnyOn={areAnyOn}")
+
         #Set off as "On"
-        if(not areAnyOn):
-            self.allSpeeds[Speed.OFF].isActive = True
+        if(not areAnyOn):           
+            self.__setOffSpeedStatus(True)
 
         return self.allSpeeds
 
+    def __setOffSpeedStatus(self, activeFlag) -> None:
+        """Sets the isActive flag on the Off item in allSpeeds
+
+        Args:
+            activeFlag (_type_): _description_
+        """
+        offSpeed = filter(lambda x: x.name == Speed.OFF.name, self.allSpeeds)
+        next(offSpeed).isActive = activeFlag
+
+
     def onChange(self, callback:Callable) -> None:
+        """Registers a call back function. It gets notified of changes.
+
+        Args:
+            callback (Callable): Function should accept the Speed as a parameter and return True if allowed False otherwise.
+        """
         self.speedChangeListner = callable
