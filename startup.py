@@ -22,7 +22,12 @@ else:
     import RPi.GPIO as GPIO
 
 
-config_root = { 'tools.encode.encoding' : 'utf-8'}
+WEB_ROOT = os.path.join(os.getcwd(),"www")
+config_root = { 
+    'tools.encode.encoding' : 'utf-8',
+    'tools.staticdir.on' : True,
+    'tools.staticdir.dir' : WEB_ROOT,
+    'tools.staticdir.index' : 'index.html'}
 app_conf = { '/': config_root }
 
 cherrypy.config.update({'server.socket_host': '0.0.0.0',  'server.socket_port' : 8080})
