@@ -39,7 +39,7 @@ else:
     gpio_pin = os.environ.get("LIGHT_GPIO_PIN")
 
 if("PUMP_GPIO_PINS" not in os.environ):
-    logger.warning("GPIO pins not set for the pump, defaulting to 1,2,3,4")
+    logger.warning("GPIO pins not set for the pump in environment variable 'PUMP_GPIO_PINS', defaulting to 1,2,3,4")
     pumpPins = [1,2,3,4]
 else:
     pumpPins = [int(x) for x in os.environ["PUMP_GPIO_PINS"].split(",")]
@@ -48,7 +48,9 @@ def pumpChange(newSpeed:Speed):
     logger.info(f"Pump change callback. Speed changed: {newSpeed}")
     return True
 
+#Add light controller here
 DependencyContainer.light = GloBrite(GpioController(GPIO, int(gpio_pin)))
+#All all pumps here with thier name
 DependencyContainer.pumps = [("Main", RelayPump(
     {
         Speed.SPEED_1: GpioController(GPIO, pumpPins[0], 0),
