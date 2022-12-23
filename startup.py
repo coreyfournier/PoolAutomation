@@ -17,7 +17,7 @@ logger = DependencyContainer.get_logger(__name__)
 #check to see if the environment variable is there or if its set to stub.
 if("POOL_TARGET" not in os.environ or os.environ["POOL_TARGET"] == "stub"):
     GPIO = GpioStub()
-    logger.info("Using GPIO Stub")
+    logger.info("Using GPIO Stub. Live pins will NOT be used.")
 else:
     import RPi.GPIO as GPIO
 
