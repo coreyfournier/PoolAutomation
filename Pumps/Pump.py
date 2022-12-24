@@ -27,12 +27,22 @@ class Pump:
     def speeds(self) ->"list[SpeedDisplay]":
         pass
     
-    def onChange(self, callback:Callable) -> None:
+    def onBeforeChange(self, callback:Callable) -> None:
         """Register a function to receive notifications on changes.
-        The call back should accept Speed as the parameter. It should return true if the speed is allowed
+        The call back should accept Speed as both parameters. First being the new speed, second previous. It should return true if the speed is allowed
         false otherwise.
 
         Args:
             callback (Callable): Function to get a notification. Parameter of Speed. Return true if allowed, false otherwise.
+        """
+        pass
+
+    def onAfterChange(self, callback:Callable) -> None:
+        """Register a function to receive notifications on changes.
+        The call back should accept Speed as the parameter.
+        false otherwise.
+
+        Args:
+            callback (Callable): Function to get a notification. Parameter of Speed.
         """
         pass
