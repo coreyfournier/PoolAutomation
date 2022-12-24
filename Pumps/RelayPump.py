@@ -4,19 +4,20 @@ import DependencyContainer
 logger = DependencyContainer.get_logger(__name__)
 
 class RelayPump(Pump):
-    def __init__(self, speedToGpio:"dict[int,GpioController]", changeListner:Callable = None):
+    def __init__(self, speedToGpio:"dict[int,GpioController]", beforeChangeListner:Callable = None, afterChangeListner:Callable = None):
         self.speedToGpio:"dict[int,GpioController]" = speedToGpio
         self.allSpeeds = [SpeedDisplay(Speed.OFF.name, False)]
         self.allSpeeds.extend(list([SpeedDisplay(x.name, False) for x in self.speedToGpio.keys()]))
-        self.speedChangeListner:Callable = changeListner
-
+        self.beforeChangeListner:Callable = beforeChangeListner
+        self.afterChangeListner:Callable = afterChangeListner
+        self.currentSpeed = Speed.OFF
 
     def on(self, speed:Speed):
         isAllowed = True
 
         if(speed in self.speedToGpio):
-            if(self.speedChangeListner != None):
-                isAllowed = self.speedChangeListner(speed)
+            if(self.beforeChangeListner != None):
+                isAllowed = self.beforeChangeListner(speed, self.currentSpeed)
 
             if(isAllowed):
                 #Make sure the other pins are off
@@ -30,7 +31,12 @@ class RelayPump(Pump):
                     self.__setOffSpeedStatus(False)
 
                 #Now turn on the pin to trigger the speed        
-                self.speedToGpio[speed].on()               
+                self.speedToGpio[speed].on()
+                #Set the current speed
+                self.currentSpeed = speed
+
+                if(self.afterChangeListner != None):
+                    self.afterChangeListner(speed)               
             else:
                 logger.debug("Pump not allowed to change speed by callback")
         else:
@@ -73,10 +79,20 @@ class RelayPump(Pump):
         next(offSpeed).isActive = activeFlag
 
 
-    def onChange(self, callback:Callable) -> None:
-        """Registers a call back function. It gets notified of changes.
+    def onBeforeChange(self, callback:Callable) -> None:
+        """Register a function to receive notifications on changes.
+        The call back should accept Speed as both parameters. First being the new speed, second previous. It should return true if the speed is allowed
+        false otherwise.
 
         Args:
             callback (Callable): Function should accept the Speed as a parameter and return True if allowed False otherwise.
         """
-        self.speedChangeListner = callable
+        self.beforeChangeListner = callback
+    
+    def onAfterChange(self, callback:Callable) -> None:
+        """Registers a call back function. It gets notified of changes.
+
+        Args:
+            callback (Callable): Function should accept the Speed as a parameter.
+        """
+        self.afterChangeListner = callback
