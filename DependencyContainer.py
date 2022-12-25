@@ -60,9 +60,10 @@ def get_logger(logger_name:str)->logging.Logger:
             force=True)
     return logger
 
-from lib.GloBrite import GloBrite 
+#from Lights.GloBrite import GloBrite 
 from Pumps.Pump import Pump
 
-light:GloBrite = None
+light = None
+
 #List of pumps description is the first item in the tuple, pump is the second.
 pumps:"list[tuple(str,Pump)]" = None

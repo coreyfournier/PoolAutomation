@@ -5,7 +5,7 @@ from Pumps.RelayPump import RelayPump
 from Pumps.Pump import Pump 
 #stub class for testing and dry runs
 from lib.GpioStub import GpioStub
-from lib.GloBrite import GloBrite
+from Lights.GloBrite import GloBrite
 from lib.GpioController import GpioController
 
 if __name__ == '__main__':

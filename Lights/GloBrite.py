@@ -1,5 +1,7 @@
 
 import threading
+import DependencyContainer
+logger = DependencyContainer.get_logger(__name__)
 
 class GloBrite:
 	def __init__(self, controller):	
@@ -7,7 +9,7 @@ class GloBrite:
 		self.lock = threading.Lock()
 
 	@staticmethod
-	def lightScenes():		
+	def lightScenes() :		
 		#[{Numer of times it needs to turn on and off}, {Name of the color},{Description}]
 		return [
 			[1, 'SAm Mode','Cycles through white, magenta, blue and green colors'],
@@ -44,18 +46,18 @@ class GloBrite:
 
 		#ensure only one person can change the scene at a time
 		with self.lock:
-			print(f'switching {selected_scene[0]} times for scene "{selected_scene[1]}"')
+			logger.debug(f'switching {selected_scene[0]} times for scene "{selected_scene[1]}"')
 
 			iterations = range(0,selected_scene[0])
 			
 			for switch_flip in iterations:
-				print(f'on') 
+				logger.debug(f'on') 
 				self.controller.on()			
-				print(f'off')
+				logger.debug(f'off')
 				self.controller.off()			
 
 			#Always end with on
-			print(f'on')
+			logger.debug(f'on')
 			self.controller.on()	
 	
 

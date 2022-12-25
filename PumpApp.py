@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 import argparse
-from lib.GloBrite import GloBrite 
+from Lights.GloBrite import GloBrite 
 #stub class for testing and dry runs
 from lib.GpioStub import GpioStub
 from lib.GpioController import GpioController
