@@ -15,6 +15,7 @@ from Pumps.RelayPump import *
 import DependencyContainer
 import asyncio
 from lib.WorkerPlugin import WorkerPlugin
+from Pumps.Schedule import *
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -38,6 +39,12 @@ def afterPumpChange(newSpeed:Speed):
  
 
 if __name__ == '__main__':
+    dataPath = os.path.join("data")
+    #This needs to be a parameter
+    scheduleFile = os.path.join(dataPath, "sample-schedule.json")
+    scheduleData = getSchedules(scheduleFile)
+    print(scheduleData)
+
     #check to see if the environment variable is there or if its set to stub.
     if("POOL_TARGET" not in os.environ or os.environ["POOL_TARGET"] == "stub"):
         GPIO = GpioStub()

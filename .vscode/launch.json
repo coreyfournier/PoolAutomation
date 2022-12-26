@@ -9,8 +9,7 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "PumpApp.py",
-            "args": ["--speed","SPEED_2","--pin","11","--target","stub"],
+            "program": "startup.py",
             "console": "integratedTerminal",
             "justMyCode": true
         }

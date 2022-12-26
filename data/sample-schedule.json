@@ -1,0 +1,28 @@
+[
+    {
+        "startTime":"07:00:00",
+        "endTime":"09:00:00",
+        "id":1,
+        "name":"Main pump schedule",
+        "isActive":true,
+        "pumps":[{
+            "id":1,
+            "name":"Main",
+            "speed":"SPEED_2"
+        }],
+        "valves":null
+    },
+    {
+        "startTime":"12:00:00",
+        "endTime":"14:00:00",
+        "id":2,
+        "name":"Main pump schedule",
+        "isActive":true,
+        "pumps":[{
+            "id":1,
+            "name":"Main",
+            "speed":"SPEED_4"
+        }],
+        "valves":null
+    }
+]
