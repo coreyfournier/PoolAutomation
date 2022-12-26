@@ -31,6 +31,8 @@ class Control(JSONWizard):
     isActive:bool = True
     #Pump speed to set when the schedule expires. Should be off
     offSpeed:Pump.Speed = Pump.Speed.OFF
+    #Set by the worker to indicate if it's running
+    isRunning:bool = False
 
 @dataclass_json
 @dataclass

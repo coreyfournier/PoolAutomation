@@ -1,7 +1,7 @@
 [
     {
-        "startTime":"07:00:00",
-        "endTime":"09:00:00",
+        "startTime":"07:00",
+        "endTime":"09:00",
         "id":1,
         "name":"Main pump schedule",
         "isActive":true,
@@ -13,8 +13,8 @@
         "valves":null
     },
     {
-        "startTime":"12:00:00",
-        "endTime":"14:00:00",
+        "startTime":"12:00",
+        "endTime":"19:00",
         "id":2,
         "name":"Main pump schedule",
         "isActive":true,

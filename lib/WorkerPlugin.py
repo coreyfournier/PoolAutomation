@@ -1,19 +1,20 @@
 import threading
 import time
-import logging
 import datetime
+import logging
 import cherrypy
 from cherrypy.process.plugins import SimplePlugin
+from Pumps.Schedule import *
 
 #https://stackoverflow.com/questions/29238079/why-is-ctrl-c-not-captured-and-signal-handler-called/29254591#29254591
 class WorkerPlugin(SimplePlugin):
   _thread   = None
   _running  = None
-  _sleep = None
+  _sleep = None  
 
-  def __init__(self, bus, sleep = 30):
+  def __init__(self, bus, scheduleData:"list[PumpSchedule]", sleep = 30):
     SimplePlugin.__init__(self, bus)
-
+    self._scheduleData:"list[PumpSchedule]" = scheduleData
     self._sleep = sleep
 
   def start(self):
@@ -53,8 +54,30 @@ class WorkerPlugin(SimplePlugin):
 
   def _target(self):
     while self._running:
+      now = datetime.datetime.now()
+      #If no end or start date is specified, put it as today
+      nowDate = now.strftime("%m/%d/%y")
+
+      for item in self._scheduleData:
+        if(item.startDate == None):          
+          item.startDate = nowDate        
+        if(item.endDate == None):
+          item.endDate = nowDate
+
+        startTime = datetime.datetime.strptime(item.startTime + " " + item.startDate, "%H:%M %m/%d/%y")
+        endTime = datetime.datetime.strptime(item.endTime + " " + item.endDate, "%H:%M %m/%d/%y")
+
+        #run the schedule
+        if(now >= startTime and now <= endTime):
+          if(not item.isRunning):
+            self.bus.log(f"Running schedule {item.name} - {now}")
+            item.isRunning = True
+        else:
+          item.isRunning = False
+          self.bus.log(f"Schedule {item.name} not ready - {now}")
+
       try:
-        self.bus.log(f'some periodic routine {datetime.datetime.now()}')
+        #self.bus.log(f'some periodic routine {datetime.datetime.now()}')
         time.sleep(self._sleep)
       except:
         self.bus.log('Error in example plugin', level = logging.ERROR, traceback = True)

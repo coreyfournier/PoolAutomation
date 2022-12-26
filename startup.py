@@ -28,7 +28,6 @@ config_root = {
     'tools.staticdir.index' : 'index.html'}
 app_conf = { '/': config_root }
 
-
 def beforePumpChange(newSpeed:Speed, oldSpeed:Speed):
     logger.info(f"Before Pump change callback. Speed changed from {oldSpeed} to {newSpeed}")
     return True
@@ -43,7 +42,7 @@ if __name__ == '__main__':
     #This needs to be a parameter
     scheduleFile = os.path.join(dataPath, "sample-schedule.json")
     scheduleData = getSchedules(scheduleFile)
-    print(scheduleData)
+    logger.info(f"Schedule={scheduleData}")
 
     #check to see if the environment variable is there or if its set to stub.
     if("POOL_TARGET" not in os.environ or os.environ["POOL_TARGET"] == "stub"):
@@ -83,7 +82,7 @@ if __name__ == '__main__':
     # before mounting anything
     #Only execute this if you are running in linux and as a service.
     #Daemonizer(cherrypy.engine).subscribe()
-    WorkerPlugin(cherrypy.engine).subscribe()
+    WorkerPlugin(cherrypy.engine, scheduleData).subscribe()
     cherrypy.tree.mount(Index(os.path.join("www")), config=app_conf)     
     cherrypy.tree.mount(LightService(), "/light" ,config=app_conf)
     cherrypy.tree.mount(PumpService(), "/pump", config=app_conf)
