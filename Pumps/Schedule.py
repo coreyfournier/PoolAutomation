@@ -5,12 +5,14 @@ from dataclasses_json import dataclass_json, LetterCase, config
 from typing import List as PyList
 from dataclass_wizard import JSONWizard
 
-
+@dataclass
 class PumpControl:
     id:int
     name:str
-    speed:Pump.Speed
+    #Name value of Pump.Speed
+    speedName:str
 
+@dataclass
 class ValveControl:
     id:int
     name:str

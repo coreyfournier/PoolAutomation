@@ -5,6 +5,8 @@ import logging
 import cherrypy
 from cherrypy.process.plugins import SimplePlugin
 from Pumps.Schedule import *
+import DependencyContainer
+from Pumps.Pump import *
 
 #https://stackoverflow.com/questions/29238079/why-is-ctrl-c-not-captured-and-signal-handler-called/29254591#29254591
 class WorkerPlugin(SimplePlugin):
@@ -71,7 +73,14 @@ class WorkerPlugin(SimplePlugin):
         if(now >= startTime and now <= endTime):
           if(not item.isRunning):
             self.bus.log(f"Running schedule {item.name} - {now}")
+            #run the set speed for each pump listed
+            self._setPumpSpeed(item, item.pumps, False)
             item.isRunning = True
+            
+        elif(item.isRunning):
+          #Turn all the pumps off
+          self._setPumpSpeed(item, item.pumps, True)
+          item.isRunning = False
         else:
           item.isRunning = False
           self.bus.log(f"Schedule {item.name} not ready - {now}")
@@ -81,6 +90,22 @@ class WorkerPlugin(SimplePlugin):
         time.sleep(self._sleep)
       except:
         self.bus.log('Error in example plugin', level = logging.ERROR, traceback = True)
+  
+  def _setPumpSpeed(self, schedule:PumpSchedule, pumps:"list[Pump]", allOff:bool):
+    if(pumps != None):
+      for pump in pumps:
+        physicalPumps = list(filter(lambda x: x[0] == pump.name, DependencyContainer.pumps))
+        if(len(physicalPumps) > 0):
+          #Get the first item and the pump tuple
+          physicalPump = physicalPumps[0][1]
+          if(allOff):
+            physicalPump.off()
+          elif(pump.speedName in Speed.__members__):
+            physicalPump.on(Speed[pump.speedName])
+          else:
+            self.bus.log(f"Schedule '{schedule.name}' with speed '{pump.speedName}' was not found")  
+        else:
+          self.bus.log(f"Schedule '{schedule.name}' with pump name '{pump.name}' not found in the available pumps")            
 
   def _do(self, arg):
     self.bus.log('handling the message: {0}'.format(arg))

@@ -8,20 +8,20 @@
         "pumps":[{
             "id":1,
             "name":"Main",
-            "speed":"SPEED_2"
+            "speedName":"SPEED_2"
         }],
         "valves":null
     },
     {
         "startTime":"12:00",
-        "endTime":"19:00",
+        "endTime":"20:20",
         "id":2,
         "name":"Main pump schedule",
         "isActive":true,
         "pumps":[{
             "id":1,
             "name":"Main",
-            "speed":"SPEED_4"
+            "speedName":"SPEED_4"
         }],
         "valves":null
     }
