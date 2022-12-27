@@ -1,1 +1,4 @@
 CherryPy==18.6.1
+dataclasses_json==0.5.7
+dataclass_wizard==0.22.2
+dataclasses==0.6

@@ -1,4 +1,3 @@
-from pickle import TRUE
 import datetime
 import cherrypy
 import os
@@ -27,6 +26,7 @@ config_root = {
     'tools.staticdir.dir' : WEB_ROOT,
     'tools.staticdir.index' : 'index.html'}
 app_conf = { '/': config_root }
+server_config = {'server.socket_host': '0.0.0.0',  'server.socket_port' : 8080}
 
 def beforePumpChange(newSpeed:Speed, oldSpeed:Speed):
     logger.info(f"Before Pump change callback. Speed changed from {oldSpeed} to {newSpeed}")
@@ -77,8 +77,8 @@ if __name__ == '__main__':
         beforePumpChange,
         afterPumpChange))]
 
-    cherrypy.config.update({'server.socket_host': '0.0.0.0',  'server.socket_port' : 8080})
 
+    cherrypy.config.update(server_config)
     # before mounting anything
     #Only execute this if you are running in linux and as a service.
     #Daemonizer(cherrypy.engine).subscribe()
@@ -87,4 +87,5 @@ if __name__ == '__main__':
     cherrypy.tree.mount(LightService(), "/light" ,config=app_conf)
     cherrypy.tree.mount(PumpService(), "/pump", config=app_conf)
     cherrypy.engine.start()
+    logger.info(f"Browse to http://localhost:{server_config['server.socket_port']}")
     cherrypy.engine.block()

@@ -1,4 +1,3 @@
-from pickle import TRUE
 import cherrypy
 import os
 from Lights.GloBrite import GloBrite 
