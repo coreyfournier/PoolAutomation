@@ -28,6 +28,8 @@
                 <select name="speed" id="speed" style="width: 250px;" onchange="speedChange(this)"></select>
             </td>
         </tr>
+    </table>
+    <div id="schedule"></div>
       <div id = "footer">
          <hr>
       </div>
@@ -52,6 +54,25 @@
                     $.each(pump.speeds, function(speedIndex, speed){
                         options.append($("<option id='pump_" + pump.index + "_" + speed.name + "' "+ (speed.isActive? "selected":"") +" />").text(speed.name));
                     });
+                });
+            });
+
+            $.getJSON("/schedule/schedules", function(result) {
+                var options = $("#schedule");
+                //don't forget error handling!
+                $.each(result, function(scheduleIndex, schedule) {
+                    var container = $("<div id='schedule-" + schedule.id + "'>")
+                    container.append("<div>"+schedule.name + (schedule.isRunning? " - running" : "") + "</div>")
+                    container.append("<div>"+schedule.startTime + " to " + schedule.startTime + "</div>")
+                    
+                    $.each(schedule.pumps, function(pumpIndex, pump){
+                        container.append($("<div id='schdule-"+schedule.id+"-pump-" + pump.id + "'>pump: " + pump.name+"</div>"));
+                    });
+
+                    $.each(schedule.valves, function(valveIndex, valve){
+                        container.append($("<div id='schdule-"+schedule.id+"-valve-" + valve.id + "'>valve: "+valve.name+"</div>"));
+                    });
+                    container.appendTo(options);                    
                 });
             });
         });

@@ -7,14 +7,14 @@ logger = DependencyContainer.get_logger(__name__)
 
 class ScheduleService:
     def __init__(self):	
-        self.pumps:"list[tuple(str,Pump)]" = DependencyContainer.pumps
-    
+        pass
+
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def schedules(self):
         """Gets all schedules active or inactive and their status
 
         Returns:
-            _type_: _description_
+            Schedule: All schedule information
         """
         return [dataclasses.asdict(item) for item in DependencyContainer.scheduleRepo.schedules]

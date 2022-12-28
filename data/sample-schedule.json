@@ -3,7 +3,7 @@
         "startTime":"07:00",
         "endTime":"09:00",
         "id":1,
-        "name":"Main pump schedule",
+        "name":"Morning schedule",
         "isActive":true,
         "pumps":[{
             "id":1,
@@ -14,9 +14,9 @@
     },
     {
         "startTime":"12:00",
-        "endTime":"20:20",
+        "endTime":"22:20",
         "id":2,
-        "name":"Main pump schedule",
+        "name":"Night time schedule",
         "isActive":true,
         "pumps":[{
             "id":1,
