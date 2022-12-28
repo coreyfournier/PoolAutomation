@@ -40,6 +40,7 @@ def afterPumpChange(newSpeed:Speed):
  
 
 if __name__ == '__main__':
+   
     dataPath = os.path.join("data")
     #This needs to be a parameter
     scheduleFile = os.path.join(dataPath, "sample-schedule.json")
@@ -47,11 +48,15 @@ if __name__ == '__main__':
     logger.info(f"Schedule={DependencyContainer.scheduleRepo}")
 
     #check to see if the environment variable is there or if its set to stub.
-    if("POOL_TARGET" not in os.environ or os.environ["POOL_TARGET"] == "stub"):
+    if("CONTROLLER_TARGET" not in os.environ or os.environ["CONTROLLER_TARGET"] == "stub"):
         GPIO = GpioStub()
         logger.info("Using GPIO Stub. Live pins will NOT be used.")
+        from lib.TempStub import TempStub
+        DependencyContainer.temperature = TempStub(50)
     else:
         import RPi.GPIO as GPIO
+        from Temperature.OneWire import OneWire
+        DependencyContainer.temperature = OneWire()
 
 
     if("LIGHT_GPIO_PIN" not in os.environ):
@@ -78,7 +83,11 @@ if __name__ == '__main__':
         },
         beforePumpChange,
         afterPumpChange))]
+    
 
+    for device in DependencyContainer.temperature.getAllDevices():
+        print(f"device={device}")
+        print(f"temp={DependencyContainer.temperature.get(device)}")
 
     cherrypy.config.update(server_config)
     # before mounting anything
