@@ -6,15 +6,13 @@ logger = DependencyContainer.get_logger(__name__)
 
 class PumpService:
     def __init__(self):	
-        self.pumps:"list[tuple(str,Pump)]" = DependencyContainer.pumps
-        
+        self.pumps:"list[tuple(str,Pump)]" = DependencyContainer.pumps        
 
     @cherrypy.expose
     def on(self, pumpIndex:int, speed:str):
         tuple = self.pumps[int(pumpIndex)]
 
         tuple[1].on(Speed[speed])
-
     
     @cherrypy.expose
     def off(self, pumpIndex:int):

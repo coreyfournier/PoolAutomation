@@ -62,8 +62,11 @@ def get_logger(logger_name:str)->logging.Logger:
 
 #from Lights.GloBrite import GloBrite 
 from Pumps.Pump import Pump
+from IO.ScheduleRepo import ScheduleRepo
 
 light = None
 
 #List of pumps description is the first item in the tuple, pump is the second.
 pumps:"list[tuple(str,Pump)]" = None
+
+scheduleRepo:ScheduleRepo = None

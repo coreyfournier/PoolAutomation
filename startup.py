@@ -8,6 +8,7 @@ from lib.GpioController import GpioController
 from cherrypy.process.plugins import Daemonizer
 from Services.LightService import LightService
 from Services.PumpService import PumpService
+from Services.ScheduleService import ScheduleService
 from Index import Index
 from Pumps.Pump import Pump
 from Pumps.RelayPump import *
@@ -15,6 +16,7 @@ import DependencyContainer
 import asyncio
 from lib.WorkerPlugin import WorkerPlugin
 from Pumps.Schedule import *
+from IO.ScheduleRepo import ScheduleRepo
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -41,8 +43,8 @@ if __name__ == '__main__':
     dataPath = os.path.join("data")
     #This needs to be a parameter
     scheduleFile = os.path.join(dataPath, "sample-schedule.json")
-    scheduleData = getSchedules(scheduleFile)
-    logger.info(f"Schedule={scheduleData}")
+    DependencyContainer.scheduleRepo = ScheduleRepo(scheduleFile)
+    logger.info(f"Schedule={DependencyContainer.scheduleRepo}")
 
     #check to see if the environment variable is there or if its set to stub.
     if("POOL_TARGET" not in os.environ or os.environ["POOL_TARGET"] == "stub"):
@@ -82,10 +84,11 @@ if __name__ == '__main__':
     # before mounting anything
     #Only execute this if you are running in linux and as a service.
     #Daemonizer(cherrypy.engine).subscribe()
-    WorkerPlugin(cherrypy.engine, scheduleData).subscribe()
+    WorkerPlugin(cherrypy.engine, DependencyContainer.scheduleRepo.schedules).subscribe()
     cherrypy.tree.mount(Index(os.path.join("www")), config=app_conf)     
     cherrypy.tree.mount(LightService(), "/light" ,config=app_conf)
     cherrypy.tree.mount(PumpService(), "/pump", config=app_conf)
+    cherrypy.tree.mount(ScheduleService(), "/schedule", config=app_conf)
     cherrypy.engine.start()
     logger.info(f"Browse to http://localhost:{server_config['server.socket_port']}")
     cherrypy.engine.block()

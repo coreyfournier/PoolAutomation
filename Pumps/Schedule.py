@@ -32,7 +32,7 @@ class Control(JSONWizard):
     
     isActive:bool = True
     #Pump speed to set when the schedule expires. Should be off
-    offSpeed:Pump.Speed = Pump.Speed.OFF
+    offSpeedName:str = Pump.Speed.OFF.name
     #Set by the worker to indicate if it's running
     isRunning:bool = False
 
@@ -45,9 +45,3 @@ class PumpSchedule(Control):
 
     startDate:datetime.date = None    
     endDate:datetime.date = None
-
-def getSchedules(file:str) -> "list[PumpSchedule]":
-    with open(file) as f:
-        scheduleJson = f.read()
-        data = PumpSchedule.schema().loads(scheduleJson, many=True) 
-        return data
