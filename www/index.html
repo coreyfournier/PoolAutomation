@@ -1,39 +1,71 @@
 <!DOCTYPE html >
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <html>
-    <script src="/js/jquery-3.6.3.min.js" crossorigin="anonymous"></script>
+    
    <head>
       <title>Pool Controls</title>
+      <!-- Bootstrap -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/site.css">
    </head>
+    <script src="/js/jquery-3.6.3.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
 	
-   <body class="index">
-    <table>
-        <tr>
-            <td valign="top">
-                <div id="header">
-                    <h1>GloBrite Color Changer</h1>
+   <body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Schedules</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="schedule"></div>
+                    </div>
                 </div>
-                    
-                <p>Choose A Scene</p>
-                <select name="scene" id="scene" style="width: 250px;"><option value="-1">-</option>></select>
-                <button onclick="sceneChange()">Change</button>
-                <br>
-                <br>
-                <button onclick="lightOff()">Off</button>
-            </td>
-            <td valign="top">
-                <div id="header">
-                    <h1>Pump</h1>
+            </div>
+    </div>    
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">GloBrite Color Changer</h3>
                 </div>
-                <select name="speed" id="speed" style="width: 250px;" onchange="speedChange(this)"></select>
+                <div class="panel-body">
+                    <p>Choose A Scene</p>
+                    <select name="scene" id="scene" style="width: 250px;"><option value="-1">-</option>></select>
+                    <button onclick="sceneChange()">Change</button>
+                    <br>
+                    <br>
+                    <button onclick="lightOff()">Off</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Pump</h3>
+                </div>
+                <div class="panel-body">
+                    <select name="speed" id="speed" style="width: 250px;" onchange="speedChange(this)"></select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <table class="table">
+        <tr>            
+            <td valign="top">                                
             </td>
         </tr>
     </table>
-    <div id="schedule"></div>
-      <div id = "footer">
+
+    
+      <div id="footer">
          <hr>
       </div>
-		
+    </div>		
    </body>
 	<script>
         $(document).ready(function(){

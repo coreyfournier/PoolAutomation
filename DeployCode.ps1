@@ -24,5 +24,7 @@ Invoke-Expression -Command "pscp -r -pw $($password) Lights\*.py  $($computer):$
 Invoke-Expression -Command "pscp -r -pw $($password) Temperature\*.py  $($computer):$($targetPath)Temperature"
 Invoke-Expression -Command "pscp -r -pw $($password) www\*.*  $($computer):$($targetPath)www"
 Invoke-Expression -Command "pscp -r -pw $($password) www\js\*.*  $($computer):$($targetPath)www/js"
+Invoke-Expression -Command "pscp -r -pw $($password) www\css\*.*  $($computer):$($targetPath)www/css"
+Invoke-Expression -Command "pscp -r -pw $($password) www\fonts\*.*  $($computer):$($targetPath)www/fonts"
 Invoke-Expression -Command "pscp -r -pw $($password) IO\*.py  $($computer):$($targetPath)IO"
 Invoke-Expression -Command "pscp -r -pw $($password) data\*.*  $($computer):$($targetPath)data"
