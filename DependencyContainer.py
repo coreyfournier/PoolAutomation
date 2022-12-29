@@ -75,3 +75,5 @@ pumps:"list[tuple(str,Pump)]" = None
 scheduleRepo:ScheduleRepo = None
 
 temperature:Temperature = None
+#List of devices available. key is the name of the device, second is the device id
+temperatureDevices:"dict[str,str]" = {}

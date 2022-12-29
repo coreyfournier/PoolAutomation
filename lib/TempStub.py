@@ -5,8 +5,13 @@ class TempStub(Temperature):
     def __init__(self, defaultTempInCelsius:float) -> None:
         super().__init__()
         self.defaultTempInCelsius = defaultTempInCelsius
+        #temp tracking. used to store the last value
+        self.__tracked:dict[str,float] = {}
 
     def get(self, deviceId:str)-> float:
+        
+        self.__tracked[deviceId] = self.defaultTempInCelsius
+
         if(DependencyContainer.tempFormat == "c"):
             return self.defaultTempInCelsius
         else:

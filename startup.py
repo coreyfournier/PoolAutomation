@@ -57,6 +57,7 @@ if __name__ == '__main__':
         import RPi.GPIO as GPIO
         from Temperature.OneWire import OneWire
         DependencyContainer.temperature = OneWire()
+        DependencyContainer.temperatureDevices = {"":""}
 
 
     if("LIGHT_GPIO_PIN" not in os.environ):
@@ -71,6 +72,11 @@ if __name__ == '__main__':
     else:
         pumpPins = [int(x) for x in os.environ["PUMP_GPIO_PINS"].split(",")]
         
+
+    for device in DependencyContainer.temperature.getAllDevices():
+        print(f"device={device}")
+        print(f"temp={DependencyContainer.temperature.get(device)}")
+        
     #Add light controller here
     DependencyContainer.light = GloBrite(GpioController(GPIO, int(gpio_pin)))
     #All all pumps here with thier name
@@ -82,12 +88,9 @@ if __name__ == '__main__':
             Speed.SPEED_4: GpioController(GPIO, pumpPins[3], 0)
         },
         beforePumpChange,
-        afterPumpChange))]
-    
+        afterPumpChange))]    
 
-    for device in DependencyContainer.temperature.getAllDevices():
-        print(f"device={device}")
-        print(f"temp={DependencyContainer.temperature.get(device)}")
+    
 
     cherrypy.config.update(server_config)
     # before mounting anything
