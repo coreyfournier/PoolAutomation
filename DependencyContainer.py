@@ -1,6 +1,6 @@
-
 import logging
 import os
+from Temperature.Temperature import Temperature
 
 #defaults to DEBUG in the get_logger
 #This must be set BEFORE any imports of custom code because it calls get_logger
@@ -9,6 +9,9 @@ log_level:int = None
 #Set a file path here to redirect logging to a file.
 #This must be set BEFORE any imports of custom code because it calls get_logger
 log_to_file:str = None
+
+#f= fahrenheit c=celsius 
+tempFormat = "f"
 
 _nameToLevel = {
     'CRITICAL': logging.CRITICAL,
@@ -70,3 +73,7 @@ light = None
 pumps:"list[tuple(str,Pump)]" = None
 
 scheduleRepo:ScheduleRepo = None
+
+temperature:Temperature = None
+#List of devices available. key is the name of the device, second is the device id
+temperatureDevices:"dict[str,str]" = {}
