@@ -9,6 +9,7 @@ from cherrypy.process.plugins import Daemonizer
 from Services.LightService import LightService
 from Services.PumpService import PumpService
 from Services.ScheduleService import ScheduleService
+from Services.TemperatureService import TemperatureService
 from Index import Index
 from Pumps.Pump import Pump
 from Pumps.RelayPump import *
@@ -17,6 +18,7 @@ import asyncio
 from lib.WorkerPlugin import WorkerPlugin
 from Pumps.Schedule import *
 from IO.ScheduleRepo import ScheduleRepo
+from IO.TemperatureRepo import TemperatureRepo
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -37,7 +39,6 @@ def beforePumpChange(newSpeed:Speed, oldSpeed:Speed):
 def afterPumpChange(newSpeed:Speed):
     logger.info(f"After Pump change callback. Speed changed: {newSpeed}")
 
- 
 
 if __name__ == '__main__':
    
@@ -52,12 +53,10 @@ if __name__ == '__main__':
         GPIO = GpioStub()
         logger.info("Using GPIO Stub. Live pins will NOT be used.")
         from lib.TempStub import TempStub
-        DependencyContainer.temperature = TempStub(50)
+        DependencyContainer.temperatureDevices = TemperatureRepo(os.path.join(dataPath, "sample-temperature-devices.json")).getDevices()
     else:
         import RPi.GPIO as GPIO
-        from Temperature.OneWire import OneWire
-        DependencyContainer.temperature = OneWire()
-        DependencyContainer.temperatureDevices = {"":""}
+        DependencyContainer.temperatureDevices = TemperatureRepo(os.path.join(dataPath, "temperature-devices.json")).getDevices()
 
 
     if("LIGHT_GPIO_PIN" not in os.environ):
@@ -67,20 +66,12 @@ if __name__ == '__main__':
         gpio_pin = os.environ.get("LIGHT_GPIO_PIN")
 
     if("PUMP_GPIO_PINS" not in os.environ):
-        logger.warning("GPIO pins not set for the pump in environment variable 'PUMP_GPIO_PINS', defaulting to 1,2,3,4")
-        pumpPins = [1,2,3,4]
+        logger.warning("GPIO pins not set for the pump in environment variable 'PUMP_GPIO_PINS'. No pumps will be loaded")
+        DependencyContainer.pumps = []
     else:
         pumpPins = [int(x) for x in os.environ["PUMP_GPIO_PINS"].split(",")]
-        
-
-    for device in DependencyContainer.temperature.getAllDevices():
-        print(f"device={device}")
-        print(f"temp={DependencyContainer.temperature.get(device)}")
-        
-    #Add light controller here
-    DependencyContainer.light = GloBrite(GpioController(GPIO, int(gpio_pin)))
-    #All all pumps here with thier name
-    DependencyContainer.pumps = [("Main", RelayPump(
+        #All all pumps here with thier name
+        DependencyContainer.pumps = [("Main", RelayPump(
         {
             Speed.SPEED_1: GpioController(GPIO, pumpPins[0], 0),
             Speed.SPEED_2: GpioController(GPIO, pumpPins[1], 0),
@@ -88,10 +79,12 @@ if __name__ == '__main__':
             Speed.SPEED_4: GpioController(GPIO, pumpPins[3], 0)
         },
         beforePumpChange,
-        afterPumpChange))]    
-
+        afterPumpChange))]
+        
+            
+    #Add light controller here
+    DependencyContainer.light = GloBrite(GpioController(GPIO, int(gpio_pin)))
     
-
     cherrypy.config.update(server_config)
     # before mounting anything
     #Only execute this if you are running in linux and as a service.
@@ -101,6 +94,7 @@ if __name__ == '__main__':
     cherrypy.tree.mount(LightService(), "/light" ,config=app_conf)
     cherrypy.tree.mount(PumpService(), "/pump", config=app_conf)
     cherrypy.tree.mount(ScheduleService(), "/schedule", config=app_conf)
+    cherrypy.tree.mount(TemperatureService(), "/temperature", config=app_conf)
     cherrypy.engine.start()
     logger.info(f"Browse to http://localhost:{server_config['server.socket_port']}")
     cherrypy.engine.block()

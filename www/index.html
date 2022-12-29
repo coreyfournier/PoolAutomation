@@ -14,7 +14,7 @@
    <body>
     <div class="container">
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">Schedules</h3>
@@ -24,9 +24,10 @@
                     </div>
                 </div>
             </div>
-    </div>    
-    <div class="row">
-        <div class="col-sm-4">
+
+            <div class="col-sm-2" id="temperature"></div>
+
+            <div class="col-sm-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">GloBrite Color Changer</h3>
@@ -53,14 +54,6 @@
             </div>
         </div>
     </div>
-
-    <table class="table">
-        <tr>            
-            <td valign="top">                                
-            </td>
-        </tr>
-    </table>
-
     
       <div id="footer">
          <hr>
@@ -91,20 +84,53 @@
 
             $.getJSON("/schedule/schedules", function(result) {
                 var options = $("#schedule");
-                //don't forget error handling!
-                $.each(result, function(scheduleIndex, schedule) {
-                    var container = $("<div id='schedule-" + schedule.id + "'>")
-                    container.append("<div>"+schedule.name + (schedule.isRunning? " - running" : "") + "</div>")
-                    container.append("<div>"+schedule.startTime + " to " + schedule.startTime + "</div>")
-                    
-                    $.each(schedule.pumps, function(pumpIndex, pump){
-                        container.append($("<div id='schdule-"+schedule.id+"-pump-" + pump.id + "'>pump: " + pump.name+"</div>"));
-                    });
+                var container = $("<table class='table'>");
+                    container.append("<tr><th></th><th class='time'>Start</th><th class='time'>End</th><th class='details'>Pumps</th><th class='details'>Valves</th></tr>");
 
-                    $.each(schedule.valves, function(valveIndex, valve){
-                        container.append($("<div id='schdule-"+schedule.id+"-valve-" + valve.id + "'>valve: "+valve.name+"</div>"));
+                //don't forget error handling!
+                $.each(result, function(scheduleIndex, schedule) {                         
+                    var row = "<tr id='schedule-" + schedule.id + "'>";
+                    
+                    row += "<th>"+schedule.name + (schedule.isRunning? " - running" : "") + "</th>";
+                    row += "<td>"+schedule.startTime + "</td><td>" + schedule.endTime + "</td>";
+                    
+                    row += "<td>";
+                    $.each(schedule.pumps, function(pumpIndex, pump){
+                        row+="<div id='schdule-"+schedule.id+"-pump-" + pump.id + "'>" + pump.name + " (" + pump.speedName + ")</div>";
                     });
-                    container.appendTo(options);                    
+                    row += "</td>";
+
+                    row += "<td>";
+                    $.each(schedule.valves, function(valveIndex, valve){
+                        row+= "<div id='schdule-"+schedule.id+"-valve-" + valve.id + "'>" + valve.name + "</div>";
+                    });
+                    row += "</td>";
+                    row +="</tr>";
+
+                    container.append(row);                    
+                });
+
+                options.append(container);
+            });
+
+            $.getJSON("/temperature/sensors", function(result) {
+                var options = $("#temperature");
+                //don't forget error handling!
+                $.each(result, function(tempIndex, temp) {
+                    container = `
+                        <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">%name%</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div>%temperature%</div>
+                        </div>
+                    </div>
+                    `;
+                    container = container.replace("%name%", temp.name)
+                    container = container.replace("%temperature%", temp.temp)
+                    
+                    options.append(container);
                 });
             });
         });

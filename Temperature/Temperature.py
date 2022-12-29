@@ -1,40 +1,40 @@
 import DependencyContainer
 
 class Temperature:
-    def __init__(self) -> None:
+    def __init__(self, deviceId:str) -> None:
+        self._deviceId:str = deviceId
         #temp tracking. used to store the last value
         self._tracked:dict[str,float] = {}
 
-    def get(self, deviceId:str)-> float:
+    def get(self)-> float:
+        """Gets the temp of the device id
+
+        Returns:
+            float: temp in fahrenheit or celsius. This is set in the Dependency container.
+        """
         pass
     
-    def celsiusToFahrenheit(self, celsius:float) -> float:
+    def _celsiusToFahrenheit(self, celsius:float) -> float:
         return celsius * 9.0 / 5.0 + 32.0
     
     def getAllDevices(self)-> "list[str]":
-        """Gets all one wire temp devices
+        """Gets all devices for this type of temp sensor
 
         Returns:
-            list[str]: All devices and thier path
+            list[str]: All device ids
         """
         pass
 
-    def getLast(self, deviceId:str) -> float:
-        """Gets the last reading for the sensor. None when there are no previous readings
-
-        Args:
-            deviceId (str): Device id
+    def getLast(self) -> float:
+        """Remmbers the last temp for the last get and returns it.
 
         Returns:
-            float: temp
+            float: _description_
         """
-        pass
-
-    def getLast(self, deviceId:str) -> float:
-        if(deviceId in self._tracked):            
+        if(self._deviceId in self._tracked):            
             if(DependencyContainer.tempFormat == "c"):
-                return self._tracked[deviceId]
+                return self._tracked[self._deviceId]
             else:
-                return self.celsiusToFahrenheit(self._tracked[deviceId])
+                return self._celsiusToFahrenheit(self._tracked[self._deviceId])
         else:
             return None

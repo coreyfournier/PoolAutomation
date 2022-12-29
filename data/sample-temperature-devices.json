@@ -1,18 +1,27 @@
 [
     {
+        "type":"TempStub",
         "name":"Solar Heat",
-        "deviceId":"/sys/bus/w1/devices/28-3c9df6480338"
+        "deviceId":"/sys/bus/w1/devices/28-3c9df6480338",
+        "defaultTemp":20
     },
     {
+        "type":"TempStub",
         "name":"Roof",
-        "deviceId":"/sys/bus/w1/devices/28-3cbaf648b71a"
+        "deviceId":"/sys/bus/w1/devices/28-3cbaf648b71a",
+        "defaultTemp":40
     },
     {
+        "type":"TempStub",
         "name":"Ambient",
-        "deviceId":"/sys/bus/w1/devices/28-3c01f0963d61"
+        "deviceId":"/sys/bus/w1/devices/28-3c01f0963d61",
+        "defaultTemp":50
     },
     {
+        "type":"TempStub",
         "name":"Pump Intake (Pool temp)",
-        "deviceId":"/sys/bus/w1/devices/28-3c9bf6482cdd"
+        "deviceId":"/sys/bus/w1/devices/28-3c9bf6482cdd",
+        "defaultTemp":30
+
     }
 ]

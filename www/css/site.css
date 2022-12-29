@@ -16,3 +16,12 @@ body {
   .theme-showcase .navbar .container {
     width: auto;
   }
+  #schedule .time {
+    width:50px;
+
+  }
+
+  #schedule .details {
+    width:120px;
+
+  }
