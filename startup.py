@@ -48,7 +48,7 @@ if __name__ == '__main__':
    
     dataPath = os.path.join("data")
     #This needs to be a parameter
-    scheduleFile = os.path.join(dataPath, "sample-schedule.json")
+    scheduleFile = os.path.join(dataPath, "schedule.json")
     DependencyContainer.scheduleRepo = ScheduleRepo(scheduleFile)
     logger.info(f"Schedule={DependencyContainer.scheduleRepo}")
 
