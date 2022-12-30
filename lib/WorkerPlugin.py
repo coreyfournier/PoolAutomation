@@ -71,7 +71,7 @@ class WorkerPlugin(SimplePlugin):
                     device.get(False)
                 else:
                     totalChange = abs(lastTemp - device.get(False))
-                    if(totalChange >= 0):
+                    if(totalChange > 0.0):
                         device.notifyChangeListner()
 
     def _checkSchedule(self):

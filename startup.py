@@ -64,10 +64,14 @@ if __name__ == '__main__':
         GPIO = GpioStub()
         logger.info("Using GPIO Stub. Live pins will NOT be used.")
         from lib.TempStub import TempStub
-        DependencyContainer.temperatureDevices = TemperatureRepo(os.path.join(dataPath, "sample-temperature-devices.json")).getDevices()
+        DependencyContainer.temperatureDevices = TemperatureRepo(
+                os.path.join(dataPath, "sample-temperature-devices.json")
+            ).getDevices(tempChangeNotification)
     else:
         import RPi.GPIO as GPIO
-        DependencyContainer.temperatureDevices = TemperatureRepo(os.path.join(dataPath, "temperature-devices.json")).getDevices()
+        DependencyContainer.temperatureDevices = TemperatureRepo(
+                os.path.join(dataPath, "temperature-devices.json")
+            ).getDevices(tempChangeNotification)
 
 
     if("LIGHT_GPIO_PIN" not in os.environ):
