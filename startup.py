@@ -50,6 +50,15 @@ def tempChangeNotification(changedDevice:Temperature):
 
     logger.info(f"Temp changed for: {name} Id:{device.getDeviceId()} Temp:{device.getLast()}")
 
+    #TODO: this needs to be made into a configuration. Not sure how to architect it yet.
+    if("ambient" in name.lower() and device.getLast() <= 33):
+        logger.info(f"Temp has reached freezing... Need to turn on pump to prevent freezing")
+        for pump in DependencyContainer.pumps:            
+            if(pump[0] == "Main"):
+                #Chaning the pump to a steady speed to prevent freezing
+                pump[1].on(Speed.SPEED_4)
+
+
 
 if __name__ == '__main__':
    
