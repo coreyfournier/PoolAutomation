@@ -35,7 +35,7 @@ class Temperature:
         pass
 
     def getLast(self) -> float:
-        """Remmbers the last temp for the last get and returns it.
+        """Remembers the last temp for the last get and returns it.
 
         Returns:
             float: _description_

@@ -102,7 +102,7 @@ class WorkerPlugin(SimplePlugin):
                 item.isRunning = False
             else:
                 item.isRunning = False
-                self.bus.log(f"Schedule {item.name} not ready - {now}")
+                #self.bus.log(f"Schedule {item.name} not ready - {now}")
 
     def _setPumpSpeed(self, schedule:PumpSchedule, pumps:"list[Pump]", allOff:bool):
         if(pumps != None):

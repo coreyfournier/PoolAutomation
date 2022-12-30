@@ -40,8 +40,15 @@ def beforePumpChange(newSpeed:Speed, oldSpeed:Speed):
 def afterPumpChange(newSpeed:Speed):
     logger.info(f"After Pump change callback. Speed changed: {newSpeed}")
 
-def tempChangeNotification(device:Temperature):
-    logger.info(f"Temp changed for: {device.getDeviceId()} {device.getLast()}")
+def tempChangeNotification(changedDevice:Temperature):
+    devices = DependencyContainer.temperatureDevices
+    name = ""
+    for key, device in devices.items():
+        if(device.getDeviceId() == changedDevice.getDeviceId()):
+            name = key
+            break
+
+    logger.info(f"Temp changed for: {name} Id:{device.getDeviceId()} Temp:{device.getLast()}")
 
 
 if __name__ == '__main__':
