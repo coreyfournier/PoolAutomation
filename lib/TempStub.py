@@ -1,17 +1,16 @@
 from Temperature.Temperature import Temperature
 import DependencyContainer
 import random
+from typing import Callable
 
 class TempStub(Temperature):
-    def __init__(self, defaultTempInCelsius:float) -> None:
-        super().__init__(str(random.random()))
+    def __init__(self, defaultTempInCelsius:float, onChangeListner:Callable = None) -> None:
+        super().__init__(str(random.random()), onChangeListner)
         self.defaultTempInCelsius = defaultTempInCelsius
-        #temp tracking. used to store the last value
-        self.__tracked:dict[str,float] = {}
-
-    def get(self)-> float:
         
-        self.__tracked[self._deviceId] = self.defaultTempInCelsius
+    def get(self, allowCached:bool = True)-> float:
+        
+        self._tracked[self._deviceId] = self.defaultTempInCelsius
 
         if(DependencyContainer.tempFormat == "c"):
             return self.defaultTempInCelsius

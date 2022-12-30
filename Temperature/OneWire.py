@@ -9,8 +9,8 @@ os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
 
 class OneWire(Temperature):
-    def __init__(self, deviceId:str, baseDeviceDirectory:str = "/sys/bus/w1/devices/", devicePrefix:str = "28*") -> None:
-        super().__init__(deviceId)
+    def __init__(self, deviceId:str ,onChangeListner:callable = None, baseDeviceDirectory:str = "/sys/bus/w1/devices/", devicePrefix:str = "28*") -> None:
+        super().__init__(deviceId, onChangeListner)
         self.__base_dir = baseDeviceDirectory
         self.__devicePrefix = devicePrefix
 
@@ -42,9 +42,12 @@ class OneWire(Temperature):
             temp_c = float(temp_string) / 1000.0            
             return temp_c
     
-    def get(self)-> float:
-        tempC = self.__read_temp(self._deviceId)
-        self._tracked[self._deviceId] = tempC
+    def get(self, allowCached:bool = True)-> float:
+        if(allowCached):
+            tempC = self._tracked[self._deviceId]
+        else:
+            tempC = self.__read_temp(self._deviceId)
+            self._tracked[self._deviceId] = tempC
         
         if(DependencyContainer.tempFormat == "c"):
             return tempC

@@ -13,6 +13,9 @@ log_to_file:str = None
 #f= fahrenheit c=celsius 
 tempFormat = "f"
 
+#How much change in temp required before a notification.
+tempAmoundChangeForEvent = .5
+
 _nameToLevel = {
     'CRITICAL': logging.CRITICAL,
     'FATAL': logging.FATAL,

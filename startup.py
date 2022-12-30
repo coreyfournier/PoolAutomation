@@ -19,6 +19,7 @@ from lib.WorkerPlugin import WorkerPlugin
 from Pumps.Schedule import *
 from IO.ScheduleRepo import ScheduleRepo
 from IO.TemperatureRepo import TemperatureRepo
+from Temperature.Temperature import Temperature
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -38,6 +39,9 @@ def beforePumpChange(newSpeed:Speed, oldSpeed:Speed):
 
 def afterPumpChange(newSpeed:Speed):
     logger.info(f"After Pump change callback. Speed changed: {newSpeed}")
+
+def tempChangeNotification(device:Temperature):
+    logger.info(f"Temp changed for: {device.getDeviceId()} {device.getLast()}")
 
 
 if __name__ == '__main__':
