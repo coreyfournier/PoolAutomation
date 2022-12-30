@@ -20,6 +20,8 @@ from Pumps.Schedule import *
 from IO.ScheduleRepo import ScheduleRepo
 from IO.TemperatureRepo import TemperatureRepo
 from Temperature.Temperature import Temperature
+from lib.Actions import *
+from lib.Variables import *
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -46,6 +48,7 @@ def tempChangeNotification(changedDevice:Temperature):
     for key, device in devices.items():
         if(device.getDeviceId() == changedDevice.getDeviceId()):
             name = key
+            DependencyContainer.actions.notifyTemperatureChangeListners(key, device)
             break
 
     logger.info(f"Temp changed for: {name} Id:{device.getDeviceId()} Temp:{device.getLast()}")
@@ -57,6 +60,9 @@ def tempChangeNotification(changedDevice:Temperature):
             if(pump[0] == "Main"):
                 #Chaning the pump to a steady speed to prevent freezing
                 pump[1].on(Speed.SPEED_4)
+
+def variableChangeNotification(variable:Variable, oldValue:any):
+    pass
 
 
 
@@ -108,6 +114,34 @@ if __name__ == '__main__':
             
     #Add light controller here
     DependencyContainer.light = GloBrite(GpioController(GPIO, int(gpio_pin)))
+
+    DependencyContainer.actions = Variables(
+        [
+            #Denotes if the slide is on or off. This will be a button
+            Variable("slide","Slide", False, bool),
+            #The roof must be this temp + current pool temp before the heater turns on.
+            Variable("solar-min-roof-diff","Minimum roof temp", 5, float),
+            Variable("solar-set-heat","Heater temp", 90, float)
+        ],
+        variableChangeNotification)
+
+    DependencyContainer.actions = Actions([
+        Action("Slide","slide",True, 
+            #on variable change
+            lambda name, var : logger.info(f"variable changed = {name}"), 
+            #on Temp change
+            lambda key, temp : logger.info(f"Temp {key} changed={temp}")),
+        Action("freeze-prevention", "Freeze Prevention", True,
+            None,
+            #on Temp change
+            lambda key, temp : logger.info(f"Prevent freezeTemp {key} changed={temp}")
+        ),
+        Action("solar-heat","Solar Heater",True, 
+            #on variable change
+            lambda name, var : logger.info(f"Solar heater variable changed = {name}"), 
+            #on Temp change
+            lambda key, temp : logger.info(f"Solar heater Temp {key} changed={temp}"))
+    ])
     
     cherrypy.config.update(server_config)
     # before mounting anything

@@ -1,6 +1,8 @@
 import logging
 import os
 from Temperature.Temperature import Temperature
+from lib.Actions import *
+from lib.Variables import *
 
 #defaults to DEBUG in the get_logger
 #This must be set BEFORE any imports of custom code because it calls get_logger
@@ -76,3 +78,7 @@ scheduleRepo:ScheduleRepo = None
 
 #List of devices available. key is the name of the device, second is the device
 temperatureDevices:"dict[str,Temperature]" = {}
+
+actions:Actions = None
+
+variables:Variables = None
