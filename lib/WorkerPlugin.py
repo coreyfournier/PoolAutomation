@@ -71,7 +71,7 @@ class WorkerPlugin(SimplePlugin):
                     device.get(False)
                 else:
                     totalChange = abs(lastTemp - device.get(False))
-                    if(totalChange >= DependencyContainer.tempAmoundChangeForEvent):
+                    if(totalChange >= 0):
                         device.notifyChangeListner()
 
     def _checkSchedule(self):
