@@ -1,6 +1,7 @@
 from typing import Callable
 import DependencyContainer
 from dataclasses import dataclass
+from IO.VariableRepo import VariableRepo
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -16,7 +17,7 @@ class Variable:
     dataType:type
 
 class Variables:
-    def __init__(self, variables:"list[Variable]", onChangeListner:Callable) -> None:
+    def __init__(self, variables:"list[Variable]", onChangeListner:Callable, repo:VariableRepo) -> None:
         """Class constructor
 
         Args:
@@ -24,6 +25,7 @@ class Variables:
         """
         self._onChangeListner:Callable = onChangeListner
         self._variables:"dict[str, Variable]" = {}
+        self._repo:VariableRepo = repo
         if(variables != None):
             for var in variables:
                 self.addVariable(var)
@@ -42,8 +44,13 @@ class Variables:
         self._onChangeListner(self._variables[name], oldValue)
     
     def get(self, name:str) -> Variable:
-        return self._variables[name]
+        if(name in self._variables):
+            return self._variables[name]
+        else:
+            return None
     
+    def save(self) -> None:
+        self._repo.save()
 
 
     

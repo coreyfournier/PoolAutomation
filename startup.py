@@ -62,8 +62,7 @@ def tempChangeNotification(changedDevice:Temperature):
                 pump[1].on(Speed.SPEED_4)
 
 def variableChangeNotification(variable:Variable, oldValue:any):
-    pass
-
+    logger.info(f"Variable {variable.name} was changed from {oldValue} to {variable.value}")
 
 
 if __name__ == '__main__':
