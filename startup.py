@@ -21,7 +21,9 @@ from IO.ScheduleRepo import ScheduleRepo
 from IO.TemperatureRepo import TemperatureRepo
 from Temperature.Temperature import Temperature
 from lib.Actions import *
-from lib.Variables import *
+from lib.Variables import Variables
+from IO.VariableRepo import *
+from lib.Variable import Variable
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -70,6 +72,7 @@ if __name__ == '__main__':
     dataPath = os.path.join("data")
     #This needs to be a parameter
     scheduleFile = os.path.join(dataPath, "schedule.json")
+    variableFile = os.path.join(dataPath,"variables.json")
     DependencyContainer.scheduleRepo = ScheduleRepo(scheduleFile)
     logger.info(f"Schedule={DependencyContainer.scheduleRepo}")
 
@@ -114,15 +117,17 @@ if __name__ == '__main__':
     #Add light controller here
     DependencyContainer.light = GloBrite(GpioController(GPIO, int(gpio_pin)))
 
-    DependencyContainer.actions = Variables(
+    DependencyContainer.variables = Variables(
+        #defaults
         [
             #Denotes if the slide is on or off. This will be a button
             Variable("slide","Slide", False, bool),
             #The roof must be this temp + current pool temp before the heater turns on.
             Variable("solar-min-roof-diff","Minimum roof temp", 5, float),
-            Variable("solar-set-heat","Heater temp", 90, float)
+            Variable("solar-set-heat","Heater temp", 90.0, float)
         ],
-        variableChangeNotification)
+        variableChangeNotification,
+        VariableRepo(variableFile))
 
     DependencyContainer.actions = Actions([
         Action("Slide","slide",True, 
@@ -141,7 +146,7 @@ if __name__ == '__main__':
             #on Temp change
             lambda key, temp : logger.info(f"Solar heater Temp {key} changed={temp}"))
     ])
-    
+
     cherrypy.config.update(server_config)
     # before mounting anything
     #Only execute this if you are running in linux and as a service.

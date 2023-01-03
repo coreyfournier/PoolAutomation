@@ -14,10 +14,9 @@ class Action:
 
 class Actions:
     def __init__(self, actions:"list[Action]" = None) -> None:
+        self._registered:"dict[str,Action]" = {}
         #All actions registered
-        if(actions == None):
-            self._registered:"dict[str,Action]" = {}
-        else:
+        if(actions != None):
             for item in actions:
                 self._registered[item.name] = item
     

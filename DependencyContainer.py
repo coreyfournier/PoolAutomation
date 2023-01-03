@@ -1,8 +1,5 @@
 import logging
 import os
-from Temperature.Temperature import Temperature
-from lib.Actions import *
-from lib.Variables import *
 
 #defaults to DEBUG in the get_logger
 #This must be set BEFORE any imports of custom code because it calls get_logger
@@ -26,7 +23,7 @@ _nameToLevel = {
     'NOTSET': logging.NOTSET,
 }
 
-def get_logger(logger_name:str)->logging.Logger:
+def get_logger(logger_name:str) -> logging.Logger:
     """Gets a universal logger specific to the caller
         Defaults the log level to DEBUG, if not environment variable is found for LOG_LEVEL
     Args:
@@ -68,6 +65,9 @@ def get_logger(logger_name:str)->logging.Logger:
 #from Lights.GloBrite import GloBrite 
 from Pumps.Pump import Pump
 from IO.ScheduleRepo import ScheduleRepo
+from Temperature.Temperature import Temperature
+from lib.Actions import *
+from lib.Variables import Variables
 
 light = None
 

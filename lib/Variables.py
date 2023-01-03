@@ -1,20 +1,9 @@
 from typing import Callable
-import DependencyContainer
-from dataclasses import dataclass
 from IO.VariableRepo import VariableRepo
+from lib.Variable import Variable
+import DependencyContainer
 
 logger = DependencyContainer.get_logger(__name__)
-
-@dataclass
-class Variable:
-    #What this will be refered to in the back end
-    name:str
-    #What will be shown to the user
-    displayName:str
-    #What will be stored here
-    value:any
-    #The intented data type
-    dataType:type
 
 class Variables:
     def __init__(self, variables:"list[Variable]", onChangeListner:Callable, repo:VariableRepo) -> None:
@@ -24,35 +13,32 @@ class Variables:
             onChangeListner (Callable): Function accepting (Variable, oldValue)
         """
         self._onChangeListner:Callable = onChangeListner
-        self._variables:"dict[str, Variable]" = {}
         self._repo:VariableRepo = repo
         if(variables != None):
+            hasAny = len(self._repo.get()) > 0
             for var in variables:
                 self.addVariable(var)
+            #if there was none in the repo, but there were variables, then same them.
+            if(not hasAny):
+                self.save()
+
     
-    def addVariable(self, variable:Variable) -> None:
-        
-        if(variable.name in self._variables):
-            raise Exception(f"A variable by the name {variable.name} has already been added.")
-        else:
-            self._variables[variable.name] = variable
+    def addVariable(self, variable:Variable) -> None:        
+        self._repo.add(variable)
     
     def updateValue(self, name:str, value:any) -> None:
-        oldValue = self._variables[name].value        
-        self._variables[name].value = value
-
-        self._onChangeListner(self._variables[name], oldValue)
-    
-    def get(self, name:str) -> Variable:
-        if(name in self._variables):
-            return self._variables[name]
-        else:
-            return None
-    
-    def save(self) -> None:
+        variable = self._repo.get()[name]
+        oldValue = variable.value        
+        variable.value = value
         self._repo.save()
 
-
+        self._onChangeListner(variable, oldValue)
     
-
-        
+    def get(self, name:str) -> Variable:
+        if(name in self._repo.get()):
+            return self._repo.get()[name]
+        else:
+            return None   
+    
+    def save(self):
+        self._repo.save()
