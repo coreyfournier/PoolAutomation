@@ -68,6 +68,17 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Heater</h3>
+                </div>
+                <div class="panel-body">
+                    <input type="number" min="80" step=".5" max="92" class="form-control" id="heater-temperature">
+                </div>
+            </div>
+        </div>
     </div>
     
       <div id="footer">
@@ -76,7 +87,49 @@
     </div>		
    </body>
 	<script>
+        function temperatureChanged(value)
+        {
+
+
+        }
+
         $(document).ready(function(){
+            var timeoutId = null;
+            $.getJSON("/variable/get?name=solar-set-heat", function(result) {
+                var control = $("#heater-temperature");
+                var lastValue = 0;
+                control.val(result.value);
+                control.on("input", function(item){
+                    
+                    //Adding a delay so it doesn't over load the server if you are togging through the values.
+                    if(timeoutId != null)                    
+                        clearTimeout(timeoutId);
+
+                    lastValue = $(this).val()
+
+                    timeoutId = setTimeout(function(){
+                        console.log("Changing " + lastValue);
+                        if(timeoutId != null)                    
+                            clearTimeout(timeoutId);
+
+                        $.ajax({
+                            type:"POST",
+                            dataType:"json",
+                            contentType: "application/json; charset=utf-8",
+                            data:JSON.stringify({
+                                "name":"solar-set-heat",
+                                "value": parseFloat(lastValue)
+                            }),
+                            url: '/variable/change',
+                            success: function(result){
+                                console.log('Solor heater temperature change' + JSON.stringify(result));
+                            }
+                        });
+                        
+                    }, 5000);                    
+                });
+            });
+
             var slideToggle = $('#slide-toggle');
 
             slideToggle.bootstrapToggle({
