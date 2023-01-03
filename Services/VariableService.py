@@ -12,26 +12,26 @@ class VariableService:
         pass
 
     @cherrypy.expose
+    @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
-    def change(self, name:str, value:any):
+    def change(self):
         #make sure the variable exists
+        
+        data = cherrypy.request.json
+        name = data["name"]
+        value = data["value"]
 
         variable = DependencyContainer.variables.get(name)
         if(variable == None):
-            logger.warn(f"Adding new variable '{name}'")
-            DependencyContainer.variables.addVariable(Variable(name, value, type(value)))
+            raise Exception(f"Missing variable '{name}'")
         else:
             DependencyContainer.variables.updateValue(name, value)
-            return variable
+            return variable.to_dict()
     
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def get(self, name:str):
         variable = DependencyContainer.variables.get(name)
 
-        return { 
-            "value" : variable.value,
-            "displayName" : variable.displayName,
-            "type": variable.dataType 
-        }
+        return variable.to_dict()
         

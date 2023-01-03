@@ -24,6 +24,7 @@ from lib.Actions import *
 from lib.Variables import Variables
 from IO.VariableRepo import *
 from lib.Variable import Variable
+from Services.VariableService import VariableService
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -118,7 +119,7 @@ if __name__ == '__main__':
     DependencyContainer.light = GloBrite(GpioController(GPIO, int(gpio_pin)))
 
     DependencyContainer.variables = Variables(
-        #defaults
+        #default variables
         [
             #Denotes if the slide is on or off. This will be a button
             Variable("slide","Slide", False, bool),
@@ -157,6 +158,7 @@ if __name__ == '__main__':
     cherrypy.tree.mount(PumpService(), "/pump", config=app_conf)
     cherrypy.tree.mount(ScheduleService(), "/schedule", config=app_conf)
     cherrypy.tree.mount(TemperatureService(), "/temperature", config=app_conf)
+    cherrypy.tree.mount(VariableService(), "/variable", config=app_conf)
     cherrypy.engine.start()
     logger.info(f"Browse to http://localhost:{server_config['server.socket_port']}")
     cherrypy.engine.block()

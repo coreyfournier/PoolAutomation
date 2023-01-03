@@ -7,9 +7,13 @@
       <!-- Bootstrap -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/site.css">
+    <link rel="stylesheet" href="/css/bootstrap-toggle.min.css">
+    
    </head>
     <script src="/js/jquery-3.6.3.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/bootstrap-toggle.min.js"></script>
+    
 	
    <body>
     <div class="container">
@@ -53,6 +57,17 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Slide</h3>
+                </div>
+                <div class="panel-body">
+                    <input type="checkbox" id="slide-toggle" data-style="slow">
+                </div>
+            </div>
+        </div>
     </div>
     
       <div id="footer">
@@ -62,6 +77,39 @@
    </body>
 	<script>
         $(document).ready(function(){
+            var slideToggle = $('#slide-toggle');
+
+            slideToggle.bootstrapToggle({
+                on: 'Having Fun',
+                off: 'Fun off'
+            });
+
+            $.getJSON("/variable/get?name=slide", function(result) {
+                if(result.value)
+                    slideToggle.bootstrapToggle('on');
+                else
+                    slideToggle.bootstrapToggle('off');
+
+                //Add the change logic after it loads
+
+                slideToggle.change(function() {
+                console.log($(this).prop('checked'));
+                $.ajax({
+                    type:"POST",
+                    dataType:"json",
+                    contentType: "application/json; charset=utf-8",
+                    data:JSON.stringify({
+                        "name":"slide",
+                        "value": $(this).prop('checked')
+                    }),
+                    url: '/variable/change',
+                    success: function(){
+                        console.log('Slide change');
+                    }
+                    });
+                });  
+            });
+
 
             $.getJSON("/light/descriptions", function(result) {
                 var options = $("#scene");
