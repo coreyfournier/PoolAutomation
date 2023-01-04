@@ -209,11 +209,29 @@ if __name__ == '__main__':
             lambda key, temp : logger.info(f"Solar heater Temp {key} changed={temp}"))
     ])
 
+    class _JSONEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, datetime.date):
+                return obj.isoformat()
+            return super().default(obj)
+        def iterencode(self, value):
+            # Adapted from cherrypy/_cpcompat.py
+            for chunk in super().iterencode(value):
+                yield chunk.encode("utf-8")
+
+    json_encoder = _JSONEncoder()
+
+    def json_handler(*args, **kwargs):
+        # Adapted from cherrypy/lib/jsontools.py
+        value = cherrypy.serving.request._json_inner_handler(*args, **kwargs)
+        return json_encoder.iterencode(value)
+        
     cherrypy.config.update(server_config)
     # before mounting anything
     #Only execute this if you are running in linux and as a service.
     #Daemonizer(cherrypy.engine).subscribe()
     WorkerPlugin(cherrypy.engine, DependencyContainer.scheduleRepo.schedules).subscribe()
+    cherrypy.config['tools.json_out.handler'] = json_handler
     cherrypy.tree.mount(Index(os.path.join("www")), config=app_conf)     
     cherrypy.tree.mount(LightService(), "/light" ,config=app_conf)
     cherrypy.tree.mount(PumpService(), "/pump", config=app_conf)

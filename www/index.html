@@ -11,6 +11,7 @@
     
    </head>
     <script src="/js/jquery-3.6.3.min.js"></script>
+    <script src="/js/jquery-dateformat.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/bootstrap-toggle.min.js"></script>
     
@@ -243,14 +244,17 @@
             $.getJSON("/schedule/schedules", function(result) {
                 var options = $("#schedule");
                 var container = $("<table class='table'>");
-                    container.append("<tr><th></th><th class='time'>Start</th><th class='time'>End</th><th class='details'>Pumps</th><th class='details'>Valves</th></tr>");
+                    container.append("<tr><th></th><th>Start</th><th>End</th><th class='details'>Pumps</th><th class='details'>Valves</th></tr>");
 
                 //don't forget error handling!
                 $.each(result, function(scheduleIndex, schedule) {                         
                     var row = "<tr id='schedule-" + schedule.id + "'>";
-                    
-                    row += "<th class='" + (schedule.isRunning? "status-on" : "") + "'>"+schedule.name + "</th>";
-                    row += "<td>"+schedule.startTime + "</td><td>" + schedule.endTime + "</td>";
+                    format = "HH:mm p";
+                    startTime = $.format.date(new Date(schedule.scheduleStart),format);
+                    endTime = $.format.date(new Date(schedule.scheduleEnd),format);
+
+                    row += "<th class='" + (schedule.isRunning? "status-on" : "") + "'>" + schedule.name + "</th>";
+                    row += "<td>"+startTime + "</td><td>" + endTime + " (" + schedule.duration.toFixed(2) + "hrs)</td>";
                     
                     row += "<td>";
                     $.each(schedule.pumps, function(pumpIndex, pump){

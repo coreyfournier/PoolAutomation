@@ -76,17 +76,10 @@ class WorkerPlugin(SimplePlugin):
 
     def _checkSchedule(self):
         now = datetime.datetime.now()
-        #If no end or start date is specified, put it as today
-        nowDate = now.strftime("%m/%d/%y")
 
         for item in self._scheduleData:
-            if(item.startDate == None):          
-                item.startDate = nowDate        
-            if(item.endDate == None):
-                item.endDate = nowDate
-
-            startTime = datetime.datetime.strptime(item.startTime + " " + item.startDate, "%H:%M %m/%d/%y")
-            endTime = datetime.datetime.strptime(item.endTime + " " + item.endDate, "%H:%M %m/%d/%y")
+            startTime = item.getScheduleStart(now)
+            endTime = item.getScheduleEnd(now)
 
             #run the schedule
             if(now >= startTime and now <= endTime):

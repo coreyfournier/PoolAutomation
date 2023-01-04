@@ -1,7 +1,7 @@
 [
     {
-        "startTime":"07:00",
-        "endTime":"09:59",
+        "startTime":"01/01/0001 07:00",
+        "endTime":"01/01/9999 09:59",
         "id":1,
         "name":"Morning",
         "isActive":true,
@@ -13,8 +13,8 @@
         "valves":null
     },
     {
-        "startTime":"10:00",
-        "endTime":"13:59",
+        "startTime":"01/01/0001 10:00",
+        "endTime":"01/01/9999 13:59",
         "id":2,
         "name":"Afternoon",
         "isActive":true,
@@ -26,8 +26,8 @@
         "valves":null
     },
     {
-        "startTime":"14:00",
-        "endTime":"22:59",
+        "startTime":"01/01/0001 14:00",
+        "endTime":"01/01/9999 22:59",
         "id":3,
         "name":"Night",
         "isActive":true,

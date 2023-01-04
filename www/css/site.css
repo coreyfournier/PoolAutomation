@@ -17,12 +17,12 @@ body {
     width: auto;
   }
   #schedule .time {
-    width:50px;
+    width:100px;
 
   }
 
   #schedule .details {
-    width:120px;
+    width:100px;
 
   }
 
