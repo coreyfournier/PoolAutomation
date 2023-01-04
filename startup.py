@@ -125,7 +125,8 @@ if __name__ == '__main__':
             Variable("slide","Slide", False, bool),
             #The roof must be this temp + current pool temp before the heater turns on.
             Variable("solar-min-roof-diff","Minimum roof temp", 5, float),
-            Variable("solar-set-heat","Heater temp", 90.0, float)
+            Variable("solar-heat-temperature","Heater temp", 90.0, float),
+            Variable("solar-heat-disabled","Heater temp", 90.0, float)
         ],
         variableChangeNotification,
         VariableRepo(variableFile))

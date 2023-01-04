@@ -87,46 +87,50 @@
     </div>		
    </body>
 	<script>
-        function temperatureChanged(value)
+        var heaterVariable = "solar-heat-temperature";
+        var slideVariable = "slide";
+
+        function changeVariable(timeoutId, variable, lastValue)
         {
+            //Adding a delay so it doesn't over load the server if you are togging through the values.
+            if(timeoutId != null)                    
+                clearTimeout(timeoutId);            
 
+            timeoutId = setTimeout(function(){
+                console.log("Changing " + lastValue);
+                if(timeoutId != null)                    
+                    clearTimeout(timeoutId);
 
+                $.ajax({
+                    type:"POST",
+                    dataType:"json",
+                    contentType: "application/json; charset=utf-8",
+                    data:JSON.stringify({
+                        "name" : variable,
+                        "value": lastValue
+                    }),
+                    url: '/variable/change',
+                    success: function(result){
+                        console.log('Variable changed ' + JSON.stringify(result));
+                    }
+                });
+                
+            }, 5000);                    
+            
+            return timeoutId;
         }
 
         $(document).ready(function(){
             var timeoutId = null;
-            $.getJSON("/variable/get?name=solar-set-heat", function(result) {
+            
+            $.getJSON("/variable/get?name=" + heaterVariable, function(result) {
                 var control = $("#heater-temperature");
-                var lastValue = 0;
+                
+                var lastValue = 0.0;
                 control.val(result.value);
-                control.on("input", function(item){
-                    
-                    //Adding a delay so it doesn't over load the server if you are togging through the values.
-                    if(timeoutId != null)                    
-                        clearTimeout(timeoutId);
-
-                    lastValue = $(this).val()
-
-                    timeoutId = setTimeout(function(){
-                        console.log("Changing " + lastValue);
-                        if(timeoutId != null)                    
-                            clearTimeout(timeoutId);
-
-                        $.ajax({
-                            type:"POST",
-                            dataType:"json",
-                            contentType: "application/json; charset=utf-8",
-                            data:JSON.stringify({
-                                "name":"solar-set-heat",
-                                "value": parseFloat(lastValue)
-                            }),
-                            url: '/variable/change',
-                            success: function(result){
-                                console.log('Solor heater temperature change' + JSON.stringify(result));
-                            }
-                        });
-                        
-                    }, 5000);                    
+                control.on("input", function(item){       
+                    lastValue = parseFloat($(this).val());             
+                    timeoutId = changeVariable(timeoutId, heaterVariable, lastValue);
                 });
             });
 
@@ -137,29 +141,19 @@
                 off: 'Fun off'
             });
 
-            $.getJSON("/variable/get?name=slide", function(result) {
+            $.getJSON("/variable/get?name=" + slideVariable, function(result) {
+                var lastValue = false;
+                var timeoutId = null;
+
                 if(result.value)
                     slideToggle.bootstrapToggle('on');
                 else
                     slideToggle.bootstrapToggle('off');
 
                 //Add the change logic after it loads
-
                 slideToggle.change(function() {
-                console.log($(this).prop('checked'));
-                $.ajax({
-                    type:"POST",
-                    dataType:"json",
-                    contentType: "application/json; charset=utf-8",
-                    data:JSON.stringify({
-                        "name":"slide",
-                        "value": $(this).prop('checked')
-                    }),
-                    url: '/variable/change',
-                    success: function(){
-                        console.log('Slide change');
-                    }
-                    });
+                    lastValue = $(this).prop('checked');
+                    timeoutId = changeVariable(timeoutId, slideVariable, lastValue);               
                 });  
             });
 
