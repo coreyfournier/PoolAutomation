@@ -76,6 +76,7 @@
                 </div>
                 <div class="panel-body">
                     <input type="number" min="80" step=".5" max="92" class="form-control" id="heater-temperature">
+                    <input type="checkbox" id="heater-enabled-toggle" data-style="slow">
                 </div>
             </div>
         </div>
@@ -88,7 +89,8 @@
    </body>
 	<script>
         var heaterVariable = "solar-heat-temperature";
-        var slideVariable = "slide";
+        var slideVariable = "slide-enabled";
+        var heaterEnabledVariable = "solar-heat-enabled";
 
         function changeVariable(timeoutId, variable, lastValue)
         {
@@ -121,11 +123,23 @@
         }
 
         $(document).ready(function(){
-            var timeoutId = null;
+            
+            var heaterEnabled = $('#heater-enabled-toggle');
+            var slideToggle = $('#slide-toggle');
+
+            heaterEnabled.bootstrapToggle({
+                on: 'Enabled',
+                off: 'Disabled'
+            });            
+
+            slideToggle.bootstrapToggle({
+                on: 'Having Fun',
+                off: 'Fun off'
+            });
             
             $.getJSON("/variable/get?name=" + heaterVariable, function(result) {
                 var control = $("#heater-temperature");
-                
+                var timeoutId = null;
                 var lastValue = 0.0;
                 control.val(result.value);
                 control.on("input", function(item){       
@@ -134,11 +148,21 @@
                 });
             });
 
-            var slideToggle = $('#slide-toggle');
+    
+            $.getJSON("/variable/get?name=" + heaterEnabledVariable, function(result) {
+                var lastValue = false;
+                var timeoutId = null;
 
-            slideToggle.bootstrapToggle({
-                on: 'Having Fun',
-                off: 'Fun off'
+                if(result.value)
+                    heaterEnabled.bootstrapToggle('on');
+                else
+                    heaterEnabled.bootstrapToggle('off');
+
+                //Add the change logic after it loads
+                heaterEnabled.change(function() {
+                    lastValue = $(this).prop('checked');
+                    timeoutId = changeVariable(timeoutId, heaterEnabledVariable, lastValue);               
+                });  
             });
 
             $.getJSON("/variable/get?name=" + slideVariable, function(result) {
