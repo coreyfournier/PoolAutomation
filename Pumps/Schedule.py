@@ -68,7 +68,7 @@ class PumpSchedule(Control):
     @property
     def scheduleStart(self):
         now = datetime.datetime.now()
-        return self.getScheduleEnd(now)
+        return self.getScheduleStart(now)
 
     @scheduleStart.setter
     def scheduleStart(self, stuff):
@@ -77,7 +77,7 @@ class PumpSchedule(Control):
     @property
     def scheduleEnd(self):
         now = datetime.datetime.now()
-        return self.getScheduleStart(now)
+        return self.getScheduleEnd(now)
 
     @scheduleEnd.setter
     def scheduleEnd(self, stuff):
@@ -99,13 +99,13 @@ class PumpSchedule(Control):
     def getScheduleStart(self, now)->datetime.datetime:        
         #It was the default year, so put it to today
         if(self.startTime.year == 1):          
-            return self.startTime.replace(year=now.year, month=now.month, day=now.day)
+            return self.startTime.replace(year=now.year, month=now.month, day=now.day, second = 0)
         else:
             return self.startTime
     
     def getScheduleEnd(self, now)->datetime.datetime:        
         #It was the default year, so put it to today
         if(self.endTime.year == 9999):          
-            return self.endTime.replace(year=now.year, month=now.month, day=now.day)
+            return self.endTime.replace(year=now.year, month=now.month, day=now.day, second = 59)
         else:
             return self.endTime
