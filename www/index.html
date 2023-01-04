@@ -72,11 +72,11 @@
         <div class="col-sm-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Solar Heater</h3>
+                    <h3 class="panel-title status-off" id="solar-heat-on">Solar Heater</h3>
                 </div>
                 <div class="panel-body">
-                    <input type="number" min="80" step=".5" max="92" class="form-control" id="heater-temperature">
-                    <input type="checkbox" id="heater-enabled-toggle" data-style="slow">
+                    <input type="number" min="80" step=".5" max="92" class="form-control" id="heat-temperature">
+                    <input type="checkbox" id="heat-enabled-toggle" data-style="slow">
                 </div>
             </div>
         </div>
@@ -103,7 +103,7 @@
         var slideVariable = "slide-enabled";
         var heaterEnabledVariable = "solar-heat-enabled";
 
-        function changeVariable(timeoutId, variable, lastValue)
+        function changeVariable(timeoutId, variable, lastValue, onSuccess)
         {
             //Adding a delay so it doesn't over load the server if you are togging through the values.
             if(timeoutId != null)                    
@@ -125,6 +125,8 @@
                     url: '/variable/change',
                     success: function(result){
                         console.log('Variable changed ' + JSON.stringify(result));
+                        if(onSuccess != null)
+                            onSuccess(result);
                     }
                 });
                 
@@ -133,7 +135,7 @@
             return timeoutId;
         }
 
-        function setToggleFromVariable(variableName, toggleControl)
+        function setToggleFromVariable(variableName, toggleControl, onChange)
         {
             $.getJSON("/variable/get?name=" + variableName, function(result) {
                 var lastValue = false;
@@ -147,17 +149,26 @@
                 //Add the change logic after it loads
                 toggleControl.change(function() {
                     lastValue = $(this).prop('checked');
-                    timeoutId = changeVariable(timeoutId, variableName, lastValue);               
+                    timeoutId = changeVariable(timeoutId, variableName, lastValue, onChange);               
                 });  
             });
         }
 
+        function showStatusFromBooleanVariable(control)
+        {
+            $.getJSON("/variable/get?name=" + control.attr("id"), function(result) {
+                control.removeClass("status-" + (result.value ? "off": "on"))
+                control.addClass("status-" + (result.value ? "on": "off"));
+           }); 
+        }
+
         $(document).ready(function(){
             
-            var heaterEnabled = $('#heater-enabled-toggle');
+            var heaterEnabled = $('#heat-enabled-toggle');
             var slideToggle = $('#slide-toggle');
             var freezePreventionEnabled = $('#freeze-prevention-enabled');
             var freezePreventionOn = $("#freeze-prevention-on");
+            var solarHeaterOn = $("#solar-heat-on");
 
             freezePreventionEnabled.bootstrapToggle({
                 on: 'Enabled',
@@ -175,24 +186,39 @@
             });
             
             $.getJSON("/variable/get?name=" + heaterVariable, function(result) {
-                var control = $("#heater-temperature");
+                var control = $("#heat-temperature");
                 var timeoutId = null;
                 var lastValue = 0.0;
                 control.val(result.value);
                 control.on("input", function(item){       
                     lastValue = parseFloat($(this).val());             
-                    timeoutId = changeVariable(timeoutId, heaterVariable, lastValue);
+                    timeoutId = changeVariable(timeoutId, heaterVariable, lastValue, null);
                 });
             });
+            showStatusFromBooleanVariable(freezePreventionOn);
+            showStatusFromBooleanVariable(solarHeaterOn);
 
-            $.getJSON("/variable/get?name=" + freezePreventionOn.attr("id"), function(result) {
-                freezePreventionOn.removeClass("status-" + (result.value ? "off": "on"))
-                freezePreventionOn.addClass("status-" + (result.value ? "on": "off"));
-           });
+            setToggleFromVariable(
+                freezePreventionEnabled.attr("id"), 
+                freezePreventionEnabled, 
+                function(){
+                    //Give the server enough time to react
+                    setTimeout(function(){
+                        showStatusFromBooleanVariable(freezePreventionOn);
+                    },5000)
+                });        
 
-            setToggleFromVariable(freezePreventionEnabled.attr("id"), freezePreventionEnabled);            
-            setToggleFromVariable(heaterEnabledVariable, heaterEnabled);
-            setToggleFromVariable(slideVariable, slideToggle);
+            setToggleFromVariable(
+                heaterEnabledVariable, 
+                heaterEnabled, 
+                //If enabled or disabled update the status
+                function(data){
+                    //Give the server enough time to react
+                    setTimeout(function(){
+                        showStatusFromBooleanVariable(solarHeaterOn);
+                    },5000)                    
+            });
+            setToggleFromVariable(slideVariable, slideToggle, null);
 
 
             $.getJSON("/light/descriptions", function(result) {
@@ -223,7 +249,7 @@
                 $.each(result, function(scheduleIndex, schedule) {                         
                     var row = "<tr id='schedule-" + schedule.id + "'>";
                     
-                    row += "<th>"+schedule.name + (schedule.isRunning? " - running" : "") + "</th>";
+                    row += "<th class='" + (schedule.isRunning? "status-on" : "") + "'>"+schedule.name + "</th>";
                     row += "<td>"+schedule.startTime + "</td><td>" + schedule.endTime + "</td>";
                     
                     row += "<td>";

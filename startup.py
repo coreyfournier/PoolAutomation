@@ -92,7 +92,7 @@ def evaluateSolarStatus():
     isSolarEnabled = DependencyContainer.variables.get("solar-heat-enabled").value
     roofTemp = DependencyContainer.temperatureDevices["Roof"].get(True)
     poolTemp = DependencyContainer.temperatureDevices["Pump Intake (Pool temp)"].get(True)
-    isSolarHeatOn = DependencyContainer.variables.get("solar-heat-on")
+    isSolarHeatOn = DependencyContainer.variables.get("solar-heat-on").value
     logger.debug("Seeing if solar should be on or off")
 
     if(isSolarEnabled):
