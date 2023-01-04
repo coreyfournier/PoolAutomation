@@ -286,7 +286,7 @@
                     </div>
                     `;
                     container = container.replace("%name%", temp.name)
-                    container = container.replace("%temperature%", temp.temp)
+                    container = container.replace("%temperature%", temp.temp.toFixed(2))
                     
                     options.append(container);
                 });
