@@ -72,11 +72,22 @@
         <div class="col-sm-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Heater</h3>
+                    <h3 class="panel-title">Solar Heater</h3>
                 </div>
                 <div class="panel-body">
                     <input type="number" min="80" step=".5" max="92" class="form-control" id="heater-temperature">
                     <input type="checkbox" id="heater-enabled-toggle" data-style="slow">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title status-on" id="freeze-prevention-on">Freeze prevention</h3>
+                </div>
+                <div class="panel-body">
+                    <input type="checkbox" id="freeze-prevention-enabled" data-style="slow">
                 </div>
             </div>
         </div>
@@ -122,10 +133,36 @@
             return timeoutId;
         }
 
+        function setToggleFromVariable(variableName, toggleControl)
+        {
+            $.getJSON("/variable/get?name=" + variableName, function(result) {
+                var lastValue = false;
+                var timeoutId = null;
+
+                if(result.value)
+                    toggleControl.bootstrapToggle('on');
+                else
+                    toggleControl.bootstrapToggle('off');
+
+                //Add the change logic after it loads
+                toggleControl.change(function() {
+                    lastValue = $(this).prop('checked');
+                    timeoutId = changeVariable(timeoutId, variableName, lastValue);               
+                });  
+            });
+        }
+
         $(document).ready(function(){
             
             var heaterEnabled = $('#heater-enabled-toggle');
             var slideToggle = $('#slide-toggle');
+            var freezePreventionEnabled = $('#freeze-prevention-enabled');
+            var freezePreventionOn = $("#freeze-prevention-on");
+
+            freezePreventionEnabled.bootstrapToggle({
+                on: 'Enabled',
+                off: 'Disabled'
+            });
 
             heaterEnabled.bootstrapToggle({
                 on: 'Enabled',
@@ -134,7 +171,7 @@
 
             slideToggle.bootstrapToggle({
                 on: 'Having Fun',
-                off: 'Fun off'
+                off: 'Off'
             });
             
             $.getJSON("/variable/get?name=" + heaterVariable, function(result) {
@@ -148,38 +185,14 @@
                 });
             });
 
-    
-            $.getJSON("/variable/get?name=" + heaterEnabledVariable, function(result) {
-                var lastValue = false;
-                var timeoutId = null;
+            $.getJSON("/variable/get?name=" + freezePreventionOn.attr("id"), function(result) {
+                freezePreventionOn.removeClass("status-" + (result.value ? "off": "on"))
+                freezePreventionOn.addClass("status-" + (result.value ? "on": "off"));
+           });
 
-                if(result.value)
-                    heaterEnabled.bootstrapToggle('on');
-                else
-                    heaterEnabled.bootstrapToggle('off');
-
-                //Add the change logic after it loads
-                heaterEnabled.change(function() {
-                    lastValue = $(this).prop('checked');
-                    timeoutId = changeVariable(timeoutId, heaterEnabledVariable, lastValue);               
-                });  
-            });
-
-            $.getJSON("/variable/get?name=" + slideVariable, function(result) {
-                var lastValue = false;
-                var timeoutId = null;
-
-                if(result.value)
-                    slideToggle.bootstrapToggle('on');
-                else
-                    slideToggle.bootstrapToggle('off');
-
-                //Add the change logic after it loads
-                slideToggle.change(function() {
-                    lastValue = $(this).prop('checked');
-                    timeoutId = changeVariable(timeoutId, slideVariable, lastValue);               
-                });  
-            });
+            setToggleFromVariable(freezePreventionEnabled.attr("id"), freezePreventionEnabled);            
+            setToggleFromVariable(heaterEnabledVariable, heaterEnabled);
+            setToggleFromVariable(slideVariable, slideToggle);
 
 
             $.getJSON("/light/descriptions", function(result) {

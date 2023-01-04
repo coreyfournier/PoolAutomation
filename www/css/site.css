@@ -25,3 +25,21 @@ body {
     width:120px;
 
   }
+
+  .status-off::after {
+    height: 20px;
+    width: 20px;
+    background-color: rgb(241, 142, 142);
+    border-radius: 50%;
+    content: "";
+    display: inline-block;
+  }
+
+  .status-on::after {
+    height: 20px;
+    width: 20px;
+    background-color: rgb(35, 236, 35);
+    border-radius: 50%;
+    content: "";
+    display: inline-block;
+  }

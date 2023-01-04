@@ -126,7 +126,10 @@ if __name__ == '__main__':
             #The roof must be this temp + current pool temp before the heater turns on.
             Variable("solar-min-roof-diff","Minimum roof temp", 5, float),
             Variable("solar-heat-temperature","Heater temp", 90.0, float),
-            Variable("solar-heat-enabled","Heater Enabled", True, bool)
+            Variable("solar-heat-enabled","Heater Enabled", True, bool),
+            Variable("freeze-prevention-enabled","Freeze prevention Enabled", True, bool),
+            #Indicates if the freeze prevention is currently running/on
+            Variable("freeze-prevention-on","Freeze prevention activated", False, bool)
         ],
         variableChangeNotification,
         VariableRepo(variableFile))
