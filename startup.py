@@ -101,7 +101,7 @@ def evaluateSolarStatus():
         if(roofTemp >= needRoofTemp):
             if(poolTemp <= solarSetTemp):                
                 if(isSolarHeatOn):
-                    logger.debug(f"Heater staying on. Pool still not warm enough {poolTemp} <= {solarSetTemp}. Roof:{roofTemp} Roof temp until off:{roofTemp-needRoofTemp}")
+                    logger.debug(f"Heater staying on. Pool still not warm enough {poolTemp} <= {solarSetTemp}. Roof:{roofTemp} Roof temp until off:{poolTemp-needRoofTemp}")
                 else:
                     DependencyContainer.variables.updateValue("solar-heat-on", True)
                     logger.info(f"Enabling solar heater")
@@ -109,7 +109,9 @@ def evaluateSolarStatus():
                 DependencyContainer.variables.updateValue("solar-heat-on", False)
                 logger.debug(f"Pool {poolTemp} > {solarSetTemp}")
         else:
-            logger.debug(f"Roof ({roofTemp}) isn't hot enough. Need {needRoofTemp - roofTemp}")
+            logger.debug(f"Roof ({roofTemp}) isn't hot enough. Need {needRoofTemp - roofTemp} Pool:{poolTemp}")
+            if(isSolarHeatOn):
+                DependencyContainer.variables.updateValue("solar-heat-on", False)
     else:
         if(isSolarHeatOn):
             DependencyContainer.variables.updateValue("solar-heat-on", False)
