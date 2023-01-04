@@ -2,21 +2,25 @@
     {
         "type":"OneWire",
         "name":"Solar Heat",
+        "apiName":"solar-heat",
         "deviceId":"/sys/bus/w1/devices/28-3c9df6480338"
     },
     {
         "type":"OneWire",
         "name":"Roof",
+        "apiName":"roof",
         "deviceId":"/sys/bus/w1/devices/28-3cbaf648b71a"
     },
     {
         "type":"OneWire",
         "name":"Ambient",
+        "apiName":"ambient",
         "deviceId":"/sys/bus/w1/devices/28-3c01f0963d61"
     },
     {
         "type":"OneWire",
         "name":"Pump Intake (Pool temp)",
+        "apiName":"pool-temp",
         "deviceId":"/sys/bus/w1/devices/28-3c9bf6482cdd"
     }
 ]

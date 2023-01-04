@@ -1,9 +1,22 @@
 [
     {
         "startTime":"07:00",
-        "endTime":"09:00",
+        "endTime":"09:59",
         "id":1,
         "name":"Morning",
+        "isActive":true,
+        "pumps":[{
+            "id":1,
+            "name":"Main",
+            "speedName":"SPEED_1"
+        }],
+        "valves":null
+    },
+    {
+        "startTime":"10:00",
+        "endTime":"13:59",
+        "id":2,
+        "name":"Afternoon",
         "isActive":true,
         "pumps":[{
             "id":1,
@@ -13,15 +26,15 @@
         "valves":null
     },
     {
-        "startTime":"12:00",
-        "endTime":"22:20",
-        "id":2,
+        "startTime":"14:00",
+        "endTime":"22:59",
+        "id":3,
         "name":"Night",
         "isActive":true,
         "pumps":[{
             "id":1,
             "name":"Main",
-            "speedName":"SPEED_4"
+            "speedName":"SPEED_3"
         }],
         "valves":null
     }

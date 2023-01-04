@@ -51,21 +51,76 @@ def tempChangeNotification(changedDevice:Temperature):
     for key, device in devices.items():
         if(device.getDeviceId() == changedDevice.getDeviceId()):
             name = key
-            DependencyContainer.actions.notifyTemperatureChangeListners(key, device)
+            #DependencyContainer.actions.notifyTemperatureChangeListners(key, device)
             break
 
     logger.info(f"Temp changed for: {name} Id:{device.getDeviceId()} Temp:{device.getLast()}")
 
     #TODO: this needs to be made into a configuration. Not sure how to architect it yet.
-    if("ambient" in name.lower() and device.getLast() <= 33):
-        logger.info(f"Temp has reached freezing... Need to turn on pump to prevent freezing")
-        for pump in DependencyContainer.pumps:            
-            if(pump[0] == "Main"):
-                #Chaning the pump to a steady speed to prevent freezing
-                pump[1].on(Speed.SPEED_4)
+    freezePreventionTemp = DependencyContainer.variables.get("freeze-prevention-temperature").value
+    if("ambient" in name.lower() and device.getLast() <= freezePreventionTemp):        
+        isFreezePreventionEnabled = DependencyContainer.variables.get("freeze-prevention-enabled").value
+        if(isFreezePreventionEnabled):
+            logger.info(f"Temp has reached freezing... Need to turn on pump to prevent freezing")
+            for pump in DependencyContainer.pumps:            
+                if(pump[0] == "Main"):
+                    #Chaning the pump to a steady speed to prevent freezing
+                    pump[1].on(Speed.SPEED_4)
+            DependencyContainer.variables.updateValue("freeze-prevention-on",True)
+        else:
+            logger.debug("Freezing, but freeze prevention disabled")
+    #If it's on, but no longer freezing turn it off
+    elif(DependencyContainer.variables.get("freeze-prevention-on").value):
+        logger.info("Turning off freeze prevention")
+        DependencyContainer.variables.updateValue("freeze-prevention-on", False)
+
+    
+    if(name.lower() in ["roof","pump intake (pool temp)"]):
+        evaluateSolarStatus()
 
 def variableChangeNotification(variable:Variable, oldValue:any):
     logger.info(f"Variable {variable.name} was changed from {oldValue} to {variable.value}")
+
+    if(variable.name == "slide-enabled"):
+        slideStatusChanged(variable, oldValue)
+    elif(variable.name in ["solar-min-roof-diff", "solar-heat-temperature", "solar-heat-enabled"]):
+        evaluateSolarStatus()
+
+def evaluateSolarStatus():
+    solarSetTemp = DependencyContainer.variables.get("solar-heat-temperature").value
+    minRoofDifference = DependencyContainer.variables.get("solar-min-roof-diff").value
+    isSolarEnabled = DependencyContainer.variables.get("solar-heat-enabled").value
+    roofTemp = DependencyContainer.temperatureDevices["Roof"].get(True)
+    poolTemp = DependencyContainer.temperatureDevices["Pump Intake (Pool temp)"].get(True)
+    isSolarHeatOn = DependencyContainer.variables.get("solar-heat-on")
+    logger.debug("Seeing if solar should be on or off")
+
+    if(isSolarEnabled):
+        #Roof must greater than this
+        needRoofTemp = poolTemp + minRoofDifference
+        if(roofTemp >= needRoofTemp):
+            if(poolTemp <= solarSetTemp):                
+                if(isSolarHeatOn):
+                    logger.debug(f"Heater staying on. Pool still not warm enough {poolTemp} <= {solarSetTemp}")
+                else:
+                    DependencyContainer.variables.updateValue("solar-heat-on", True)
+                    logger.info(f"Enabling solar heater")
+            else:
+                DependencyContainer.variables.updateValue("solar-heat-on", False)
+                logger.debug(f"Pool {poolTemp} > {solarSetTemp}")
+        else:
+            logger.debug(f"Roof ({roofTemp}) isn't hot enough. Need {needRoofTemp - roofTemp}")
+    else:
+        if(isSolarHeatOn):
+            DependencyContainer.variables.updateValue("solar-heat-on", False)
+        logger.debug("Solar is disabled")
+
+
+def slideStatusChanged(variable:Variable, oldValue:any):
+    if(variable.value):
+        logger.info("Slide turning on")
+    else:
+        logger.info("Slide turning off")
 
 
 if __name__ == '__main__':
@@ -124,12 +179,14 @@ if __name__ == '__main__':
             #Denotes if the slide is on or off. This will be a button
             Variable("slide-enabled","Slide", False, bool),
             #The roof must be this temp + current pool temp before the heater turns on.
-            Variable("solar-min-roof-diff","Minimum roof temp", 5, float),
+            Variable("solar-min-roof-diff","Minimum roof temp", 3, float),
             Variable("solar-heat-temperature","Heater temp", 90.0, float),
             Variable("solar-heat-enabled","Heater Enabled", True, bool),
+            Variable("solar-heat-on","Heater is on", False, bool),
             Variable("freeze-prevention-enabled","Freeze prevention Enabled", True, bool),
             #Indicates if the freeze prevention is currently running/on
-            Variable("freeze-prevention-on","Freeze prevention activated", False, bool)
+            Variable("freeze-prevention-on","Freeze prevention activated", False, bool),
+            Variable("freeze-prevention-temperature","Temperature to activate prevention", 33, float)
         ],
         variableChangeNotification,
         VariableRepo(variableFile))
