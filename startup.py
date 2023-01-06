@@ -44,18 +44,9 @@ def beforePumpChange(newSpeed:Speed, oldSpeed:Speed):
 
 def afterPumpChange(newSpeed:Speed):
     logger.info(f"After Pump change callback. Speed changed: {newSpeed}")
+  
 
-def tempChangeNotification(changedDevice:Temperature):
-    devices = DependencyContainer.temperatureDevices
-    name = ""
-    for key, device in devices.items():
-        if(device.getDeviceId() == changedDevice.getDeviceId()):
-            name = key
-            #DependencyContainer.actions.notifyTemperatureChangeListners(key, device)
-            break
-
-    logger.info(f"Temp changed for: {name} Id:{device.getDeviceId()} Temp:{device.getLast()}")
-
+def evaluateFreezePrevention(name, device:Temperature, action:Action):
     #TODO: this needs to be made into a configuration. Not sure how to architect it yet.
     freezePreventionTemp = DependencyContainer.variables.get("freeze-prevention-temperature").value
     if("ambient" in name.lower() and device.getLast() <= freezePreventionTemp):        
@@ -66,27 +57,17 @@ def tempChangeNotification(changedDevice:Temperature):
                 if(pump[0] == "Main"):
                     #Chaning the pump to a steady speed to prevent freezing
                     pump[1].on(Speed.SPEED_4)
+            action.overrideSchedule = True
             DependencyContainer.variables.updateValue("freeze-prevention-on",True)
         else:
             logger.debug("Freezing, but freeze prevention disabled")
     #If it's on, but no longer freezing turn it off
     elif(DependencyContainer.variables.get("freeze-prevention-on").value):
         logger.info("Turning off freeze prevention")
+        action.overrideSchedule = False
         DependencyContainer.variables.updateValue("freeze-prevention-on", False)
 
-    
-    if(name.lower() in ["roof","pump intake (pool temp)"]):
-        evaluateSolarStatus()
-
-def variableChangeNotification(variable:Variable, oldValue:any):
-    logger.info(f"Variable {variable.name} was changed from {oldValue} to {variable.value}")
-
-    if(variable.name == "slide-enabled"):
-        slideStatusChanged(variable, oldValue)
-    elif(variable.name in ["solar-min-roof-diff", "solar-heat-temperature", "solar-heat-enabled"]):
-        evaluateSolarStatus()
-
-def evaluateSolarStatus():
+def evaluateSolarStatus(action:Action):
     solarSetTemp = DependencyContainer.variables.get("solar-heat-temperature").value
     minRoofDifference = DependencyContainer.variables.get("solar-min-roof-diff").value
     isSolarEnabled = DependencyContainer.variables.get("solar-heat-enabled").value
@@ -103,25 +84,31 @@ def evaluateSolarStatus():
                 if(isSolarHeatOn):
                     logger.debug(f"Heater staying on. Pool still not warm enough {poolTemp} <= {solarSetTemp}. Roof:{roofTemp} Roof temp until off:{poolTemp-needRoofTemp}")
                 else:
+                    action.overrideSchedule = True
                     DependencyContainer.variables.updateValue("solar-heat-on", True)
                     logger.info(f"Enabling solar heater")
             else:
+                action.overrideSchedule = False
                 DependencyContainer.variables.updateValue("solar-heat-on", False)
                 logger.debug(f"Pool {poolTemp} > {solarSetTemp}")
         else:
             logger.debug(f"Roof ({roofTemp}) isn't hot enough. Need {needRoofTemp - roofTemp} Pool:{poolTemp}")
             if(isSolarHeatOn):
                 DependencyContainer.variables.updateValue("solar-heat-on", False)
+                action.overrideSchedule = False
     else:
         if(isSolarHeatOn):
+            action.overrideSchedule = False
             DependencyContainer.variables.updateValue("solar-heat-on", False)
         logger.debug("Solar is disabled")
 
 
-def slideStatusChanged(variable:Variable, oldValue:any):
+def slideStatusChanged(variable:Variable, oldValue:any, action:Action):
     if(variable.value):
+        action.overrideSchedule = True
         logger.info("Slide turning on")
     else:
+        action.overrideSchedule = False
         logger.info("Slide turning off")
 
 
@@ -134,6 +121,51 @@ if __name__ == '__main__':
     DependencyContainer.scheduleRepo = ScheduleRepo(scheduleFile)
     logger.info(f"Schedule={DependencyContainer.scheduleRepo}")
 
+    DependencyContainer.variables = Variables(
+        #default variables
+        [
+            #Denotes if the slide is on or off. This will be a button
+            Variable("slide-enabled","Slide", False, bool),
+            #The roof must be this temp + current pool temp before the heater turns on.
+            Variable("solar-min-roof-diff","Minimum roof temp", 3, float),
+            Variable("solar-heat-temperature","Heater temp", 90.0, float),
+            Variable("solar-heat-enabled","Heater Enabled", True, bool),
+            Variable("solar-heat-on","Heater is on", False, bool),
+            Variable("freeze-prevention-enabled","Freeze prevention Enabled", True, bool),
+            #Indicates if the freeze prevention is currently running/on
+            Variable("freeze-prevention-on","Freeze prevention activated", False, bool),
+            Variable("freeze-prevention-temperature","Temperature to activate prevention", 33, float)
+        ],
+        None,
+        VariableRepo(variableFile))
+
+    
+    DependencyContainer.actions = Actions([
+        Action("slide", "Slide",
+            #on variable change
+            lambda variable, oldValue, action : slideStatusChanged(variable, oldValue, action) if(variable.name == "slide-enabled") else None, 
+            #on Temp change
+            None,
+            #if it starts up and the slide is on, don't let the schedule start
+            DependencyContainer.variables.get("slide-enabled").value
+        ),
+        Action("freeze-prevention", "Freeze Prevention",
+            None,
+            #on Temp change
+            lambda key, device, action : evaluateFreezePrevention(key, device, action),
+            #if it starts up and freeze prevention is on, don't let the schedule start
+            DependencyContainer.variables.get("freeze-prevention-on").value
+        ),
+        Action("solar-heat", "Solar Heater",
+            #on variable change
+            lambda variable, oldValue, action : evaluateSolarStatus(action) if(variable.name in ["solar-min-roof-diff", "solar-heat-temperature", "solar-heat-enabled"]) else None, 
+            #on Temp change
+            lambda key, device, action : evaluateSolarStatus(action) if(key.lower() in ["roof","pump intake (pool temp)"]) else None,
+            #if it starts up and freeze prevention is on, don't let the schedule start
+            DependencyContainer.variables.get("solar-heat-on").value
+        )
+    ])
+
     #check to see if the environment variable is there or if its set to stub.
     if("CONTROLLER_TARGET" not in os.environ or os.environ["CONTROLLER_TARGET"] == "stub"):
         GPIO = GpioStub()
@@ -141,12 +173,12 @@ if __name__ == '__main__':
         from lib.TempStub import TempStub
         DependencyContainer.temperatureDevices = TemperatureRepo(
                 os.path.join(dataPath, "sample-temperature-devices.json")
-            ).getDevices(tempChangeNotification)
+            ).getDevices(DependencyContainer.actions.notifyTemperatureChangeListners)
     else:
         import RPi.GPIO as GPIO
         DependencyContainer.temperatureDevices = TemperatureRepo(
                 os.path.join(dataPath, "temperature-devices.json")
-            ).getDevices(tempChangeNotification)
+            ).getDevices(DependencyContainer.actions.notifyTemperatureChangeListners)
 
 
     if("LIGHT_GPIO_PIN" not in os.environ):
@@ -175,41 +207,7 @@ if __name__ == '__main__':
     #Add light controller here
     DependencyContainer.light = GloBrite(GpioController(GPIO, int(gpio_pin)))
 
-    DependencyContainer.variables = Variables(
-        #default variables
-        [
-            #Denotes if the slide is on or off. This will be a button
-            Variable("slide-enabled","Slide", False, bool),
-            #The roof must be this temp + current pool temp before the heater turns on.
-            Variable("solar-min-roof-diff","Minimum roof temp", 3, float),
-            Variable("solar-heat-temperature","Heater temp", 90.0, float),
-            Variable("solar-heat-enabled","Heater Enabled", True, bool),
-            Variable("solar-heat-on","Heater is on", False, bool),
-            Variable("freeze-prevention-enabled","Freeze prevention Enabled", True, bool),
-            #Indicates if the freeze prevention is currently running/on
-            Variable("freeze-prevention-on","Freeze prevention activated", False, bool),
-            Variable("freeze-prevention-temperature","Temperature to activate prevention", 33, float)
-        ],
-        variableChangeNotification,
-        VariableRepo(variableFile))
-
-    DependencyContainer.actions = Actions([
-        Action("Slide","slide",True, 
-            #on variable change
-            lambda name, var : logger.info(f"variable changed = {name}"), 
-            #on Temp change
-            lambda key, temp : logger.info(f"Temp {key} changed={temp}")),
-        Action("freeze-prevention", "Freeze Prevention", True,
-            None,
-            #on Temp change
-            lambda key, temp : logger.info(f"Prevent freezeTemp {key} changed={temp}")
-        ),
-        Action("solar-heat","Solar Heater",True, 
-            #on variable change
-            lambda name, var : logger.info(f"Solar heater variable changed = {name}"), 
-            #on Temp change
-            lambda key, temp : logger.info(f"Solar heater Temp {key} changed={temp}"))
-    ])
+    
 
     class _JSONEncoder(json.JSONEncoder):
         def default(self, obj):
