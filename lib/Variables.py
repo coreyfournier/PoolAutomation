@@ -10,7 +10,7 @@ class Variables:
         """Class constructor
 
         Args:
-            onChangeListner (Callable): Function accepting (Variable, oldValue)
+            onChangeListner (Callable): Function accepting (Variable, oldValue). Even if this is None, it will also notify DependencyContainer.actions.notifyVariableChangeListners
         """
         self._onChangeListner:Callable = onChangeListner
         self._repo:VariableRepo = repo
@@ -32,7 +32,11 @@ class Variables:
         variable.value = value
         self._repo.save()
 
-        self._onChangeListner(variable, oldValue)
+        if(DependencyContainer.actions != None):
+            DependencyContainer.actions.notifyVariableChangeListners(variable, oldValue)
+        
+        if(self._onChangeListner != None):
+            self._onChangeListner(variable, oldValue)
     
     def get(self, name:str) -> Variable:
         if(name in self._repo.get()):

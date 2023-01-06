@@ -79,6 +79,7 @@ scheduleRepo:ScheduleRepo = None
 #List of devices available. key is the name of the device, second is the device
 temperatureDevices:"dict[str,Temperature]" = {}
 
+#Custom actions / code that can execute based on the environment.
 actions:Actions = None
 
 variables:Variables = None

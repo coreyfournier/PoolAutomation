@@ -76,26 +76,34 @@ class WorkerPlugin(SimplePlugin):
 
     def _checkSchedule(self):
         now = datetime.datetime.now()
+        overrides = DependencyContainer.actions.getScheduleOverrides()
+        hasOverride = True if len(overrides) > 0 else False
 
         for item in self._scheduleData:
             startTime = item.getScheduleStart(now)
             endTime = item.getScheduleEnd(now)
 
-            #run the schedule
-            if(now >= startTime and now <= endTime):
-                if(not item.isRunning):
-                    self.bus.log(f"Running schedule {item.name} - {now}")
-                    #run the set speed for each pump listed
-                    self._setPumpSpeed(item, item.pumps, False)
-                    item.isRunning = True
-                
-            elif(item.isRunning):
-                #Turn all the pumps off
-                self._setPumpSpeed(item, item.pumps, True)
-                item.isRunning = False
+            #Don't run the schedule if it has an override
+            if(hasOverride):
+                #If it is running, indicate that it's off
+                if(item.isRunning):
+                    item.isRunning = False
             else:
-                item.isRunning = False
-                #self.bus.log(f"Schedule {item.name} not ready - {now}")
+                #run the schedule
+                if(now >= startTime and now <= endTime):
+                    if(not item.isRunning):
+                        self.bus.log(f"Running schedule {item.name} - {now}")
+                        #run the set speed for each pump listed
+                        self._setPumpSpeed(item, item.pumps, False)
+                        item.isRunning = True
+                    
+                elif(item.isRunning):
+                    #Turn all the pumps off
+                    self._setPumpSpeed(item, item.pumps, True)
+                    item.isRunning = False
+                else:
+                    item.isRunning = False
+                    #self.bus.log(f"Schedule {item.name} not ready - {now}")
 
     def _setPumpSpeed(self, schedule:PumpSchedule, pumps:"list[Pump]", allOff:bool):
         if(pumps != None):

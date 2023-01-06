@@ -17,4 +17,8 @@ class ScheduleService:
         Returns:
             Schedule: All schedule information
         """
-        return [dataclasses.asdict(item) for item in DependencyContainer.scheduleRepo.schedules]
+        return {
+            "overrides": [{"name": item.name, "displayName": item.displayName } for item in DependencyContainer.actions.getScheduleOverrides()],
+            "schedules": [dataclasses.asdict(item) for item in DependencyContainer.scheduleRepo.schedules]
+        }
+        

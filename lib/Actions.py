@@ -6,11 +6,14 @@ from lib.Variables import Variable
 
 @dataclass
 class Action:
-    displayName:str
+    #Name that is used when coding if necessary
     name:str
-    overrideSchedule:bool = True
+    #What is displayed to the user
+    displayName:str        
     onVariableChange:Callable = None
     onTemperatureChange:Callable = None
+    #When true the schedule will not cause changes to anything
+    overrideSchedule:bool = False
 
 class Actions:
     def __init__(self, actions:"list[Action]" = None) -> None:
@@ -29,9 +32,17 @@ class Actions:
     def notifyTemperatureChangeListners(self, name, device:Temperature):
         for key, action in self._registered.items():
             if(action.onTemperatureChange != None):
-                action.onTemperatureChange(name, device)
+                action.onTemperatureChange(name, device, action)
     
     def notifyVariableChangeListners(self, variable:Variable, oldValue:any):
         for key, action in self._registered.items():
             if(action.onVariableChange != None):
-                action.onVariableChange(variable, oldValue)
+                action.onVariableChange(variable, oldValue, action)
+    
+    def getScheduleOverrides(self)-> "list[Action]":
+        """Gets any actions that need to stop the schedule from running
+
+        Returns:
+            list[Action]: Actions that override the schedule
+        """
+        return [x for x in self._registered.values() if x.overrideSchedule]
