@@ -17,9 +17,9 @@ class TemperatureRepo:
 
             for row in data:
                 if(row["type"] == "OneWire"):
-                    devices[row["name"]] = OneWire(row["deviceId"], onChangeListner)
+                    devices[row["name"]] = OneWire(row["name"],row["deviceId"], onChangeListner)
                 elif(row["type"] == "TempStub"):
-                    devices[row["name"]] = TempStub(row["defaultTemp"], onChangeListner)
+                    devices[row["name"]] = TempStub(row["name"],row["defaultTemp"], onChangeListner)
                 else:
                     raise Exception(f"Unknown type {row['type']}")
 
