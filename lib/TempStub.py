@@ -4,8 +4,8 @@ import random
 from typing import Callable
 
 class TempStub(Temperature):
-    def __init__(self, defaultTempInCelsius:float, onChangeListner:Callable = None) -> None:
-        super().__init__(str(random.random()), onChangeListner)
+    def __init__(self,name:str, defaultTempInCelsius:float, onChangeListner:Callable = None) -> None:
+        super().__init__(name, str(random.random()), onChangeListner)
         self.defaultTempInCelsius = defaultTempInCelsius
         
     def get(self, allowCached:bool = True)-> float:

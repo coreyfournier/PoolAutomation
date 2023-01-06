@@ -9,8 +9,8 @@ os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
 
 class OneWire(Temperature):
-    def __init__(self, deviceId:str ,onChangeListner:callable = None, baseDeviceDirectory:str = "/sys/bus/w1/devices/", devicePrefix:str = "28*") -> None:
-        super().__init__(deviceId, onChangeListner)
+    def __init__(self, name:str, deviceId:str ,onChangeListner:callable = None, baseDeviceDirectory:str = "/sys/bus/w1/devices/", devicePrefix:str = "28*") -> None:
+        super().__init__(name, deviceId, onChangeListner)
         self.__base_dir = baseDeviceDirectory
         self.__devicePrefix = devicePrefix
 
