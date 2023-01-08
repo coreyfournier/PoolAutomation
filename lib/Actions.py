@@ -12,15 +12,38 @@ class Action:
     displayName:str        
     onVariableChange:Callable = None
     onTemperatureChange:Callable = None
+    onOverrideChange:Callable = None
     #When true the schedule will not cause changes to anything
-    overrideSchedule:bool = False
+    _overrideSchedule:bool = False
+
+    @property
+    def overrideSchedule(self) -> bool:
+        return self._overrideSchedule
+
+    @overrideSchedule.setter
+    def overrideSchedule(self, v: bool) -> None:        
+        #Only make changes if it actually changed.
+        if(v != self._overrideSchedule):
+            self._overrideSchedule = v
+            if(self.onOverrideChange != None):
+                #notify of the change with the old a new
+                self.onOverrideChange(self)
+        
 
 class Actions:
-    def __init__(self, actions:"list[Action]" = None) -> None:
+    def __init__(self, actions:"list[Action]" = None, onOverrideChange:Callable = None) -> None:
+        """Custom actions to drive automation
+
+        Args:
+            actions (list[Action], optional): All actions to register. Defaults to None.
+            onOverrideChange (Callable, optional): Listner to know when the override changes. Should accept the new override value and which action caused it. Defaults to None.
+        """
         self._registered:"dict[str,Action]" = {}
         #All actions registered
         if(actions != None):
             for item in actions:
+                #register the change listner
+                item.onOverrideChange = onOverrideChange
                 self._registered[item.name] = item
     
     def add(self, action:Action):
@@ -46,3 +69,8 @@ class Actions:
             list[Action]: Actions that override the schedule
         """
         return [x for x in self._registered.values() if x.overrideSchedule]
+    
+    def hasOverrides(self):
+        overrides = DependencyContainer.actions.getScheduleOverrides()
+        return len(overrides) > 0
+    

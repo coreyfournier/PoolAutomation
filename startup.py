@@ -108,8 +108,18 @@ def slideStatusChanged(variable:Variable, oldValue:any, action:Action):
         action.overrideSchedule = True
         logger.info("Slide turning on")
     else:
-        action.overrideSchedule = False
         logger.info("Slide turning off")
+        #This will cause the schedules to resume if there are any
+        action.overrideSchedule = False
+
+        #If any schedules are starting, don't turn the pump off
+        if(DependencyContainer.scheduleRepo != None):
+            activeSchedules = [x for x in DependencyContainer.scheduleRepo.schedules if x.isRunning]
+            #If no schedules are running, then turn the pump off
+            if(len(activeSchedules) == 0):                
+                hasOverride = DependencyContainer.actions.hasOverrides()      
+                if(not hasOverride):
+                    logger.info(f"Turning pump off as there are no running schedules or schedule overrides")        
 
 
 if __name__ == '__main__':
@@ -139,6 +149,10 @@ if __name__ == '__main__':
         None,
         VariableRepo(variableFile))
 
+    def overrideChangedFromAction(action:Action):
+        logger.debug(f"Action {action.name} changed to {action.overrideSchedule}")
+        if action.overrideSchedule == False:            
+            workerPlugin.checkSchedule()            
     
     DependencyContainer.actions = Actions([
         Action("slide", "Slide",
@@ -164,7 +178,11 @@ if __name__ == '__main__':
             #if it starts up and freeze prevention is on, don't let the schedule start
             DependencyContainer.variables.get("solar-heat-on").value
         )
-    ])
+    ],
+    #When schedule override is is turned off, check to see if the schedule should be resumed
+    overrideChangedFromAction
+        )
+
 
     #check to see if the environment variable is there or if its set to stub.
     if("CONTROLLER_TARGET" not in os.environ or os.environ["CONTROLLER_TARGET"] == "stub"):
@@ -174,7 +192,7 @@ if __name__ == '__main__':
         DependencyContainer.temperatureDevices = TemperatureRepo(
                 os.path.join(dataPath, "sample-temperature-devices.json")
             ).getDevices(DependencyContainer.actions.notifyTemperatureChangeListners)
-    else:
+    else:#When running on the raspberry pi
         import RPi.GPIO as GPIO
         DependencyContainer.temperatureDevices = TemperatureRepo(
                 os.path.join(dataPath, "temperature-devices.json")
@@ -206,7 +224,6 @@ if __name__ == '__main__':
             
     #Add light controller here
     DependencyContainer.light = GloBrite(GpioController(GPIO, int(gpio_pin)))
-
     
 
     class _JSONEncoder(json.JSONEncoder):
@@ -230,7 +247,8 @@ if __name__ == '__main__':
     # before mounting anything
     #Only execute this if you are running in linux and as a service.
     #Daemonizer(cherrypy.engine).subscribe()
-    WorkerPlugin(cherrypy.engine, DependencyContainer.scheduleRepo.schedules).subscribe()
+    workerPlugin = WorkerPlugin(cherrypy.engine, DependencyContainer.scheduleRepo.schedules)
+    workerPlugin.subscribe()
     cherrypy.config['tools.json_out.handler'] = json_handler
     cherrypy.tree.mount(Index(os.path.join("www")), config=app_conf)     
     cherrypy.tree.mount(LightService(), "/light" ,config=app_conf)

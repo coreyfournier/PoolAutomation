@@ -57,7 +57,7 @@ class WorkerPlugin(SimplePlugin):
     def _target(self):
         while self._running:
             #Checking the schedules to see if any need to be active or inactive
-            self._checkSchedule()
+            self.checkSchedule()
             #Reading any temperature sensors and sending notifications
             self._getTemperature()
             time.sleep(self._sleep)
@@ -74,10 +74,12 @@ class WorkerPlugin(SimplePlugin):
                     if(totalChange > 0.0):
                         device.notifyChangeListner()
 
-    def _checkSchedule(self):
+    def checkSchedule(self):
         now = datetime.datetime.now()
-        overrides = DependencyContainer.actions.getScheduleOverrides()
-        hasOverride = True if len(overrides) > 0 else False
+        if(DependencyContainer.actions == None):
+            hasOverride = False
+        else:        
+            hasOverride = DependencyContainer.actions.hasOverrides()
 
         for item in self._scheduleData:
             startTime = item.getScheduleStart(now)
@@ -104,7 +106,7 @@ class WorkerPlugin(SimplePlugin):
                 else:
                     item.isRunning = False
                     #self.bus.log(f"Schedule {item.name} not ready - {now}")
-
+    
     def _setPumpSpeed(self, schedule:PumpSchedule, pumps:"list[Pump]", allOff:bool):
         if(pumps != None):
             for pump in pumps:
