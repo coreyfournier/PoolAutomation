@@ -102,16 +102,16 @@ def evaluateSolarStatus(action:Action):
             DependencyContainer.variables.updateValue("solar-heat-on", False)
         logger.debug("Solar is disabled")
 
+def slideStatusChanged(variable:Variable, oldValue:any, action:Action):    
 
-def slideStatusChanged(variable:Variable, oldValue:any, action:Action):
     if(variable.value):
         action.overrideSchedule = True
-        logger.info("Slide turning on")
+        logger.info(f"Slide turning on")
+        
     else:
-        logger.info("Slide turning off")
+        logger.info(f"Slide turning off")
         #This will cause the schedules to resume if there are any
         action.overrideSchedule = False
-
         #If any schedules are starting, don't turn the pump off
         if(DependencyContainer.scheduleRepo != None):
             activeSchedules = [x for x in DependencyContainer.scheduleRepo.schedules if x.isRunning]
@@ -120,6 +120,8 @@ def slideStatusChanged(variable:Variable, oldValue:any, action:Action):
                 hasOverride = DependencyContainer.actions.hasOverrides()      
                 if(not hasOverride):
                     logger.info(f"Turning pump off as there are no running schedules or schedule overrides")        
+                    
+
 
 
 if __name__ == '__main__':
@@ -189,21 +191,30 @@ if __name__ == '__main__':
         GPIO = GpioStub()
         logger.info("Using GPIO Stub. Live pins will NOT be used.")
         from lib.TempStub import TempStub
+        import lib.SmbusStub as smbus2
         DependencyContainer.temperatureDevices = TemperatureRepo(
                 os.path.join(dataPath, "sample-temperature-devices.json")
             ).getDevices(DependencyContainer.actions.notifyTemperatureChangeListners)
     else:#When running on the raspberry pi
         import RPi.GPIO as GPIO
+        import smbus2
+        
         DependencyContainer.temperatureDevices = TemperatureRepo(
-                os.path.join(dataPath, "temperature-devices.json")
+                os.path.join(dataPath, "sample-temperature-devices.json")
             ).getDevices(DependencyContainer.actions.notifyTemperatureChangeListners)
-
+        # DependencyContainer.temperatureDevices = TemperatureRepo(
+        #         os.path.join(dataPath, "temperature-devices.json")
+        #     ).getDevices(DependencyContainer.actions.notifyTemperatureChangeListners)
+    
+    from lib.I2cRelay import I2cRelay
+    relay = I2cRelay(0x27, smbus2.SMBus(1))
 
     if("LIGHT_GPIO_PIN" not in os.environ):
         logger.warning("GPIO pin not set for light in environment variable 'LIGHT_GPIO_PIN'. Defaulting to zero")
         gpio_pin = 0
-    else:
+    else:        
         gpio_pin = os.environ.get("LIGHT_GPIO_PIN")
+        logger.info(f"LIGHT_GPIO_PIN set to {gpio_pin}")
 
     if("PUMP_GPIO_PINS" not in os.environ):
         logger.warning("GPIO pins not set for the pump in environment variable 'PUMP_GPIO_PINS'. No pumps will be loaded")
