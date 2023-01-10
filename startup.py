@@ -77,6 +77,8 @@ def evaluateSolarStatus(action:Action):
     poolTemp = DependencyContainer.temperatureDevices["Pump Intake (Pool temp)"].get(True)
     isSolarHeatOn = DependencyContainer.variables.get("solar-heat-on").value
     logger.debug("Seeing if solar should be on or off")
+    solarShouldBeOn = False
+    pumpForSolar:DeviceController = DependencyContainer.pumps[0][1]
 
     if(isSolarEnabled):
         #Roof must greater than this
@@ -85,28 +87,36 @@ def evaluateSolarStatus(action:Action):
             if(poolTemp <= solarSetTemp):                
                 if(isSolarHeatOn):
                     logger.debug(f"Heater staying on. Pool still not warm enough {poolTemp} <= {solarSetTemp}. Roof:{roofTemp} Roof temp until off:{poolTemp-needRoofTemp}")
-                else:
-                    action.overrideSchedule = True
-                    DependencyContainer.variables.updateValue("solar-heat-on", True)
-                    logger.info(f"Enabling solar heater")
-                    DependencyContainer.pumps[0][1].on(Speed.SPEED_3)
-                    DependencyContainer.valves.on("solar")
-            else:
-                action.overrideSchedule = False
-                DependencyContainer.variables.updateValue("solar-heat-on", False)
-                logger.debug(f"Pool {poolTemp} > {solarSetTemp}")
+                    solarShouldBeOn = True
+                    
+            else: #Pool > solar
+                if(isSolarHeatOn):
+                    solarShouldBeOn = False                   
+                    logger.debug(f"Pool {poolTemp} > {solarSetTemp}")                    
         else:
             logger.debug(f"Roof ({roofTemp}) isn't hot enough. Need {needRoofTemp - roofTemp} Pool:{poolTemp}")
             if(isSolarHeatOn):
-                DependencyContainer.variables.updateValue("solar-heat-on", False)
-                action.overrideSchedule = False
-                DependencyContainer.valves.off("solar")
+                solarShouldBeOn = False                
     else:
         if(isSolarHeatOn):
-            action.overrideSchedule = False
-            DependencyContainer.variables.updateValue("solar-heat-on", False)
-            DependencyContainer.valves.off("solar")
+            solarShouldBeOn = False            
         logger.debug("Solar is disabled")
+
+    if(isSolarHeatOn and not solarShouldBeOn):
+        logger.info("Turning solar OFF")
+        #Turn it off, it should not be on
+        action.overrideSchedule = False
+        DependencyContainer.variables.updateValue("solar-heat-on", False)
+        DependencyContainer.valves.off("solar")
+        turnOffPumpIfNoActiveSchedule(pumpForSolar)
+    elif(not isSolarHeatOn and solarShouldBeOn):
+        logger.info("Turning solar ON")
+        #It's not on and it should be
+        action.overrideSchedule = True
+        DependencyContainer.variables.updateValue("solar-heat-on", True)
+        pumpForSolar.on(Speed.SPEED_3)
+        DependencyContainer.valves.on("solar")   
+
 
 def slideStatusChanged(variable:Variable, oldValue:any, action:Action):    
 
@@ -122,15 +132,23 @@ def slideStatusChanged(variable:Variable, oldValue:any, action:Action):
         #This will cause the schedules to resume if there are any
         action.overrideSchedule = False
         #If any schedules are starting, don't turn the pump off
-        if(DependencyContainer.scheduleRepo != None):
-            activeSchedules = [x for x in DependencyContainer.scheduleRepo.schedules if x.isRunning]
-            #If no schedules are running, then turn the pump off
-            if(len(activeSchedules) == 0):                
-                hasOverride = DependencyContainer.actions.hasOverrides()      
-                if(not hasOverride):
-                    logger.info(f"Turning pump off as there are no running schedules or schedule overrides")                      
-                    DependencyContainer.pumps[0][1].off()
+        turnOffPumpIfNoActiveSchedule(DependencyContainer.pumps[0][1])
 
+def turnOffPumpIfNoActiveSchedule(pump:DeviceController):
+    """This expects overrideSchedule to be set to False for the action.
+    This would fire an event for the Schedule to resume. If none resumed, then none will be running.
+    When no schedules are running, then the pump will turn off
+    Args:
+        pump (DeviceController): _description_
+    """
+    if(DependencyContainer.scheduleRepo != None):
+        activeSchedules = [x for x in DependencyContainer.scheduleRepo.schedules if x.isRunning]
+        #If no schedules are running, then turn the pump off
+        if(len(activeSchedules) == 0):                
+            hasOverride = DependencyContainer.actions.hasOverrides()      
+            if(not hasOverride):
+                logger.info(f"Turning pump off as there are no running schedules or schedule overrides")                      
+                pump.off()
 
 
 if __name__ == '__main__':
@@ -161,10 +179,9 @@ if __name__ == '__main__':
         VariableRepo(variableFile))
 
     def overrideChangedFromAction(action:Action):
-        logger.debug(f"Action '{action.name}' changed to {action.overrideSchedule}")
-        if action.overrideSchedule == False: 
-            logger.debug("Checking to see if the schedule needs to make changes")           
-            workerPlugin.checkSchedule()            
+        logger.debug(f"Action '{action.name}' changed to {action.overrideSchedule}")    
+        logger.debug("Checking to see if the schedule needs to make changes")           
+        workerPlugin.checkSchedule()            
     
     DependencyContainer.actions = Actions([
         Action("slide", "Slide",
