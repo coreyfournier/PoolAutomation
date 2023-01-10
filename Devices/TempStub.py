@@ -1,4 +1,4 @@
-from Temperature.Temperature import Temperature
+from Devices.Temperature import Temperature
 import DependencyContainer
 import random
 from typing import Callable

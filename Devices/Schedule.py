@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 import datetime
-from Pumps import Pump
+from Devices import Pump
 from dataclasses_json import dataclass_json, LetterCase, config
 from typing import List as PyList
 from dataclass_wizard import JSONWizard

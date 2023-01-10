@@ -1,9 +1,9 @@
 import cherrypy
 import os
-from Lights.GloBrite import GloBrite 
+from Devices.GloBrite import GloBrite 
 #stub class for testing and dry runs
-from lib.GpioStub import GpioStub
-from lib.GpioController import GpioController
+from IO.GpioStub import GpioStub
+from IO.GpioController import GpioController
 import argparse
 
 class Index:

@@ -1,8 +1,8 @@
 import cherrypy
-from Pumps.Pump import *
+from Devices.Pump import *
 import dataclasses
 import DependencyContainer
-from Pumps.Schedule import *
+from Devices.Schedule import *
 logger = DependencyContainer.get_logger(__name__)
 
 class ScheduleService:

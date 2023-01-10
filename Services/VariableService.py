@@ -1,5 +1,5 @@
 import cherrypy
-from Pumps.Pump import *
+from Devices.Pump import *
 import dataclasses
 import DependencyContainer
 from lib.Variable import Variable

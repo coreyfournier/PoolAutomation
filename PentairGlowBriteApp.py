@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 import sys
 import argparse
-from Pumps.RelayPump import RelayPump
-from Pumps.Pump import Pump 
+from Devices.RelayPump import RelayPump
+from Devices.Pump import Pump 
 #stub class for testing and dry runs
-from lib.GpioStub import GpioStub
-from Lights.GloBrite import GloBrite
-from lib.GpioController import GpioController
+from IO.GpioStub import GpioStub
+from Devices.GloBrite import GloBrite
+from IO.GpioController import GpioController
 
 if __name__ == '__main__':
 	my_parser  = argparse.ArgumentParser(prog='PentairGlowBriteApp', description='Changes the scene on a Raspberry pi for the Pentair GlowBrite.')

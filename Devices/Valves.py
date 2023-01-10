@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json
 import builtins 
 from marshmallow import Schema, fields
-from Pumps.SpeedController import SpeedController
+from Devices.DeviceController import DeviceController
 from typing import Callable
 
 @dataclass
@@ -11,7 +11,7 @@ class Valve:
     apiName:str
     id:int
     isOn:bool
-    controller:SpeedController
+    controller:DeviceController
 
 class Valves:
     def __init__(self, valves:"list[Valve]", onChangeListner:Callable = None) -> None:

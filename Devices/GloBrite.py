@@ -1,10 +1,11 @@
 
 import threading
 import DependencyContainer
+from Devices.DeviceController import DeviceController
 logger = DependencyContainer.get_logger(__name__)
 
 class GloBrite:
-	def __init__(self, controller):	
+	def __init__(self, controller:DeviceController):	
 		self.controller = controller
 		self.lock = threading.Lock()
 

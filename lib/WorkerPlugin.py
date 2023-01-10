@@ -4,9 +4,9 @@ import datetime
 import logging
 import cherrypy
 from cherrypy.process.plugins import SimplePlugin
-from Pumps.Schedule import *
+from Devices.Schedule import *
 import DependencyContainer
-from Pumps.Pump import *
+from Devices.Pump import *
 
 #https://stackoverflow.com/questions/29238079/why-is-ctrl-c-not-captured-and-signal-handler-called/29254591#29254591
 class WorkerPlugin(SimplePlugin):

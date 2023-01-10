@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 import sys
 import argparse
-from Lights.GloBrite import GloBrite 
+from Devices.GloBrite import GloBrite 
 #stub class for testing and dry runs
-from lib.GpioStub import GpioStub
-from lib.GpioController import GpioController
-from Pumps.Pump import Pump
-from Pumps.RelayPump import *
+from IO.GpioStub import GpioStub
+from IO.GpioController import GpioController
+from Devices.Pump import Pump
+from Devices.RelayPump import *
 
 if __name__ == '__main__':
     my_parser  = argparse.ArgumentParser(prog='PumpApp', description='')

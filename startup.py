@@ -1,32 +1,32 @@
 import datetime
 import cherrypy
 import os
-from Lights.GloBrite import GloBrite 
+from Devices.GloBrite import GloBrite 
 #stub class for testing and dry runs
-from lib.GpioStub import GpioStub
-from lib.GpioController import GpioController
+from IO.GpioStub import GpioStub
+from IO.GpioController import GpioController
 from cherrypy.process.plugins import Daemonizer
 from Services.LightService import LightService
 from Services.PumpService import PumpService
 from Services.ScheduleService import ScheduleService
 from Services.TemperatureService import TemperatureService
 from Index import Index
-from Pumps.Pump import Pump
-from Pumps.RelayPump import *
+from Devices.Pump import Pump
+from Devices.RelayPump import *
 import DependencyContainer
 import asyncio
 from lib.WorkerPlugin import WorkerPlugin
-from Pumps.Schedule import *
+from Devices.Schedule import *
 from IO.ScheduleRepo import ScheduleRepo
 from IO.TemperatureRepo import TemperatureRepo
-from Temperature.Temperature import Temperature
+from Devices.Temperature import Temperature
 from lib.Actions import *
 from lib.Variables import Variables
 from IO.VariableRepo import *
 from lib.Variable import Variable
 from Services.VariableService import VariableService
-from lib.Valves import *
-from lib.I2cController import I2cController
+from Devices.Valves import *
+from IO.I2cController import I2cController
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -199,8 +199,8 @@ if __name__ == '__main__':
     if("CONTROLLER_TARGET" not in os.environ or os.environ["CONTROLLER_TARGET"] == "stub"):
         GPIO = GpioStub()
         logger.info("Using GPIO Stub. Live pins will NOT be used.")
-        from lib.TempStub import TempStub
-        import lib.SmbusStub as smbus2
+        from Devices.TempStub import TempStub
+        import IO.SmbusStub as smbus2
         
         DependencyContainer.temperatureDevices = TemperatureRepo(
                 os.path.join(dataPath, "sample-temperature-devices.json")

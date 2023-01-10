@@ -2,7 +2,7 @@ import os
 import glob
 import time
 import DependencyContainer
-from Temperature.Temperature import Temperature
+from Devices.Temperature import Temperature
 logger = DependencyContainer.get_logger(__name__)
 
 os.system('modprobe w1-gpio')

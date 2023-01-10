@@ -1,7 +1,7 @@
 from typing import Callable
 import DependencyContainer
 from dataclasses import dataclass
-from Temperature import Temperature
+from Devices import Temperature
 from lib.Variables import Variable
 
 @dataclass

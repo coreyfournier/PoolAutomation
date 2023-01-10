@@ -1,6 +1,6 @@
-from lib.SmbusStub import SMBus
+from IO.SmbusStub import SMBus
 import DependencyContainer
-from lib.I2cRelay import I2cRelay
+from IO.I2cRelay import I2cRelay
 logger = DependencyContainer.get_logger(__name__)
 
 class I2cController(I2cRelay):

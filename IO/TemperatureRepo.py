@@ -1,7 +1,7 @@
 import json
-from Temperature.OneWire import OneWire
-from Temperature.Temperature import Temperature
-from lib.TempStub import TempStub
+from Devices.OneWire import OneWire
+from Devices.Temperature import Temperature
+from Devices.TempStub import TempStub
 from typing import Callable
 
 class TemperatureRepo:

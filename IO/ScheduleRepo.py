@@ -1,4 +1,4 @@
-from Pumps.Schedule import PumpSchedule
+from Devices.Schedule import PumpSchedule
 
 
 class ScheduleRepo:

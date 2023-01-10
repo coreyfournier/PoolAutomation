@@ -63,12 +63,12 @@ def get_logger(logger_name:str) -> logging.Logger:
     return logger
 
 #from Lights.GloBrite import GloBrite 
-from Pumps.Pump import Pump
+from Devices.Pump import Pump
 from IO.ScheduleRepo import ScheduleRepo
-from Temperature.Temperature import Temperature
+from Devices.Temperature import Temperature
 from lib.Actions import *
 from lib.Variables import Variables
-from lib.Valves import Valves
+from Devices.Valves import Valves
 
 light = None
 

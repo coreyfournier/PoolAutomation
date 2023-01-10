@@ -1,4 +1,4 @@
-class SpeedController:
+class DeviceController:
     def __init__(self) -> None:
         pass
     def on(self):
