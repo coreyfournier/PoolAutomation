@@ -56,7 +56,7 @@ def evaluateFreezePrevention(name, device:Temperature, action:Action):
             for pump in DependencyContainer.pumps:            
                 if(pump[0] == "Main"):
                     #Chaning the pump to a steady speed to prevent freezing
-                    pump[1].on(Speed.SPEED_4)
+                    pump[1].on(Speed.SPEED_1)
             action.overrideSchedule = True
             DependencyContainer.variables.updateValue("freeze-prevention-on",True)
         else:
@@ -87,6 +87,7 @@ def evaluateSolarStatus(action:Action):
                     action.overrideSchedule = True
                     DependencyContainer.variables.updateValue("solar-heat-on", True)
                     logger.info(f"Enabling solar heater")
+                    DependencyContainer.pumps[0][1].on(Speed.SPEED_3)
             else:
                 action.overrideSchedule = False
                 DependencyContainer.variables.updateValue("solar-heat-on", False)
@@ -107,7 +108,8 @@ def slideStatusChanged(variable:Variable, oldValue:any, action:Action):
     if(variable.value):
         action.overrideSchedule = True
         logger.info(f"Slide turning on")
-        
+        #I know the first pump is main
+        DependencyContainer.pumps[0][1].on(Speed.SPEED_1)
     else:
         logger.info(f"Slide turning off")
         #This will cause the schedules to resume if there are any
@@ -119,8 +121,8 @@ def slideStatusChanged(variable:Variable, oldValue:any, action:Action):
             if(len(activeSchedules) == 0):                
                 hasOverride = DependencyContainer.actions.hasOverrides()      
                 if(not hasOverride):
-                    logger.info(f"Turning pump off as there are no running schedules or schedule overrides")        
-                    
+                    logger.info(f"Turning pump off as there are no running schedules or schedule overrides")                      
+                    DependencyContainer.pumps[0][1].off()
 
 
 
@@ -195,6 +197,8 @@ if __name__ == '__main__':
         DependencyContainer.temperatureDevices = TemperatureRepo(
                 os.path.join(dataPath, "sample-temperature-devices.json")
             ).getDevices(DependencyContainer.actions.notifyTemperatureChangeListners)
+        
+        DependencyContainer.pumps = []
     else:#When running on the raspberry pi
         import RPi.GPIO as GPIO
         import smbus2
@@ -205,9 +209,21 @@ if __name__ == '__main__':
         # DependencyContainer.temperatureDevices = TemperatureRepo(
         #         os.path.join(dataPath, "temperature-devices.json")
         #     ).getDevices(DependencyContainer.actions.notifyTemperatureChangeListners)
-    
-    from lib.I2cRelay import I2cRelay
-    relay = I2cRelay(0x27, smbus2.SMBus(1))
+
+        from lib.I2cController import I2cController
+        
+        bus = smbus2.SMBus(1)
+        #All all pumps here with thier name
+        DependencyContainer.pumps = [("Main", RelayPump(
+        {
+            #Example for GPIO relay: Speed.SPEED_1: GpioController(GPIO, boardPin, 0)
+            Speed.SPEED_1: I2cController(1, 0x27, bus),
+            Speed.SPEED_2: I2cController(2, 0x27, bus),
+            Speed.SPEED_3: I2cController(3, 0x27, bus),
+            Speed.SPEED_4: I2cController(4, 0x27, bus)
+        },
+        beforePumpChange,
+        afterPumpChange))]
 
     if("LIGHT_GPIO_PIN" not in os.environ):
         logger.warning("GPIO pin not set for light in environment variable 'LIGHT_GPIO_PIN'. Defaulting to zero")
@@ -215,23 +231,6 @@ if __name__ == '__main__':
     else:        
         gpio_pin = os.environ.get("LIGHT_GPIO_PIN")
         logger.info(f"LIGHT_GPIO_PIN set to {gpio_pin}")
-
-    if("PUMP_GPIO_PINS" not in os.environ):
-        logger.warning("GPIO pins not set for the pump in environment variable 'PUMP_GPIO_PINS'. No pumps will be loaded")
-        DependencyContainer.pumps = []
-    else:
-        pumpPins = [int(x) for x in os.environ["PUMP_GPIO_PINS"].split(",")]
-        #All all pumps here with thier name
-        DependencyContainer.pumps = [("Main", RelayPump(
-        {
-            Speed.SPEED_1: GpioController(GPIO, pumpPins[0], 0),
-            Speed.SPEED_2: GpioController(GPIO, pumpPins[1], 0),
-            Speed.SPEED_3: GpioController(GPIO, pumpPins[2], 0),
-            Speed.SPEED_4: GpioController(GPIO, pumpPins[3], 0)
-        },
-        beforePumpChange,
-        afterPumpChange))]
-        
             
     #Add light controller here
     DependencyContainer.light = GloBrite(GpioController(GPIO, int(gpio_pin)))

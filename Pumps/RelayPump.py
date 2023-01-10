@@ -1,11 +1,13 @@
 from Pumps.Pump import *
 from lib.GpioController import GpioController
 import DependencyContainer
+from Pumps.SpeedController import SpeedController
+
 logger = DependencyContainer.get_logger(__name__)
 
 class RelayPump(Pump):
-    def __init__(self, speedToGpio:"dict[int,GpioController]", beforeChangeListner:Callable = None, afterChangeListner:Callable = None):
-        self.speedToGpio:"dict[int,GpioController]" = speedToGpio
+    def __init__(self, speedToGpio:"dict[int,SpeedController]", beforeChangeListner:Callable = None, afterChangeListner:Callable = None):
+        self.speedToGpio:"dict[int,SpeedController]" = speedToGpio
         self.allSpeeds = [SpeedDisplay(Speed.OFF.name, False)]
         self.allSpeeds.extend(list([SpeedDisplay(x.name, False) for x in self.speedToGpio.keys()]))
         self.beforeChangeListner:Callable = beforeChangeListner
@@ -57,7 +59,6 @@ class RelayPump(Pump):
             if(item.name != Speed.OFF.name):
                 controller = self.speedToGpio[Speed[item.name]]
                 item.isActive = controller.isOn()
-                logger.debug(f"pin={controller.gpio_pin} State={item.isActive}")
                 if(item.isActive):
                     areAnyOn = True
         

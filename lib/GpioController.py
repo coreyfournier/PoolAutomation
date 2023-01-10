@@ -1,9 +1,10 @@
 from time import sleep
 import DependencyContainer
+from Pumps.SpeedController import SpeedController
 logger = DependencyContainer.get_logger(__name__)
 
 #Controller as an implementation interface to the target
-class GpioController:
+class GpioController(SpeedController):
 	def __init__(self, gpio, gpio_pin:int, delay_in_seconds:float = .5):	
 		"""Interface to flip pins on the pie
 

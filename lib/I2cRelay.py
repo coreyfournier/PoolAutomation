@@ -1,9 +1,10 @@
 import smbus2
 import DependencyContainer
+from Pumps.SpeedController import SpeedController
 
 logger = DependencyContainer.get_logger(__name__)
 
-class I2cRelay:
+class I2cRelay(SpeedController):
     def __init__(self, relayAddress:int, bus:smbus2.SMBus) -> None:
         """Used to control an i2c relay. This for sure works on:
         https://www.amazon.com/dp/B07JGSNWFF?psc=1&ref=ppx_yo2ov_dt_b_product_details
@@ -33,7 +34,7 @@ class I2cRelay:
         #0xFF ensurs the number is an unsigned integer
         return (~number & 0xFF)
     
-    def Off(self, relayNumber):
+    def off(self, relayNumber):
         existingState = self._existing()
         #Invert the changed one and make sure it's an unsigned integer
         flippedRelay = self._getBitAddress(relayNumber)
@@ -44,7 +45,7 @@ class I2cRelay:
         logger.debug(f"Switching off ({relayNumber}) {bin(newRelayState)} Existing:{bin(existingState)} Address:{self._address:04x} Register:{self._deviceRegister:04x}")
         self._bus.write_byte_data(self._address, self._deviceRegister, newRelayState)
 
-    def On(self, relayNumber):
+    def on(self, relayNumber):
         #Assuming it's an 8 channel relay
         existingState = self._existing()
         flippedRelay = self._getBitAddress(relayNumber)
@@ -93,3 +94,6 @@ class I2cRelay:
 
         #Filter out the other bits and then compare what's left to our relay
         return (self._invertBits(self._bus.read_byte(self._address, 0)) & currentRelay)  == currentRelay
+    
+    def destroy(self):
+        self._bus.close()
