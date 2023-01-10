@@ -18,6 +18,7 @@ class WorkerPlugin(SimplePlugin):
         SimplePlugin.__init__(self, bus)
         self._scheduleData:"list[PumpSchedule]" = scheduleData
         self._sleep = sleep
+        self.lock = threading.Lock()
 
     def start(self):
         '''Called when the engine starts'''
@@ -75,37 +76,39 @@ class WorkerPlugin(SimplePlugin):
                         device.notifyChangeListner()
 
     def checkSchedule(self):
-        now = datetime.datetime.now()
-        if(DependencyContainer.actions == None):
-            hasOverride = False
-        else:        
-            hasOverride = DependencyContainer.actions.hasOverrides()
+        #Make sure no one else tries to modify anything
+        with self.lock:
+            now = datetime.datetime.now()
+            if(DependencyContainer.actions == None):
+                hasOverride = False
+            else:        
+                hasOverride = DependencyContainer.actions.hasOverrides()
 
-        for item in self._scheduleData:
-            startTime = item.getScheduleStart(now)
-            endTime = item.getScheduleEnd(now)
+            for item in self._scheduleData:
+                startTime = item.getScheduleStart(now)
+                endTime = item.getScheduleEnd(now)
 
-            #Don't run the schedule if it has an override
-            if(hasOverride):
-                #If it is running, indicate that it's off
-                if(item.isRunning):
-                    item.isRunning = False
-            else:
-                #run the schedule
-                if(now >= startTime and now <= endTime):
-                    if(not item.isRunning):
-                        self.bus.log(f"Running schedule {item.name} - {now}")
-                        #run the set speed for each pump listed
-                        self._setPumpSpeed(item, item.pumps, False)
-                        item.isRunning = True
-                    
-                elif(item.isRunning):
-                    #Turn all the pumps off
-                    self._setPumpSpeed(item, item.pumps, True)
-                    item.isRunning = False
+                #Don't run the schedule if it has an override
+                if(hasOverride):
+                    #If it is running, indicate that it's off
+                    if(item.isRunning):
+                        item.isRunning = False
                 else:
-                    item.isRunning = False
-                    #self.bus.log(f"Schedule {item.name} not ready - {now}")
+                    #run the schedule
+                    if(now >= startTime and now <= endTime):
+                        if(not item.isRunning):
+                            self.bus.log(f"Running schedule {item.name} - {now}")
+                            #run the set speed for each pump listed
+                            self._setPumpSpeed(item, item.pumps, False)
+                            item.isRunning = True
+                        
+                    elif(item.isRunning):
+                        #Turn all the pumps off
+                        self._setPumpSpeed(item, item.pumps, True)
+                        item.isRunning = False
+                    else:
+                        item.isRunning = False
+                        #self.bus.log(f"Schedule {item.name} not ready - {now}")
     
     def _setPumpSpeed(self, schedule:PumpSchedule, pumps:"list[Pump]", allOff:bool):
         if(pumps != None):
