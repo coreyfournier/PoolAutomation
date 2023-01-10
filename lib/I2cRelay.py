@@ -1,11 +1,11 @@
-import smbus2
+from lib.SmbusStub import SMBus
 import DependencyContainer
 from Pumps.SpeedController import SpeedController
 
 logger = DependencyContainer.get_logger(__name__)
 
 class I2cRelay(SpeedController):
-    def __init__(self, relayAddress:int, bus:smbus2.SMBus) -> None:
+    def __init__(self, relayAddress:int, bus:SMBus) -> None:
         """Used to control an i2c relay. This for sure works on:
         https://www.amazon.com/dp/B07JGSNWFF?psc=1&ref=ppx_yo2ov_dt_b_product_details
         If you don't know the address of the relay you can find it here as well as configure the pi to enable i2c:
@@ -16,7 +16,7 @@ class I2cRelay(SpeedController):
             bus (smbus2.SMBus): EX: smbus2.SMBus(1) #1 is the bus of the pi
         """
         self._address = relayAddress
-        self._bus:smbus2.SMBus = bus
+        self._bus:SMBus = bus
         self._deviceRegister = 0xFF
         self._maxRelays = 8
 

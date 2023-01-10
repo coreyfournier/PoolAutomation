@@ -68,6 +68,7 @@ from IO.ScheduleRepo import ScheduleRepo
 from Temperature.Temperature import Temperature
 from lib.Actions import *
 from lib.Variables import Variables
+from lib.Valves import Valves
 
 light = None
 
@@ -83,3 +84,5 @@ temperatureDevices:"dict[str,Temperature]" = {}
 actions:Actions = None
 
 variables:Variables = None
+
+valves:Valves = None

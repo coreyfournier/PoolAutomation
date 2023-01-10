@@ -25,6 +25,8 @@ from lib.Variables import Variables
 from IO.VariableRepo import *
 from lib.Variable import Variable
 from Services.VariableService import VariableService
+from lib.Valves import *
+from lib.I2cController import I2cController
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -88,6 +90,7 @@ def evaluateSolarStatus(action:Action):
                     DependencyContainer.variables.updateValue("solar-heat-on", True)
                     logger.info(f"Enabling solar heater")
                     DependencyContainer.pumps[0][1].on(Speed.SPEED_3)
+                    DependencyContainer.valves.on("solar")
             else:
                 action.overrideSchedule = False
                 DependencyContainer.variables.updateValue("solar-heat-on", False)
@@ -97,10 +100,12 @@ def evaluateSolarStatus(action:Action):
             if(isSolarHeatOn):
                 DependencyContainer.variables.updateValue("solar-heat-on", False)
                 action.overrideSchedule = False
+                DependencyContainer.valves.off("solar")
     else:
         if(isSolarHeatOn):
             action.overrideSchedule = False
             DependencyContainer.variables.updateValue("solar-heat-on", False)
+            DependencyContainer.valves.off("solar")
         logger.debug("Solar is disabled")
 
 def slideStatusChanged(variable:Variable, oldValue:any, action:Action):    
@@ -110,8 +115,10 @@ def slideStatusChanged(variable:Variable, oldValue:any, action:Action):
         logger.info(f"Slide turning on")
         #I know the first pump is main
         DependencyContainer.pumps[0][1].on(Speed.SPEED_1)
+        DependencyContainer.valves.on("slide")
     else:
         logger.info(f"Slide turning off")
+        DependencyContainer.valves.off("slide")
         #This will cause the schedules to resume if there are any
         action.overrideSchedule = False
         #If any schedules are starting, don't turn the pump off
@@ -194,6 +201,7 @@ if __name__ == '__main__':
         logger.info("Using GPIO Stub. Live pins will NOT be used.")
         from lib.TempStub import TempStub
         import lib.SmbusStub as smbus2
+        
         DependencyContainer.temperatureDevices = TemperatureRepo(
                 os.path.join(dataPath, "sample-temperature-devices.json")
             ).getDevices(DependencyContainer.actions.notifyTemperatureChangeListners)
@@ -202,7 +210,7 @@ if __name__ == '__main__':
     else:#When running on the raspberry pi
         import RPi.GPIO as GPIO
         import smbus2
-        
+
         DependencyContainer.temperatureDevices = TemperatureRepo(
                 os.path.join(dataPath, "sample-temperature-devices.json")
             ).getDevices(DependencyContainer.actions.notifyTemperatureChangeListners)
@@ -210,20 +218,27 @@ if __name__ == '__main__':
         #         os.path.join(dataPath, "temperature-devices.json")
         #     ).getDevices(DependencyContainer.actions.notifyTemperatureChangeListners)
 
-        from lib.I2cController import I2cController
         
-        bus = smbus2.SMBus(1)
-        #All all pumps here with thier name
-        DependencyContainer.pumps = [("Main", RelayPump(
-        {
-            #Example for GPIO relay: Speed.SPEED_1: GpioController(GPIO, boardPin, 0)
-            Speed.SPEED_1: I2cController(1, 0x27, bus),
-            Speed.SPEED_2: I2cController(2, 0x27, bus),
-            Speed.SPEED_3: I2cController(3, 0x27, bus),
-            Speed.SPEED_4: I2cController(4, 0x27, bus)
-        },
-        beforePumpChange,
-        afterPumpChange))]
+        
+    bus = smbus2.SMBus(1)    
+    #All all pumps here with thier name
+    DependencyContainer.pumps = [("Main", RelayPump(
+    {
+        #Example for GPIO relay: Speed.SPEED_1: GpioController(GPIO, boardPin, 0)
+        Speed.SPEED_1: I2cController(1, 0x27, bus),
+        Speed.SPEED_2: I2cController(2, 0x27, bus),
+        Speed.SPEED_3: I2cController(3, 0x27, bus),
+        Speed.SPEED_4: I2cController(4, 0x27, bus)
+    },
+    beforePumpChange,
+    afterPumpChange))]
+
+    DependencyContainer.valves = Valves([
+        #GPIO17
+        Valve("Solar","solar",1,False, GpioController(GPIO,13,0)),
+        #GPIO22
+        Valve("Slide","slide",2,False, GpioController(GPIO,15,0))
+    ])
 
     if("LIGHT_GPIO_PIN" not in os.environ):
         logger.warning("GPIO pin not set for light in environment variable 'LIGHT_GPIO_PIN'. Defaulting to zero")
