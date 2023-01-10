@@ -12,7 +12,10 @@ class PumpService:
     def on(self, pumpIndex:int, speed:str):
         tuple = self.pumps[int(pumpIndex)]
 
-        tuple[1].on(Speed[speed])
+        if(Speed[speed] == Speed.OFF):
+            tuple[1].off()    
+        else:
+            tuple[1].on(Speed[speed])
     
     @cherrypy.expose
     def off(self, pumpIndex:int):

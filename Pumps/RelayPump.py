@@ -48,7 +48,8 @@ class RelayPump(Pump):
         """Ensures that the pump is completely off by switching off all relays for the pump
         """        
         self.__setOffSpeedStatus(True)
-        self.on(Speed.OFF)
+        for key in self.speedToGpio.keys():
+            self.speedToGpio[key].off()
     
     def speeds(self) ->"list[SpeedDisplay]":
         areAnyOn:bool = False
