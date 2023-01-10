@@ -161,8 +161,9 @@ if __name__ == '__main__':
         VariableRepo(variableFile))
 
     def overrideChangedFromAction(action:Action):
-        logger.debug(f"Action {action.name} changed to {action.overrideSchedule}")
-        if action.overrideSchedule == False:            
+        logger.debug(f"Action '{action.name}' changed to {action.overrideSchedule}")
+        if action.overrideSchedule == False: 
+            logger.debug("Checking to see if the schedule needs to make changes")           
             workerPlugin.checkSchedule()            
     
     DependencyContainer.actions = Actions([
