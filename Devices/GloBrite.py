@@ -50,12 +50,13 @@ class GloBrite:
 			logger.debug(f'switching {selected_scene[0]} times for scene "{selected_scene[1]}"')
 
 			iterations = range(0,selected_scene[0])
-			
-			for switch_flip in iterations:
-				logger.debug(f'on') 
-				self.controller.on()			
-				logger.debug(f'off')
-				self.controller.off()			
+			#If it's just one, it will turn on below
+			if(len(iterations) > 1):
+				for switch_flip in iterations:
+					logger.debug(f'on') 
+					self.controller.on()			
+					logger.debug(f'off')
+					self.controller.off()			
 
 			#Always end with on
 			logger.debug(f'on')

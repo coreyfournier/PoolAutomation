@@ -295,8 +295,8 @@
 
                 //don't forget error handling!
                 $.each(result, function(pumpIndex, pump) {
-                    console.log("pump=" + pump.description)
-                    pumps.append(("<div>"+pump.description+"</div>"))
+                    console.log("pump=" + pump.displayName)
+                    pumps.append(("<div>"+pump.displayName+"</div>"))
                     
                     speedControl = $('<select name="speed" id="speed" style="width: 250px;" onchange="speedChange(this)"></select>');
                     pumps.append(speedControl)
@@ -315,7 +315,7 @@
                 {
                     options.append($("<span>Overrides:</span>"));
                     $.each(result.overrides, function(overrideIndex, override) {
-                        options.append($("<span>" + override.displayName + "</span>"));
+                        options.append($("<span style='margin-left:2px;'>" + override.displayName + "</span>"));
                     });                         
                 }
 
@@ -334,7 +334,7 @@
                     
                     row += "<td>";
                     $.each(schedule.pumps, function(pumpIndex, pump){
-                        row+="<div id='schdule-"+schedule.id+"-pump-" + pump.id + "'>" + pump.name + " (" + pump.speedName + ")</div>";
+                        row+="<div id='schdule-"+schedule.id+"-pump-" + pump.id + "'>" + pump.displayName + " (" + pump.speedName + ")</div>";
                     });
                     row += "</td>";
 

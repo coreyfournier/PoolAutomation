@@ -17,7 +17,9 @@ class GpioController(DeviceController):
 		self.gpio_pin = gpio_pin
 		self.delay = delay_in_seconds
 		#initial is the off state
-		self.initial = self.gpio.LOW
+		self.initial = self.gpio.HIGH
+		#What is considered on. Off will be inital
+		self.onState = self.gpio.LOW		
 
 		#Set warnings to false otherwise you will get a warning when doing PIN IO after the pin was using other times.
 		self.gpio.setwarnings(False)
@@ -27,7 +29,7 @@ class GpioController(DeviceController):
 
 	def on(self):
 		logger.debug(f'Turning on pin {self.gpio_pin}')
-		self.gpio.output(self.gpio_pin, self.gpio.HIGH)	
+		self.gpio.output(self.gpio_pin, self.onState)	
 
 		if(self.delay > 0):
 			sleep(self.delay)	

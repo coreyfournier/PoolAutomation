@@ -36,7 +36,7 @@ class PumpService:
 
             display.append({
                 "index": index,
-                "description" : pump.displayName,
+                "displayName" : pump.displayName,
                 "name" : pump.name,
                 "speeds": speeds
             })

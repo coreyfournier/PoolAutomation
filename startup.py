@@ -87,7 +87,7 @@ def evaluateSolarStatus(action:Action):
             if(poolTemp <= solarSetTemp):                
                 if(isSolarHeatOn):
                     logger.debug(f"Heater staying on. Pool still not warm enough {poolTemp} <= {solarSetTemp}. Roof:{roofTemp} Roof temp until off:{poolTemp-needRoofTemp}")
-                    solarShouldBeOn = True
+                solarShouldBeOn = True
                     
             else: #Pool > solar
                 if(isSolarHeatOn):
@@ -284,7 +284,7 @@ if __name__ == '__main__':
     cherrypy.config.update(server_config)
     # before mounting anything
     #Only execute this if you are running in linux and as a service.
-    #Daemonizer(cherrypy.engine).subscribe()
+    Daemonizer(cherrypy.engine).subscribe()
     workerPlugin = WorkerPlugin(cherrypy.engine, DependencyContainer.scheduleRepo.schedules)
     workerPlugin.subscribe()
     cherrypy.config['tools.json_out.handler'] = json_handler

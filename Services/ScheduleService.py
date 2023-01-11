@@ -17,8 +17,19 @@ class ScheduleService:
         Returns:
             Schedule: All schedule information
         """
+        schedules = [dataclasses.asdict(item) for item in DependencyContainer.scheduleRepo.schedules]
+
+        if(DependencyContainer.pumps != None):
+            for schedule in schedules:
+                for pump in schedule["pumps"]:                
+                    pumpInfo = DependencyContainer.pumps.get(pump["name"])
+                    if(pumpInfo == None):
+                        pump["displayName"] = "Missing"
+                    else:
+                        pump["displayName"] = pumpInfo.displayName
+                        
         return {
             "overrides": [{"name": item.name, "displayName": item.displayName } for item in DependencyContainer.actions.getScheduleOverrides()],
-            "schedules": [dataclasses.asdict(item) for item in DependencyContainer.scheduleRepo.schedules]
+            "schedules": schedules
         }
         
