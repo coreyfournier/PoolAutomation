@@ -42,8 +42,11 @@ def get_logger(logger_name:str) -> logging.Logger:
 
     log_format = '%(asctime)s %(levelname)s: [%(name)s.%(funcName)s] %(message)s'
     date_format = '%Y-%m-%d %H:%M:%S'
-    logger = logging.getLogger(f'PoolAutomation.{logger_name}')
+    logger = logging.getLogger(f'PoolAutomation.{logger_name}')    
     logger.setLevel(log_level)
+    #limiting what is sent out for cherrypy
+    cherrypyLogger = logging.getLogger('cherrypy.')
+    cherrypyLogger.setLevel(logging.WARN)
 
     if log_to_file == None:
         logging.basicConfig(

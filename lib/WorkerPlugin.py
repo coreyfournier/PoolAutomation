@@ -9,6 +9,8 @@ import DependencyContainer
 from Devices.Pump import *
 from Devices.Pumps import Pumps
 
+logger = DependencyContainer.get_logger(__name__)
+
 #https://stackoverflow.com/questions/29238079/why-is-ctrl-c-not-captured-and-signal-handler-called/29254591#29254591
 class WorkerPlugin(SimplePlugin):
     _thread   = None
@@ -23,12 +25,11 @@ class WorkerPlugin(SimplePlugin):
 
     def start(self):
         '''Called when the engine starts'''
-        self.bus.log('Setting up example plugin')
 
         # You can listen for a message published in request handler or
         # elsewhere. Usually it's putting some into the queue and waiting 
         # for queue entry in the thread.
-        self.bus.subscribe('do-something', self._do)
+        #self.bus.subscribe('do-something', self._do)
 
         self._running = True
         if not self._thread:
@@ -43,8 +44,7 @@ class WorkerPlugin(SimplePlugin):
 
     def stop(self):
         '''Called when the engine stops'''
-        self.bus.log('Freeing up example plugin')
-        self.bus.unsubscribe('do-something', self._do)
+        #self.bus.unsubscribe('do-something', self._do)
 
         self._running = False
 
@@ -98,7 +98,7 @@ class WorkerPlugin(SimplePlugin):
                     #run the schedule
                     if(now >= startTime and now <= endTime):
                         if(not item.isRunning):
-                            self.bus.log(f"Running schedule {item.name} - {now}")
+                            logger.debug(f"Running schedule {item.name} - {now}")
                             #run the set speed for each pump listed
                             self._setPumpSpeed(item, item.pumps, False)
                             item.isRunning = True
@@ -119,14 +119,14 @@ class WorkerPlugin(SimplePlugin):
                     physicalPump = DependencyContainer.pumps.get(pump.name)
 
                     if(physicalPump == None):
-                        self.bus.log(f"Schedule '{schedule.name}' with pump name '{pump.name}' not found in the available pumps")        
+                        logger.debug(f"Schedule '{schedule.name}' with pump name '{pump.name}' not found in the available pumps")        
                     else:
                         if(allOff):
                             physicalPump.off()
                         elif(pump.speedName in Speed.__members__):
                             physicalPump.on(Speed[pump.speedName])
                         else:
-                            self.bus.log(f"Schedule '{schedule.name}' with speed '{pump.speedName}' was not found")  
+                            logger.debug(f"Schedule '{schedule.name}' with speed '{pump.speedName}' was not found")  
                        
 
     def _do(self, arg):
