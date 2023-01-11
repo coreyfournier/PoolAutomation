@@ -1,21 +1,22 @@
 import cherrypy
 from Devices.Pump import *
+from Devices.Pumps import Pumps
 import dataclasses
 import DependencyContainer
 logger = DependencyContainer.get_logger(__name__)
 
 class PumpService:
     def __init__(self):	
-        self.pumps:"list[tuple(str,Pump)]" = DependencyContainer.pumps        
+        self.pumps:Pumps = DependencyContainer.pumps        
 
     @cherrypy.expose
     def on(self, pumpIndex:int, speed:str):
-        tuple = self.pumps[int(pumpIndex)]
+        pump = self.pumps.getById(int(pumpIndex))
 
         if(Speed[speed] == Speed.OFF):
-            tuple[1].off()    
+            pump.off()    
         else:
-            tuple[1].on(Speed[speed])
+            pump.on(Speed[speed])
     
     @cherrypy.expose
     def off(self, pumpIndex:int):
@@ -29,13 +30,14 @@ class PumpService:
         display:"list[{}]" = []
 
         index:int = 0
-        for x in self.pumps:
+        for pump in self.pumps.getAll():
             #It's not seralizable unless converted to a dictionary
-            speeds = [dataclasses.asdict(item) for item in x[1].speeds()]
+            speeds = [dataclasses.asdict(item) for item in pump.speeds()]
 
             display.append({
                 "index": index,
-                "description": x[0],
+                "description" : pump.displayName,
+                "name" : pump.name,
                 "speeds": speeds
             })
             index += 1

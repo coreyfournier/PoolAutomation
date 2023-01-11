@@ -14,9 +14,14 @@ class SpeedDisplay:
     name:str
     isActive:bool
 
-
+@dataclass
 class Pump:        
     #Pump Interface
+    name:str
+    displayName:str
+    beforeChangeListner:Callable = None
+    afterChangeListner:Callable = None
+    
 
     def on(self, speed:Speed):
         pass

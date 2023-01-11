@@ -5,8 +5,11 @@ from Devices.DeviceController import DeviceController
 
 logger = DependencyContainer.get_logger(__name__)
 
+
 class RelayPump(Pump):
-    def __init__(self, speedToGpio:"dict[int,DeviceController]", beforeChangeListner:Callable = None, afterChangeListner:Callable = None):
+    def __init__(self, name:str, displayName:str, speedToGpio:"dict[int,DeviceController]", beforeChangeListner:Callable = None, afterChangeListner:Callable = None):
+        super().__init__(name, displayName, beforeChangeListner, afterChangeListner)
+
         self.speedToGpio:"dict[int,DeviceController]" = speedToGpio
         self.allSpeeds = [SpeedDisplay(Speed.OFF.name, False)]
         self.allSpeeds.extend(list([SpeedDisplay(x.name, False) for x in self.speedToGpio.keys()]))

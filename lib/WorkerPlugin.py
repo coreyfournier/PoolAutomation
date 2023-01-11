@@ -7,6 +7,7 @@ from cherrypy.process.plugins import SimplePlugin
 from Devices.Schedule import *
 import DependencyContainer
 from Devices.Pump import *
+from Devices.Pumps import Pumps
 
 #https://stackoverflow.com/questions/29238079/why-is-ctrl-c-not-captured-and-signal-handler-called/29254591#29254591
 class WorkerPlugin(SimplePlugin):
@@ -112,19 +113,23 @@ class WorkerPlugin(SimplePlugin):
     
     def _setPumpSpeed(self, schedule:PumpSchedule, pumps:"list[Pump]", allOff:bool):
         if(pumps != None):
-            for pump in pumps:
-                physicalPumps = list(filter(lambda x: x[0] == pump.name, DependencyContainer.pumps))
-                if(len(physicalPumps) > 0):
-                    #Get the first item and the pump tuple
-                    physicalPump = physicalPumps[0][1]
-                    if(allOff):
-                        physicalPump.off()
-                    elif(pump.speedName in Speed.__members__):
-                        physicalPump.on(Speed[pump.speedName])
+            for pump in pumps:                
+                
+                if(DependencyContainer.pumps != None):
+                    physicalPump = DependencyContainer.pumps.get(pump.name)
+
+                    if(physicalPump == None):
+                        self.bus.log(f"Schedule '{schedule.name}' with pump name '{pump.name}' not found in the available pumps")        
                     else:
-                        self.bus.log(f"Schedule '{schedule.name}' with speed '{pump.speedName}' was not found")  
-                else:
-                    self.bus.log(f"Schedule '{schedule.name}' with pump name '{pump.name}' not found in the available pumps")        
+                        #Get the first item and the pump tuple
+                        physicalPump = physicalPump[0][1]
+                        if(allOff):
+                            physicalPump.off()
+                        elif(pump.speedName in Speed.__members__):
+                            physicalPump.on(Speed[pump.speedName])
+                        else:
+                            self.bus.log(f"Schedule '{schedule.name}' with speed '{pump.speedName}' was not found")  
+                       
 
     def _do(self, arg):
         self.bus.log('handling the message: {0}'.format(arg))

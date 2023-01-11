@@ -69,11 +69,12 @@ from Devices.Temperature import Temperature
 from lib.Actions import *
 from lib.Variables import Variables
 from Devices.Valves import Valves
+from Devices.Pumps import Pumps
 
 light = None
 
 #List of pumps description is the first item in the tuple, pump is the second.
-pumps:"list[tuple(str,Pump)]" = None
+pumps:Pumps = None
 
 scheduleRepo:ScheduleRepo = None
 

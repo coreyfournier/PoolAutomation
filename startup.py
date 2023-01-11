@@ -27,6 +27,7 @@ from lib.Variable import Variable
 from Services.VariableService import VariableService
 from Devices.Valves import *
 from IO.I2cController import I2cController
+from Devices.Pumps import Pumps
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -55,12 +56,9 @@ def evaluateFreezePrevention(name, device:Temperature, action:Action):
         isFreezePreventionEnabled = DependencyContainer.variables.get("freeze-prevention-enabled").value
         if(isFreezePreventionEnabled):
             logger.info(f"Temp has reached freezing... Need to turn on pump to prevent freezing")
-            for pump in DependencyContainer.pumps:            
-                if(pump[0] == "Main"):
-                    #Chaning the pump to a steady speed to prevent freezing
-                    pump[1].on(Speed.SPEED_1)
+            DependencyContainer.pumps.get("main").on(Speed.SPEED_1)
             action.overrideSchedule = True
-            DependencyContainer.variables.updateValue("freeze-prevention-on",True)
+            DependencyContainer.variables.updateValue("freeze-prevention-on", True)
         else:
             logger.debug("Freezing, but freeze prevention disabled")
     #If it's on, but no longer freezing turn it off
@@ -78,7 +76,7 @@ def evaluateSolarStatus(action:Action):
     isSolarHeatOn = DependencyContainer.variables.get("solar-heat-on").value
     logger.debug("Seeing if solar should be on or off")
     solarShouldBeOn = False
-    pumpForSolar:DeviceController = DependencyContainer.pumps[0][1]
+    pumpForSolar:DeviceController = DependencyContainer.pumps.get("main")
 
     if(isSolarEnabled):
         #Roof must greater than this
@@ -124,7 +122,7 @@ def slideStatusChanged(variable:Variable, oldValue:any, action:Action):
         action.overrideSchedule = True
         logger.info(f"Slide turning on")
         #I know the first pump is main
-        DependencyContainer.pumps[0][1].on(Speed.SPEED_1)
+        DependencyContainer.pumps.get("main").on(Speed.SPEED_1)
         DependencyContainer.valves.on("slide")
     else:
         logger.info(f"Slide turning off")
@@ -132,7 +130,7 @@ def slideStatusChanged(variable:Variable, oldValue:any, action:Action):
         #This will cause the schedules to resume if there are any
         action.overrideSchedule = False
         #If any schedules are starting, don't turn the pump off
-        turnOffPumpIfNoActiveSchedule(DependencyContainer.pumps[0][1])
+        turnOffPumpIfNoActiveSchedule(DependencyContainer.pumps.get("main"))
 
 def turnOffPumpIfNoActiveSchedule(pump:DeviceController):
     """This expects overrideSchedule to be set to False for the action.
@@ -237,19 +235,21 @@ if __name__ == '__main__':
         #     ).getDevices(DependencyContainer.actions.notifyTemperatureChangeListners)
 
         
-        
+    #Get the bus for i2c controls    
     bus = smbus2.SMBus(1)    
-    #All all pumps here with thier name
-    DependencyContainer.pumps = [("Main", RelayPump(
-    {
-        #Example for GPIO relay: Speed.SPEED_1: GpioController(GPIO, boardPin, 0)
-        Speed.SPEED_1: I2cController(1, 0x27, bus),
-        Speed.SPEED_2: I2cController(2, 0x27, bus),
-        Speed.SPEED_3: I2cController(3, 0x27, bus),
-        Speed.SPEED_4: I2cController(4, 0x27, bus)
-    },
-    beforePumpChange,
-    afterPumpChange))]
+
+
+    DependencyContainer.pumps = Pumps(    
+        [RelayPump("main","Main",
+        {
+            #Example for GPIO relay: Speed.SPEED_1: GpioController(GPIO, boardPin, 0)
+            Speed.SPEED_1: I2cController(1, 0x27, bus),
+            Speed.SPEED_2: I2cController(2, 0x27, bus),
+            Speed.SPEED_3: I2cController(3, 0x27, bus),
+            Speed.SPEED_4: I2cController(4, 0x27, bus)
+        },
+        beforePumpChange,
+        afterPumpChange)])
 
     DependencyContainer.valves = Valves([
         #GPIO17
