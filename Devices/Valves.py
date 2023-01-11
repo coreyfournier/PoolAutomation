@@ -13,6 +13,14 @@ class Valve:
     isOn:bool
     controller:DeviceController
 
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "apiName" : self.apiName,
+            "id" : self.id,
+            "isOn" : self.isOn
+        }
+
 class Valves:
     def __init__(self, valves:"list[Valve]", onChangeListner:Callable = None) -> None:
         self._valves:"dict[str,Valve]" = {}
@@ -25,6 +33,9 @@ class Valves:
     
     def get(self, name:str)-> Valve:
         return self._valves[name]
+    
+    def getAll(self)-> "list[Valve]":
+        return [item for key, item in self._valves.items()]
     
     def on(self, name:str):
         self._valves[name].controller.on()

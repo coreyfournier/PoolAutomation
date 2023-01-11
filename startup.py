@@ -10,6 +10,8 @@ from Services.LightService import LightService
 from Services.PumpService import PumpService
 from Services.ScheduleService import ScheduleService
 from Services.TemperatureService import TemperatureService
+from Services.ValveService import ValveService
+from Services.VariableService import VariableService
 from Index import Index
 from Devices.Pump import Pump
 from Devices.RelayPump import *
@@ -24,10 +26,10 @@ from lib.Actions import *
 from lib.Variables import Variables
 from IO.VariableRepo import *
 from lib.Variable import Variable
-from Services.VariableService import VariableService
 from Devices.Valves import *
 from IO.I2cController import I2cController
 from Devices.Pumps import Pumps
+
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -299,6 +301,7 @@ if __name__ == '__main__':
     cherrypy.tree.mount(ScheduleService(), "/schedule", config=app_conf)
     cherrypy.tree.mount(TemperatureService(), "/temperature", config=app_conf)
     cherrypy.tree.mount(VariableService(), "/variable", config=app_conf)
+    cherrypy.tree.mount(ValveService(), "/valve", config=app_conf)
     cherrypy.engine.start()
     logger.info(f"Browse to http://localhost:{server_config['server.socket_port']}")
     cherrypy.engine.block()

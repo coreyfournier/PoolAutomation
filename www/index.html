@@ -92,6 +92,15 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Valves</h3>
+                </div>
+                <div class="panel-body" id="valves"></div>
+            </div>
+        </div>
     </div>
     
       <div id="footer">
@@ -103,6 +112,8 @@
         var heaterVariable = "solar-heat-temperature";
         var slideVariable = "slide-enabled";
         var heaterEnabledVariable = "solar-heat-enabled";
+
+        $(document).ready(loadUiData);
 
         function changeVariable(timeoutId, variable, lastValue, onSuccess)
         {
@@ -163,8 +174,8 @@
            }); 
         }
 
-        $(document).ready(function(){
-            
+        function loadUiData()
+        {            
             var heaterEnabled = $('#heat-enabled-toggle');
             var slideToggle = $('#slide-toggle');
             var freezePreventionEnabled = $('#freeze-prevention-enabled');
@@ -184,6 +195,53 @@
             slideToggle.bootstrapToggle({
                 on: 'Having Fun',
                 off: 'Off'
+            });
+
+            $.getJSON("/valve/get",function(result){
+                var valves = $("#valves")
+                valves.empty();
+
+                $.each(result, function(i, item) {
+                    console.log(JSON.stringify(item));
+                    var container = $("<div>");
+                    var toggle = $("<input type='checkbox' id='valve-"+item.apiName+"' data-apiName='"+item.apiName+"' data-style='slow'>");
+
+                    
+                    container.append(toggle);
+                    container.append($("<span style='margin-left:5px;'>" + item.name + "</span>"));
+
+                    toggle.bootstrapToggle({
+                        on: 'On',
+                        off: 'Off'
+                    });
+                    
+                    if(item.isOn)
+                        toggle.bootstrapToggle('on');
+                    else
+                        toggle.bootstrapToggle('off');
+
+                    valves.append(container);
+                    var lastValue = null;
+                    var timeoutId = null;
+                    //Add the change logic after it loads
+                    toggle.change(function() {
+                        lastValue = $(this).prop('checked');
+
+                        if(timeoutId != null)                    
+                            clearTimeout(timeoutId);
+
+                        timeoutId = setTimeout(function(){
+                            $.ajax({
+                                url: '/valve/' + (lastValue ? "on" : "off") + "?name=" + item.apiName,
+                                success: function(){
+                                    console.log("valve: " + lastValue);
+                                }
+                            });
+                        },5000)                                         
+                    });  
+
+                    
+                });
             });
             
             $.getJSON("/variable/get?name=" + heaterVariable, function(result) {
@@ -224,6 +282,7 @@
 
             $.getJSON("/light/descriptions", function(result) {
                 var options = $("#scene");
+                options.empty();
                 //don't forget error handling!
                 $.each(result, function(index) {
                     options.append($("<option />").val(index).text(this[1] + ' - ' + this[2]));
@@ -231,8 +290,8 @@
             });
 
             $.getJSON("/pump/descriptions", function(result) {
-                var options = $("#speed");
                 var pumps = $("#pumps");
+                pumps.empty();
 
                 //don't forget error handling!
                 $.each(result, function(pumpIndex, pump) {
@@ -250,6 +309,7 @@
 
             $.getJSON("/schedule/schedules", function(result) {
                 var options = $("#schedule");
+                options.empty();
 
                 if(result.overrides.length > 0)
                 {
@@ -293,6 +353,8 @@
 
             $.getJSON("/temperature/sensors", function(result) {
                 var options = $("#temperature");
+                options.empty();
+
                 //don't forget error handling!
                 $.each(result, function(tempIndex, temp) {
                     container = `
@@ -311,11 +373,10 @@
                     options.append(container);
                 });
             });
-        });
+        }
         
         function speedChange(control)
         {
-            console.log($(control).val());
             $.ajax({
                     url: '/pump/on?pumpIndex=0&speed=' + $(control).val(),
                     success: function(){
