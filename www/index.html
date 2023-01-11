@@ -53,8 +53,8 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Pump</h3>
                 </div>
-                <div class="panel-body">
-                    <select name="speed" id="speed" style="width: 250px;" onchange="speedChange(this)"></select>
+                <div class="panel-body" id="pumps">
+                    
                 </div>
             </div>
         </div>
@@ -232,11 +232,18 @@
 
             $.getJSON("/pump/descriptions", function(result) {
                 var options = $("#speed");
+                var pumps = $("#pumps");
+
                 //don't forget error handling!
                 $.each(result, function(pumpIndex, pump) {
                     console.log("pump=" + pump.description)
+                    pumps.append(("<div>"+pump.description+"</div>"))
+                    
+                    speedControl = $('<select name="speed" id="speed" style="width: 250px;" onchange="speedChange(this)"></select>');
+                    pumps.append(speedControl)
+                    
                     $.each(pump.speeds, function(speedIndex, speed){
-                        options.append($("<option id='pump_" + pump.index + "_" + speed.name + "' "+ (speed.isActive? "selected":"") +" />").text(speed.name));
+                        speedControl.append($("<option id='pump_" + pump.index + "_" + speed.name + "' "+ (speed.isActive? "selected":"") +" />").text(speed.name));
                     });
                 });
             });
