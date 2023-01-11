@@ -121,8 +121,6 @@ class WorkerPlugin(SimplePlugin):
                     if(physicalPump == None):
                         self.bus.log(f"Schedule '{schedule.name}' with pump name '{pump.name}' not found in the available pumps")        
                     else:
-                        #Get the first item and the pump tuple
-                        physicalPump = physicalPump[0][1]
                         if(allOff):
                             physicalPump.off()
                         elif(pump.speedName in Speed.__members__):

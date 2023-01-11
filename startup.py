@@ -260,15 +260,8 @@ if __name__ == '__main__':
         Valve("Slide","slide",2,False, GpioController(GPIO,15,0))
     ])
 
-    if("LIGHT_GPIO_PIN" not in os.environ):
-        logger.warning("GPIO pin not set for light in environment variable 'LIGHT_GPIO_PIN'. Defaulting to zero")
-        gpio_pin = 0
-    else:        
-        gpio_pin = os.environ.get("LIGHT_GPIO_PIN")
-        logger.info(f"LIGHT_GPIO_PIN set to {gpio_pin}")
-            
     #Add light controller here
-    DependencyContainer.light = GloBrite(GpioController(GPIO, int(gpio_pin)))
+    DependencyContainer.light = GloBrite(GpioController(GPIO, 11))
     
 
     class _JSONEncoder(json.JSONEncoder):

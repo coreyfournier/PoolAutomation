@@ -7,7 +7,7 @@
         "isActive":true,
         "pumps":[{
             "id":1,
-            "name":"Main",
+            "name":"main",
             "speedName":"SPEED_1"
         }],
         "valves":null
@@ -20,7 +20,7 @@
         "isActive":true,
         "pumps":[{
             "id":1,
-            "name":"Main",
+            "name":"main",
             "speedName":"SPEED_2"
         }],
         "valves":null
@@ -33,7 +33,7 @@
         "isActive":true,
         "pumps":[{
             "id":1,
-            "name":"Main",
+            "name":"main",
             "speedName":"SPEED_3"
         }],
         "valves":null
