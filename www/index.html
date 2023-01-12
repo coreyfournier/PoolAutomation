@@ -28,80 +28,83 @@
                         <div id="schedule"></div>
                     </div>
                 </div>
+            </div>            
+            <div class="col-sm-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Slide</h3>
+                    </div>
+                    <div class="panel-body">
+                        <input type="checkbox" id="slide-toggle" data-style="slow">
+                    </div>
+                </div>
             </div>
-
-            <div class="col-sm-2" id="temperature"></div>
+        </div>
+        <div class="row" id="temperature">
+            
+        </div>
+        <div class="row">        
+            <div class="col-sm-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title status-off" id="solar-heat-on">Solar Heater</h3>
+                    </div>
+                    <div class="panel-body">
+                        <input type="number" min="80" step=".5" max="92" class="form-control" id="heat-temperature">
+                        <input type="checkbox" id="heat-enabled-toggle" data-style="slow">
+                    </div>
+                </div>
+            </div>
 
             <div class="col-sm-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">GloBrite Color Changer</h3>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">GloBrite Color Changer</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p>Choose A Scene</p>
+                        <select name="scene" id="scene" style="width: 250px;"><option value="-1">-</option>></select>
+                        <button onclick="sceneChange()">Change</button>
+                        <br>
+                        <br>
+                        <button onclick="lightOff()">Off</button>
+                    </div>
                 </div>
-                <div class="panel-body">
-                    <p>Choose A Scene</p>
-                    <select name="scene" id="scene" style="width: 250px;"><option value="-1">-</option>></select>
-                    <button onclick="sceneChange()">Change</button>
-                    <br>
-                    <br>
-                    <button onclick="lightOff()">Off</button>
-                </div>
-            </div>
+            </div>       
         </div>
+        <div class="row">           
 
-        <div class="col-sm-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Pump</h3>
-                </div>
-                <div class="panel-body" id="pumps">
-                    
+            <div class="col-sm-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title status-on" id="freeze-prevention-on">Freeze prevention</h3>
+                    </div>
+                    <div class="panel-body">
+                        <input type="checkbox" id="freeze-prevention-enabled" data-style="slow">
+                    </div>
                 </div>
             </div>
-        </div>
+            <div class="col-sm-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Pump</h3>
+                    </div>
+                    <div class="panel-body" id="pumps">
+                        
+                    </div>
+                </div>
+            </div>
 
-        <div class="col-sm-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Slide</h3>
-                </div>
-                <div class="panel-body">
-                    <input type="checkbox" id="slide-toggle" data-style="slow">
-                </div>
-            </div>
-        </div>
-
-        <div class="col-sm-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title status-off" id="solar-heat-on">Solar Heater</h3>
-                </div>
-                <div class="panel-body">
-                    <input type="number" min="80" step=".5" max="92" class="form-control" id="heat-temperature">
-                    <input type="checkbox" id="heat-enabled-toggle" data-style="slow">
+            <div class="col-sm-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Valves</h3>
+                    </div>
+                    <div class="panel-body" id="valves"></div>
                 </div>
             </div>
-        </div>
-
-        <div class="col-sm-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title status-on" id="freeze-prevention-on">Freeze prevention</h3>
-                </div>
-                <div class="panel-body">
-                    <input type="checkbox" id="freeze-prevention-enabled" data-style="slow">
-                </div>
-            </div>
-        </div>
-
-        <div class="col-sm-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Valves</h3>
-                </div>
-                <div class="panel-body" id="valves"></div>
-            </div>
-        </div>
     </div>
+</div>
     
       <div id="footer">
          <hr>
@@ -320,7 +323,7 @@
                 }
 
                 var container = $("<table class='table'>");
-                    container.append("<tr><th></th><th>Start</th><th>End</th><th class='details'>Pumps</th><th class='details'>Valves</th></tr>");
+                    container.append("<tr><th></th><th>Start</th><th>End</th><th>Pumps</th></tr>");
 
                 //don't forget error handling!
                 $.each(result.schedules, function(scheduleIndex, schedule) {                         
@@ -335,12 +338,6 @@
                     row += "<td>";
                     $.each(schedule.pumps, function(pumpIndex, pump){
                         row+="<div id='schdule-"+schedule.id+"-pump-" + pump.id + "'>" + pump.displayName + " (" + pump.speedName + ")</div>";
-                    });
-                    row += "</td>";
-
-                    row += "<td>";
-                    $.each(schedule.valves, function(valveIndex, valve){
-                        row+= "<div id='schdule-"+schedule.id+"-valve-" + valve.id + "'>" + valve.name + "</div>";
                     });
                     row += "</td>";
                     row +="</tr>";
@@ -358,12 +355,14 @@
                 //don't forget error handling!
                 $.each(result, function(tempIndex, temp) {
                     container = `
+                    <div class="col-sm-2">
                         <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">%name%</h3>
-                        </div>
-                        <div class="panel-body">
-                            <div>%temperature%</div>
+                            <div class="panel-heading">
+                                <h3 class="panel-title">%name%</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div>%temperature%</div>
+                            </div>
                         </div>
                     </div>
                     `;
