@@ -167,7 +167,7 @@
                 off: 'Disabled'
             });
 
-                       $.getJSON("/valve/get",function(result){
+            $.getJSON("/valve/get",function(result){
                 var valves = $("#valves")
                 valves.empty();
 
@@ -214,18 +214,18 @@
                 });
             });
             
-            $.getJSON("/variable/get?name=" + heaterVariable, function(result) {
-                var control = $("#heat-temperature");
-                var timeoutId = null;
-                var lastValue = 0.0;
-                control.val(result.value);
-                control.on("input", function(item){       
-                    lastValue = parseFloat($(this).val());             
-                    timeoutId = changeVariable(timeoutId, heaterVariable, lastValue, null);
-                });
-            });
+            // $.getJSON("/variable/get?name=" + heaterVariable, function(result) {
+            //     var control = $("#heat-temperature");
+            //     var timeoutId = null;
+            //     var lastValue = 0.0;
+            //     control.val(result.value);
+            //     control.on("input", function(item){       
+            //         lastValue = parseFloat($(this).val());             
+            //         timeoutId = changeVariable(timeoutId, heaterVariable, lastValue, null);
+            //     });
+            // });
             showStatusFromBooleanVariable(freezePreventionOn);
-            showStatusFromBooleanVariable(solarHeaterOn);
+            //showStatusFromBooleanVariable(solarHeaterOn);
             loadVariableGroups();
             setToggleFromVariable(
                 freezePreventionEnabled.attr("id"), 
@@ -237,17 +237,17 @@
                     },5000)
                 });        
 
-            setToggleFromVariable(
-                heaterEnabledVariable, 
-                heaterEnabled, 
-                //If enabled or disabled update the status
-                function(data){
-                    //Give the server enough time to react
-                    setTimeout(function(){
-                        showStatusFromBooleanVariable(solarHeaterOn);
-                    },5000)                    
-            });
-            setToggleFromVariable(slideVariable, slideToggle, null);
+            // setToggleFromVariable(
+            //     heaterEnabledVariable, 
+            //     heaterEnabled, 
+            //     //If enabled or disabled update the status
+            //     function(data){
+            //         //Give the server enough time to react
+            //         setTimeout(function(){
+            //             showStatusFromBooleanVariable(solarHeaterOn);
+            //         },5000)                    
+            // });
+            //setToggleFromVariable(slideVariable, slideToggle, null);
 
 
             $.getJSON("/light/descriptions", function(result) {
@@ -367,8 +367,11 @@
                     control.append(container);                    
 
                     panel = $("#panel-" + panelId);
+                    var lastValues = [];
 
                     $.each(item.variables, function(index, variable) {
+                        var timeoutId = null;
+                        
                         if(variable.displayName != null || variable.displayName != '')
                                 panel.append($("<span style='margin-left:5px;'>" + variable.displayName + "</span>"));
 
@@ -387,11 +390,21 @@
                                 toggle.bootstrapToggle('on');
                             else
                                 toggle.bootstrapToggle('off');
+
+                            toggle.change(function() {
+                                lastValues[variable.name] = $(this).prop('checked');
+                                timeoutId = changeVariable(timeoutId, variable.name, lastValues[variable.name], null);
+                            });  
                         }
                         else //Guessing it's a number
                         {
                             var number = $("<input type='number' id='"+variable.name+"' step='.5' class='form-control' value='" + variable.value +"''>");                                                                           
                             panel.append(number);
+
+                            number.change(function() {
+                                lastValues[variable.name] = parseFloat($(this).val());
+                                timeoutId = changeVariable(timeoutId, variable.name, lastValues[variable.name], null);
+                            });
                         }
 
                     });                                        
