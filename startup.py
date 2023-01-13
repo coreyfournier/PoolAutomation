@@ -25,7 +25,7 @@ from Devices.Temperature import Temperature
 from lib.Actions import *
 from lib.Variables import Variables
 from IO.VariableRepo import *
-from lib.Variable import Variable
+from lib.Variable import *
 from Devices.Valves import *
 from IO.I2cController import I2cController
 from Devices.Pumps import Pumps
@@ -164,13 +164,19 @@ if __name__ == '__main__':
         #default variables
         [
             #Denotes if the slide is on or off. This will be a button
-            Variable("slide-enabled","Slide", False, bool),
+            VariableGroup("Slide", [Variable("slide-enabled","Slide", False, bool)], True),
+            
+            VariableGroup("Solar Heater", [                
+                Variable("solar-heat-temperature","Heater temp", 90.0, float),
+                Variable("solar-heat-enabled","Heater Enabled", True, bool)                
+            ], True),
             #The roof must be this temp + current pool temp before the heater turns on.
             Variable("solar-min-roof-diff","Minimum roof temp", 3, float),
-            Variable("solar-heat-temperature","Heater temp", 90.0, float),
-            Variable("solar-heat-enabled","Heater Enabled", True, bool),
-            Variable("solar-heat-on","Heater is on", False, bool),
-            Variable("freeze-prevention-enabled","Freeze prevention Enabled", True, bool),
+            Variable("solar-heat-on","Heater is on", False, bool),            
+
+            VariableGroup("Solar Heater", [
+                Variable("freeze-prevention-enabled","Freeze prevention Enabled", True, bool)
+            ],True),
             #Indicates if the freeze prevention is currently running/on
             Variable("freeze-prevention-on","Freeze prevention activated", False, bool),
             Variable("freeze-prevention-temperature","Temperature to activate prevention", 33, float)
@@ -284,7 +290,7 @@ if __name__ == '__main__':
     cherrypy.config.update(server_config)
     # before mounting anything
     #Only execute this if you are running in linux and as a service.
-    Daemonizer(cherrypy.engine).subscribe()
+    #Daemonizer(cherrypy.engine).subscribe()
     workerPlugin = WorkerPlugin(cherrypy.engine, DependencyContainer.scheduleRepo.schedules)
     workerPlugin.subscribe()
     cherrypy.config['tools.json_out.handler'] = json_handler

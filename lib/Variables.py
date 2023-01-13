@@ -1,12 +1,12 @@
 from typing import Callable
 from IO.VariableRepo import VariableRepo
-from lib.Variable import Variable
+from lib.Variable import *
 import DependencyContainer
 
 logger = DependencyContainer.get_logger(__name__)
 
 class Variables:
-    def __init__(self, variables:"list[Variable]", onChangeListner:Callable, repo:VariableRepo) -> None:
+    def __init__(self, variables:"list[Variable|VariableGroup]", onChangeListner:Callable, repo:VariableRepo) -> None:
         """Class constructor
 
         Args:
@@ -14,16 +14,19 @@ class Variables:
         """
         self._onChangeListner:Callable = onChangeListner
         self._repo:VariableRepo = repo
-        if(variables != None):
-            hasAny = len(self._repo.get()) > 0
+        self._groups:"dict[str,VariableGroup]" = {}
+
+        if(variables != None):            
+            hasAny = self._repo.hasAny()
             for var in variables:
                 self.addVariable(var)
-            #if there was none in the repo, but there were variables, then same them.
+                
+            #if there was none in the repo, but there were variables, then save them.
             if(not hasAny):
                 self.save()
 
     
-    def addVariable(self, variable:Variable) -> None:        
+    def addVariable(self, variable:"Variable|VariableGroup") -> None:        
         self._repo.add(variable)
     
     def updateValue(self, name:str, value:any) -> None:
@@ -46,3 +49,6 @@ class Variables:
     
     def save(self):
         self._repo.save()
+
+    def getVariablesForUi(self) -> "list[VariableGroup]":
+        return self._repo.getGroups()

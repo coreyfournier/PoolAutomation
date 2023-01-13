@@ -2,7 +2,7 @@ import cherrypy
 from Devices.Pump import *
 import dataclasses
 import DependencyContainer
-from lib.Variable import Variable
+from lib.Variable import *
 from lib.Variables import Variables
 
 logger = DependencyContainer.get_logger(__name__)
@@ -32,6 +32,9 @@ class VariableService:
     @cherrypy.tools.json_out()
     def get(self, name:str):
         variable = DependencyContainer.variables.get(name)
-
         return variable.to_dict()
         
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def UiVariables(self):
+        return [temp.to_dict() for temp in DependencyContainer.variables.getVariablesForUi()]
