@@ -19,6 +19,8 @@ class VariableGroup(JSONWizard):
     title:str
     variables:"PyList[Variable]"
     showInUi:bool = True
+    #If there is a variable that holds the on status. This must be a boolean
+    isOnVariable:str = None
 
 @dataclass_json
 @dataclass

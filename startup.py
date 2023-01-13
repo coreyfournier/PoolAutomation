@@ -169,14 +169,17 @@ if __name__ == '__main__':
             VariableGroup("Solar Heater", [                
                 Variable("solar-heat-temperature","Heater temp", 90.0, float),
                 Variable("solar-heat-enabled","Heater Enabled", True, bool)                
-            ], True),
+            ], 
+            True, 
+            "slide-enabled"),
             #The roof must be this temp + current pool temp before the heater turns on.
             Variable("solar-min-roof-diff","Minimum roof temp", 3, float),
-            Variable("solar-heat-on","Heater is on", False, bool),            
-
+            Variable("solar-heat-on","Heater is on", False, bool),
             VariableGroup("Solar Heater", [
                 Variable("freeze-prevention-enabled","Freeze prevention Enabled", True, bool)
-            ],True),
+            ],
+            True,
+            "solar-heat-on"),
             #Indicates if the freeze prevention is currently running/on
             Variable("freeze-prevention-on","Freeze prevention activated", False, bool),
             Variable("freeze-prevention-temperature","Temperature to activate prevention", 33, float)

@@ -28,34 +28,13 @@
                         <div id="schedule"></div>
                     </div>
                 </div>
-            </div>            
-            <div class="col-sm-2">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Slide</h3>
-                    </div>
-                    <div class="panel-body">
-                        <input type="checkbox" id="slide-toggle" data-style="slow">
-                    </div>
-                </div>
-            </div>
+            </div>                        
         </div>
         <div class="row" id="temperature">
             
         </div>
+        <div class="row" id="variable-groups"></div>
         <div class="row">        
-            <div class="col-sm-2">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title status-off" id="solar-heat-on">Solar Heater</h3>
-                    </div>
-                    <div class="panel-body">
-                        <input type="number" min="80" step=".5" max="92" class="form-control" id="heat-temperature">
-                        <input type="checkbox" id="heat-enabled-toggle" data-style="slow">
-                    </div>
-                </div>
-            </div>
-
             <div class="col-sm-4">
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -179,8 +158,6 @@
 
         function loadUiData()
         {            
-            var heaterEnabled = $('#heat-enabled-toggle');
-            var slideToggle = $('#slide-toggle');
             var freezePreventionEnabled = $('#freeze-prevention-enabled');
             var freezePreventionOn = $("#freeze-prevention-on");
             var solarHeaterOn = $("#solar-heat-on");
@@ -190,17 +167,7 @@
                 off: 'Disabled'
             });
 
-            heaterEnabled.bootstrapToggle({
-                on: 'Enabled',
-                off: 'Disabled'
-            });            
-
-            slideToggle.bootstrapToggle({
-                on: 'Having Fun',
-                off: 'Off'
-            });
-
-            $.getJSON("/valve/get",function(result){
+                       $.getJSON("/valve/get",function(result){
                 var valves = $("#valves")
                 valves.empty();
 
@@ -259,7 +226,7 @@
             });
             showStatusFromBooleanVariable(freezePreventionOn);
             showStatusFromBooleanVariable(solarHeaterOn);
-
+            loadVariableGroups();
             setToggleFromVariable(
                 freezePreventionEnabled.attr("id"), 
                 freezePreventionEnabled, 
@@ -370,6 +337,64 @@
                     container = container.replace("%temperature%", temp.temp.toFixed(2))
                     
                     options.append(container);
+                });
+            });
+        }
+
+        function loadVariableGroups()
+        {
+            var panelId = 0;
+            $.getJSON("/variable/UiVariables", function(result) {
+                var control = $("#variable-groups");
+
+                $.each(result, function(index, item) {
+                    panelId +=1;
+                    container = `
+                    <div class="col-sm-2">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title" id="%isOnVariable%">%name%</h3>
+                            </div>
+                            <div class="panel-body" id="panel-%panel-id%">
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                    
+                    container = container.replace("%isOnVariable%", item.isOnVariable);
+                    container = container.replace("%name%", item.title);
+                    container = container.replace("%panel-id%", panelId);
+                    control.append(container);                    
+
+                    panel = $("#panel-" + panelId);
+
+                    $.each(item.variables, function(index, variable) {
+                        if(variable.displayName != null || variable.displayName != '')
+                                panel.append($("<span style='margin-left:5px;'>" + variable.displayName + "</span>"));
+
+                        if(variable.dataType == "bool")
+                        {
+                            var toggle = $("<input type='checkbox' id='"+variable.name+"' data-style='slow'>");                   
+
+                            panel.append(toggle);
+
+                            toggle.bootstrapToggle({
+                                on: 'On',
+                                off: 'Off'
+                            });
+                            
+                            if(item.value)
+                                toggle.bootstrapToggle('on');
+                            else
+                                toggle.bootstrapToggle('off');
+                        }
+                        else //Guessing it's a number
+                        {
+                            var number = $("<input type='number' id='"+variable.name+"' step='.5' class='form-control' value='" + variable.value +"''>");                                                                           
+                            panel.append(number);
+                        }
+
+                    });                                        
                 });
             });
         }

@@ -8,7 +8,7 @@ class VariableRepo:
         self.__file:str = file
         self._container:VariableContainer = VariableContainer(groups=[], variables=[])
         self._variables:"dict[str,Variable]" = {}
-        self._uniqueContainers:"dict[str,VariableContainer]" = {}
+        self._uniqueGroups:"dict[str,VariableContainer]" = {}
         
 
         if(os.path.exists(file)):
@@ -17,14 +17,17 @@ class VariableRepo:
                 if(len(varSettingsJson) > 0):
                     self._container = VariableContainer.schema().loads(varSettingsJson) 
                     self._variables = self._container.getAll()
-                    
+
+                    #Make sure we have a list of unique groups, so they don't get added again
+                    for item in self._container.groups:
+                        self._uniqueGroups[item.title] = item
                     
 
     def add(self, variable:"Variable|VariableGroup") -> None:
         refresh = False        
         if(isinstance(variable, VariableGroup)):
-            if(variable.title not in self._uniqueContainers):
-                self._uniqueContainers[variable.title] = variable
+            if(variable.title not in self._uniqueGroups):
+                self._uniqueGroups[variable.title] = variable
                 self._container.groups.append(variable)
                 refresh = True
         else:
