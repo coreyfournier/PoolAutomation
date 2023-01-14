@@ -17,7 +17,7 @@ class ScheduleService:
         Returns:
             Schedule: All schedule information
         """
-        schedules = [dataclasses.asdict(item) for item in DependencyContainer.scheduleRepo.schedules]
+        schedules = [dataclasses.asdict(item) for item in DependencyContainer.schedules.get()]
 
         if(DependencyContainer.pumps != None):
             for schedule in schedules:

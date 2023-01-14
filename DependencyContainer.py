@@ -67,7 +67,7 @@ def get_logger(logger_name:str) -> logging.Logger:
 
 #from Lights.GloBrite import GloBrite 
 from Devices.Pump import Pump
-from IO.ScheduleRepo import ScheduleRepo
+from Devices.Schedules import Schedules
 from Devices.Temperature import Temperature
 from lib.Actions import *
 from lib.Variables import Variables
@@ -79,7 +79,7 @@ light = None
 #List of pumps description is the first item in the tuple, pump is the second.
 pumps:Pumps = None
 
-scheduleRepo:ScheduleRepo = None
+schedules:Schedules = None
 
 #List of devices available. key is the name of the device, second is the device
 temperatureDevices:"dict[str,Temperature]" = {}

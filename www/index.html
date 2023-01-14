@@ -328,7 +328,7 @@
                         var timeoutId = null;
                         
                         if(variable.displayName != null && variable.displayName != '')
-                            panel.append($("<span style='margin-left:5px;'>" + variable.displayName + "</span>"));
+                            panel.append($("<span style='margin-right:5px;'>" + variable.displayName + "</span>"));
 
                         if(variable.dataType == "bool")
                         {
@@ -353,7 +353,7 @@
                         }
                         else //Guessing it's a number
                         {
-                            var number = $("<input type='number' id='" + variable.name + "' step='.5' class='form-control' value='" + variable.value + "''>");   
+                            var number = $("<input type='number' id='" + variable.name + "' step='.5' class='form-control' value='" + variable.value + "'' style='width:75px;'>");   
 
                             panel.append(number);
                             number.change(function() {

@@ -2,19 +2,18 @@ import DependencyContainer
 from typing import Callable
 
 class Temperature:
-    def __init__(self, name:str, deviceId:str, onChangeListner:Callable = None) -> None:
+    def __init__(self, name:str, deviceId:str) -> None:
         self._deviceId:str = deviceId
         self._name:str = name
         #temp tracking. used to store the last value
         self._tracked:dict[str,float] = {}
-        self._onChangeListner:Callable = onChangeListner
-    
+        
     def getDeviceId(self):
         return self._deviceId
 
-    def notifyChangeListner(self):
-        if(self._onChangeListner != None):
-            self._onChangeListner(self._name, self)
+    def notifyChangeListner(self):        
+        if(DependencyContainer.actions.notifyTemperatureChangeListners != None):
+            DependencyContainer.actions.notifyTemperatureChangeListners(self._name, self)
 
     def get(self, allowCached:bool = True)-> float:
         """Gets the temp of the device id
