@@ -52,17 +52,6 @@
             </div>       
         </div>
         <div class="row">           
-
-            <div class="col-sm-3">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title status-on" id="freeze-prevention-on">Freeze prevention</h3>
-                    </div>
-                    <div class="panel-body">
-                        <input type="checkbox" id="freeze-prevention-enabled" data-style="slow">
-                    </div>
-                </div>
-            </div>
             <div class="col-sm-4">
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -214,41 +203,7 @@
                 });
             });
             
-            // $.getJSON("/variable/get?name=" + heaterVariable, function(result) {
-            //     var control = $("#heat-temperature");
-            //     var timeoutId = null;
-            //     var lastValue = 0.0;
-            //     control.val(result.value);
-            //     control.on("input", function(item){       
-            //         lastValue = parseFloat($(this).val());             
-            //         timeoutId = changeVariable(timeoutId, heaterVariable, lastValue, null);
-            //     });
-            // });
-            showStatusFromBooleanVariable(freezePreventionOn);
-            //showStatusFromBooleanVariable(solarHeaterOn);
             loadVariableGroups();
-            setToggleFromVariable(
-                freezePreventionEnabled.attr("id"), 
-                freezePreventionEnabled, 
-                function(){
-                    //Give the server enough time to react
-                    setTimeout(function(){
-                        showStatusFromBooleanVariable(freezePreventionOn);
-                    },5000)
-                });        
-
-            // setToggleFromVariable(
-            //     heaterEnabledVariable, 
-            //     heaterEnabled, 
-            //     //If enabled or disabled update the status
-            //     function(data){
-            //         //Give the server enough time to react
-            //         setTimeout(function(){
-            //             showStatusFromBooleanVariable(solarHeaterOn);
-            //         },5000)                    
-            // });
-            //setToggleFromVariable(slideVariable, slideToggle, null);
-
 
             $.getJSON("/light/descriptions", function(result) {
                 var options = $("#scene");
@@ -268,7 +223,7 @@
                     console.log("pump=" + pump.displayName)
                     pumps.append(("<div>"+pump.displayName+"</div>"))
                     
-                    speedControl = $('<select name="speed" id="speed" style="width: 250px;" onchange="speedChange(this)"></select>');
+                    speedControl = $('<select name="speed" id="speed" style="width: 250px;" onchange="speedChange(this,' + pump.index + ')"></select>');
                     pumps.append(speedControl)
                     
                     $.each(pump.speeds, function(speedIndex, speed){
@@ -350,7 +305,7 @@
                 $.each(result, function(index, item) {
                     panelId +=1;
                     container = `
-                    <div class="col-sm-2">
+                    <div class="col-sm-3">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h3 class="panel-title" id="%isOnVariable%">%name%</h3>
@@ -372,12 +327,12 @@
                     $.each(item.variables, function(index, variable) {
                         var timeoutId = null;
                         
-                        if(variable.displayName != null || variable.displayName != '')
-                                panel.append($("<span style='margin-left:5px;'>" + variable.displayName + "</span>"));
+                        if(variable.displayName != null && variable.displayName != '')
+                            panel.append($("<span style='margin-left:5px;'>" + variable.displayName + "</span>"));
 
                         if(variable.dataType == "bool")
                         {
-                            var toggle = $("<input type='checkbox' id='"+variable.name+"' data-style='slow'>");                   
+                            var toggle = $("<input type='checkbox' id='" + variable.name + "' data-style='slow'>");                   
 
                             panel.append(toggle);
 
@@ -386,36 +341,57 @@
                                 off: 'Off'
                             });
                             
-                            if(item.value)
+                            if(variable.value)
                                 toggle.bootstrapToggle('on');
                             else
                                 toggle.bootstrapToggle('off');
 
                             toggle.change(function() {
                                 lastValues[variable.name] = $(this).prop('checked');
-                                timeoutId = changeVariable(timeoutId, variable.name, lastValues[variable.name], null);
+                                timeoutId = changeVariable(timeoutId, variable.name, lastValues[variable.name], function(changeResult){showStatusIfExists(changeResult,item.isOnVariable)});
                             });  
                         }
                         else //Guessing it's a number
                         {
-                            var number = $("<input type='number' id='"+variable.name+"' step='.5' class='form-control' value='" + variable.value +"''>");                                                                           
-                            panel.append(number);
+                            var number = $("<input type='number' id='" + variable.name + "' step='.5' class='form-control' value='" + variable.value + "''>");   
 
+                            panel.append(number);
                             number.change(function() {
                                 lastValues[variable.name] = parseFloat($(this).val());
-                                timeoutId = changeVariable(timeoutId, variable.name, lastValues[variable.name], null);
+                                timeoutId = changeVariable(timeoutId, variable.name, lastValues[variable.name], function(changeResult){showStatusIfExists(changeResult,item.isOnVariable)});
                             });
                         }
+
+                        if(item.isOnVariable != null)
+                            showStatusFromBooleanVariable($("#" + item.isOnVariable));
 
                     });                                        
                 });
             });
         }
+
+        /*
+        If the variable has an "on" variable in the group, then check to see if it's state changed to on after something changed
+        */
+        function showStatusIfExists(changedVariable, onVariable)
+        {
+            if(onVariable != null)
+            {
+                $.getJSON("/variable/get?name=" + onVariable, function(result) {
+                        if(result != null)
+                        {
+                            var control = $("#" + onVariable);
+                            control.removeClass("status-" + (result.value? "off" : "on"));
+                            control.addClass("status-" + (result.value? "on" : "off"));
+                        }
+                    }); 
+            }
+        }
         
-        function speedChange(control)
+        function speedChange(control, index)
         {
             $.ajax({
-                    url: '/pump/on?pumpIndex=0&speed=' + $(control).val(),
+                    url: '/pump/on?pumpIndex=' + index + '&speed=' + $(control).val(),
                     success: function(){
                         alert('changed speed to ' + $(control).val());
                     }

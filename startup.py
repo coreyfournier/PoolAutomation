@@ -164,25 +164,34 @@ if __name__ == '__main__':
         #default variables
         [
             #Denotes if the slide is on or off. This will be a button
-            VariableGroup("Slide", [Variable("slide-enabled","Slide", False, bool)], True),
+            VariableGroup("Slide", [
+                Variable("slide-on",None, False, bool)
+            ], 
+            True,
+            "slide-on"),
             
             VariableGroup("Solar Heater", [                
                 Variable("solar-heat-temperature","Heater temp", 90.0, float),
-                Variable("solar-heat-enabled","Heater Enabled", True, bool)                
+                Variable("solar-heat-enabled","Enabled", True, bool)                
             ], 
             True, 
-            "slide-enabled"),
+            "solar-heat-on"),
+
             #The roof must be this temp + current pool temp before the heater turns on.
             Variable("solar-min-roof-diff","Minimum roof temp", 3, float),
             Variable("solar-heat-on","Heater is on", False, bool),
             VariableGroup("Solar Heater", [
-                Variable("solar-heat-enabled","Freeze prevention Enabled", True, bool)
+                Variable("solar-heat-enabled","Enabled", True, bool)
             ],
             True,
             "solar-heat-on"),
+            VariableGroup("Freeze Prevention", [
+                Variable("freeze-prevention-enabled","Enabled", True, bool)    
+            ],
+            True,
+            "freeze-prevention-on"),
             #Indicates if the freeze prevention is currently running/on
             Variable("freeze-prevention-on","Freeze prevention activated", False, bool),
-            Variable("freeze-prevention-enabled","Freeze prevention Enabled", True, bool),
             Variable("freeze-prevention-temperature","Temperature to activate prevention", 33, float)
         ],
         None,
@@ -200,7 +209,7 @@ if __name__ == '__main__':
             #on Temp change
             None,
             #if it starts up and the slide is on, don't let the schedule start
-            DependencyContainer.variables.get("slide-enabled").value
+            DependencyContainer.variables.get("slide-on").value
         ),
         Action("freeze-prevention", "Freeze Prevention",
             None,

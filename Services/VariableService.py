@@ -32,7 +32,11 @@ class VariableService:
     @cherrypy.tools.json_out()
     def get(self, name:str):
         variable = DependencyContainer.variables.get(name)
-        return variable.to_dict()
+        
+        if(variable == None):
+            return None
+        else:
+            return variable.to_dict()
         
     @cherrypy.expose
     @cherrypy.tools.json_out()
