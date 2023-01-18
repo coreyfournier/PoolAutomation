@@ -35,31 +35,34 @@ logger = DependencyContainer.get_logger(__name__)
 def configure(variableRepo:VariableRepo, GPIO, smbus2):
 
     #Get the bus for i2c controls    
-    bus = smbus2.SMBus(1)    
+    bus = smbus2.SMBus(1)
+    relayAddress = 0x27    
 
     DependencyContainer.pumps = Pumps(    
         [RelayPump("main","Main",
         {
             #Example for GPIO relay: Speed.SPEED_1: GpioController(GPIO, boardPin, 0)
-            Speed.SPEED_1: I2cController(1, 0x27, bus),
-            Speed.SPEED_2: I2cController(2, 0x27, bus),
-            Speed.SPEED_3: I2cController(3, 0x27, bus),
-            Speed.SPEED_4: I2cController(4, 0x27, bus)
+            Speed.SPEED_1: I2cController(1, relayAddress, bus),
+            Speed.SPEED_2: I2cController(2, relayAddress, bus),
+            Speed.SPEED_3: I2cController(3, relayAddress, bus),
+            Speed.SPEED_4: I2cController(4, relayAddress, bus)
         },
         beforePumpChange,
         afterPumpChange)])
 
     DependencyContainer.valves = Valves([
+        #example for using board pin (GPIO) 
+        #Valve("Solar","solar",1,False, GpioController(GPIO,13,0))
         #GPIO17
-        Valve("Solar","solar",1,False, GpioController(GPIO,13,0)),
+        Valve("Solar","solar",1,False, I2cController(5, relayAddress, bus)),
         #GPIO22
-        Valve("Slide","slide",2,False, GpioController(GPIO,15,0))
+        Valve("Slide","slide",2,False, I2cController(6, relayAddress, bus))
     ])
 
     
     #Add light controller here
     DependencyContainer.lights = Lights([
-        GloBrite("main","Main", GpioController(GPIO, 11))
+        GloBrite("main","Main", I2cController(7, relayAddress, bus))
     ])
 
     DependencyContainer.variables = Variables(
