@@ -37,7 +37,11 @@ class Variable(Schema):
             'encoder': dataTypeToString,
             'decoder': stringToDataType
             #'mm_field': fields.DateTime(format='iso')
-        }})  
+        }})
+    #Denotes that this is a date time and can expire. The set date time will then be checked to see if it has expired
+    expires:bool = False
+    #Only applies when expires is true. Indicates that this should no longer be checked to see if it expired because that time already passed.
+    hasExpired:bool = True
 
 @dataclass_json
 @dataclass
