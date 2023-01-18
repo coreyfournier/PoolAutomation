@@ -30,24 +30,11 @@
                 </div>
             </div>                        
         </div>
-        <div class="row" id="temperature">
-            
-        </div>
+        <div class="row" id="temperature"></div>
         <div class="row" id="variable-groups"></div>
         <div class="row">        
             <div class="col-sm-4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">GloBrite Color Changer</h3>
-                    </div>
-                    <div class="panel-body">
-                        <p>Choose A Scene</p>
-                        <select name="scene" id="scene" style="width: 250px;"><option value="-1">-</option>></select>
-                        <button onclick="sceneChange()">Change</button>
-                        <br>
-                        <br>
-                        <button onclick="lightOff()">Off</button>
-                    </div>
+                <div class="panel panel-default" id="lights">                    
                 </div>
             </div>       
         </div>
@@ -156,6 +143,35 @@
                 off: 'Disabled'
             });
 
+            $.getJSON("/light/get",function(result){
+                var template = `<div class="panel-heading">
+                        <h3 class="panel-title">%displayName%</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p>Choose A Scene</p>
+                        <select id="light-scene-%name%" style="width: 250px;"><option value="-1">-</option>></select>
+                        <button onclick="sceneChange('%name%', 'light-scene-%name%')">Change</button>
+                        <br>
+                        <br>
+                        <button onclick="lightOff('%name%')">Off</button>
+                    </div>`;
+
+                    $.each(result, function(i, light) {
+                        var tmp = template;
+                        tmp = tmp.replaceAll("%name%", light.name);
+                        tmp = tmp.replaceAll("%displayName%", light.displayName);
+                        
+                        $("#lights").append($(tmp));
+                        
+                        var options = $("#light-scene-" + light.name);
+
+                        $.each(light.lightScenes, function(index, info) {
+                            options.append($("<option />").val(index).text(info.name + ' - ' + info.description));
+                        });
+                        
+                    });
+            });
+
             $.getJSON("/valve/get",function(result){
                 var valves = $("#valves")
                 valves.empty();
@@ -204,15 +220,6 @@
             });
             
             loadVariableGroups();
-
-            $.getJSON("/light/descriptions", function(result) {
-                var options = $("#scene");
-                options.empty();
-                //don't forget error handling!
-                $.each(result, function(index) {
-                    options.append($("<option />").val(index).text(this[1] + ' - ' + this[2]));
-                });
-            });
 
             $.getJSON("/pump/descriptions", function(result) {
                 var pumps = $("#pumps");
@@ -288,8 +295,8 @@
                         </div>
                     </div>
                     `;
-                    container = container.replace("%name%", temp.name)
-                    container = container.replace("%temperature%", temp.temp.toFixed(2))
+                    container = container.replaceAll("%name%", temp.name)
+                    container = container.replaceAll("%temperature%", temp.temp.toFixed(2))
                     
                     options.append(container);
                 });
@@ -316,9 +323,9 @@
                     </div>
                     `;
                     
-                    container = container.replace("%isOnVariable%", item.isOnVariable);
-                    container = container.replace("%name%", item.title);
-                    container = container.replace("%panel-id%", panelId);
+                    container = container.replaceAll("%isOnVariable%", item.isOnVariable);
+                    container = container.replaceAll("%name%", item.title);
+                    container = container.replaceAll("%panel-id%", panelId);
                     control.append(container);                    
 
                     panel = $("#panel-" + panelId);
@@ -398,13 +405,13 @@
             });
         }
 
-        function sceneChange(){
-            var selectedValue = $('#scene option').filter(":selected").val();
+        function sceneChange(name, control){
+            var selectedValue = $('#' + control + ' option').filter(":selected").val();
 
             if(selectedValue >= 0)
             {
                 $.ajax({
-                    url: '/light/change?sceneIndex=' + selectedValue,
+                    url: '/light/change?name='+name+'&sceneIndex=' + selectedValue,
                     success: function(){
                         alert('changed scene');
                     }
@@ -412,9 +419,9 @@
             }
         }
 
-        function lightOff(){
+        function lightOff(name){
             $.ajax({
-                url: '/light/off',
+                url: '/light/off?name=' + name,
                 success: function(){
                     alert('turned off');
                 }

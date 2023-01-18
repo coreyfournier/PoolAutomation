@@ -2,17 +2,19 @@
 import threading
 import DependencyContainer
 from Devices.DeviceController import DeviceController
+from Devices.Light import *
+
 logger = DependencyContainer.get_logger(__name__)
 
-class GloBrite:
-	def __init__(self, controller:DeviceController):	
+class GloBrite(Light):
+	def __init__(self, name:str, displayName:str, controller:DeviceController):	
+		super().__init__(name, displayName)
+
 		self.controller = controller
 		self.lock = threading.Lock()
 
-	@staticmethod
-	def lightScenes() :		
-		#[{Numer of times it needs to turn on and off}, {Name of the color},{Description}]
-		return [
+		#[Number of times to turn on and off, short name, long name]
+		self._sceneConfig = [
 			[1, 'SAm Mode','Cycles through white, magenta, blue and green colors'],
 			[2, 'Party Mode','Rapid color changing bulding energy and excitment'],
 			[3, 'Romance Mode','Slow color transitions creating a mesmerizing and calming effect'],
@@ -28,10 +30,15 @@ class GloBrite:
 			[13,'Hold','Saved the current color effect during a color light show'],
 			[14,'Recall', 'Activate the last saved color effect']
 		]
+
+		self._scenes = [Scene(x[1], x[2]) for x in self._sceneConfig]
+
+	def lightScenes(self) -> "list[Scene]":
+		return self._scenes
+
 		
-	@staticmethod
-	def sceneDescriptions():
-		globrite_light_scenes = GloBrite.lightScenes()
+	def sceneDescriptions(self):
+		globrite_light_scenes = self._sceneConfig
 
 		scene_description = ''
 		for item in range(len(globrite_light_scenes)):
@@ -42,7 +49,7 @@ class GloBrite:
 		return scene_description	
 
 	def change(self, scene_index):
-		globrite_light_scenes = GloBrite.lightScenes()
+		globrite_light_scenes = self._sceneConfig
 		selected_scene = globrite_light_scenes[scene_index]
 
 		#ensure only one person can change the scene at a time

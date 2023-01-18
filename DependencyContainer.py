@@ -73,8 +73,9 @@ from lib.Actions import *
 from lib.Variables import Variables
 from Devices.Valves import Valves
 from Devices.Pumps import Pumps
+from Devices.Lights import Lights
 
-light = None
+lights:Lights = None
 
 #List of pumps description is the first item in the tuple, pump is the second.
 pumps:Pumps = None

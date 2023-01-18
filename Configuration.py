@@ -3,13 +3,64 @@ from Devices.Temperature import Temperature
 from lib.Actions import *
 from Devices.Pump import *
 from Devices.DeviceController import *
-from lib.Variables import *
-from lib.Variable import *
 from IO.ScheduleRepo import ScheduleRepo
+from IO.GpioController import GpioController
+from IO.I2cController import I2cController
 import os
 
+from Devices.Temperature import Temperature
+from lib.Actions import *
+from lib.Variables import Variables
+from IO.VariableRepo import *
+from lib.Variable import *
+from Devices.Valves import *
+from Devices.Pump import Pump
+from Devices.RelayPump import *
+from Devices.Pumps import Pumps
+from Devices.GloBrite import GloBrite 
+from Devices.Lights import Lights
+
 logger = DependencyContainer.get_logger(__name__)
-def configure(variableRepo:VariableRepo):
+
+
+def beforePumpChange(newSpeed:Speed, oldSpeed:Speed):
+    logger.info(f"Before Pump change callback. Speed changed from {oldSpeed} to {newSpeed}")
+    return True
+
+def afterPumpChange(newSpeed:Speed):
+    logger.info(f"After Pump change callback. Speed changed: {newSpeed}")
+
+
+logger = DependencyContainer.get_logger(__name__)
+def configure(variableRepo:VariableRepo, GPIO, smbus2):
+
+    #Get the bus for i2c controls    
+    bus = smbus2.SMBus(1)    
+
+    DependencyContainer.pumps = Pumps(    
+        [RelayPump("main","Main",
+        {
+            #Example for GPIO relay: Speed.SPEED_1: GpioController(GPIO, boardPin, 0)
+            Speed.SPEED_1: I2cController(1, 0x27, bus),
+            Speed.SPEED_2: I2cController(2, 0x27, bus),
+            Speed.SPEED_3: I2cController(3, 0x27, bus),
+            Speed.SPEED_4: I2cController(4, 0x27, bus)
+        },
+        beforePumpChange,
+        afterPumpChange)])
+
+    DependencyContainer.valves = Valves([
+        #GPIO17
+        Valve("Solar","solar",1,False, GpioController(GPIO,13,0)),
+        #GPIO22
+        Valve("Slide","slide",2,False, GpioController(GPIO,15,0))
+    ])
+
+    
+    #Add light controller here
+    DependencyContainer.lights = Lights([
+        GloBrite("main","Main", GpioController(GPIO, 11))
+    ])
 
     DependencyContainer.variables = Variables(
             #default variables

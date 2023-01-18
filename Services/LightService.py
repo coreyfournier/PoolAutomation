@@ -1,30 +1,31 @@
 from pickle import TRUE
 import cherrypy
 import os
-from Devices.GloBrite import GloBrite 
 import DependencyContainer
 
 
 class LightService:
     def __init__(self):	
-        self.gb:GloBrite = DependencyContainer.light
+        self.lights = DependencyContainer.lights
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def change(self, sceneIndex):
+    def get(self):
+        temp = [x.to_dict() for x in self.lights.getAll()]
+        return temp
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def change(self, name:str, sceneIndex:int):
         cherrypy.response.headers['Content-Type'] = 'application/json'
-        self.gb.change(int(sceneIndex))
+        light = self.lights.get(name)
+        light.change(int(sceneIndex))
 
         return "OK"
 
     @cherrypy.expose
-    @cherrypy.tools.json_out()
-    def descriptions(self):
-        return self.gb.lightScenes()
-
-    @cherrypy.expose
-    def off(self):
-        self.gb.off()
+    def off(self, name:str):
+        self.lights.get(name).off()
         return "OK"
 
 
