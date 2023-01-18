@@ -62,7 +62,7 @@ def configure(variableRepo:VariableRepo, GPIO, smbus2):
     
     #Add light controller here
     DependencyContainer.lights = Lights([
-        GloBrite("main","Main", I2cController(7, relayAddress, bus))
+        GloBrite("main","Light", I2cController(7, relayAddress, bus))
     ])
 
     DependencyContainer.variables = Variables(
