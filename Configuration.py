@@ -36,7 +36,7 @@ def configure(variableRepo:VariableRepo, GPIO, smbus2):
 
     #Get the bus for i2c controls    
     bus = smbus2.SMBus(1)
-    relayAddress = 0x27    
+    relayAddress = 0x3f    
 
     DependencyContainer.pumps = Pumps(    
         [RelayPump("main","Main",
@@ -106,7 +106,7 @@ def configure(variableRepo:VariableRepo, GPIO, smbus2):
     DependencyContainer.actions = Actions([
         Action("slide", "Slide",
             #on variable change
-            lambda variable, oldValue, action : slideStatusChanged(variable, oldValue, action) if(variable.name == "slide-enabled") else None, 
+            lambda variable, oldValue, action : slideStatusChanged(variable, oldValue, action) if(variable.name == "slide-on") else None, 
             #on Temp change
             None,
             #if it starts up and the slide is on, don't let the schedule start
