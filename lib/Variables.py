@@ -2,6 +2,8 @@ from typing import Callable
 from IO.VariableRepo import VariableRepo
 from lib.Variable import *
 import DependencyContainer
+import time
+import datetime
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -25,6 +27,24 @@ class Variables:
             if(not hasAny):
                 self.save()
 
+    def getVariablesThatExpire(self, allowExpired = False):
+        ready = []
+        for key, variable in self._repo.get().items():
+            if(variable.expires != None and variable.expires and ((not variable.hasExpired and not allowExpired) or allowExpired)):
+                ready.append(variable)
+        return ready
+
+    def checkForExpiredVariables(self):
+        """Checks against now to see if the variables are not exprired and should be expired. 
+        Fires a notification when it does.
+        """
+        now = datetime.datetime.now()
+        for item in self.getVariablesThatExpire():
+            if(now > item.value):
+                item.hasExpired = True
+                #Notify anyone that it expired
+                if(self._onChangeListner != None):
+                    self._onChangeListner(item, False)
     
     def addVariable(self, variable:"Variable|VariableGroup") -> None:        
         self._repo.add(variable)

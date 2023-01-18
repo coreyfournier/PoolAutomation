@@ -1,3 +1,4 @@
+import datetime
 import DependencyContainer
 from Devices.Temperature import Temperature
 from lib.Actions import *
@@ -68,6 +69,11 @@ def configure(variableRepo:VariableRepo, GPIO, smbus2):
     DependencyContainer.variables = Variables(
             #default variables
             [
+                VariableGroup("Quick Clean",[
+                    Variable("quick-clean-expires-on","Expires on", None, datetime, True)                    
+                    ],
+                    isOnVariable="quick-clean-on"),
+                Variable("quick-clean-on",None, False, bool),
                 #Denotes if the slide is on or off. This will be a button
                 VariableGroup("Slide", [
                     Variable("slide-on",None, False, bool)

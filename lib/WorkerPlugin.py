@@ -69,6 +69,9 @@ class WorkerPlugin(SimplePlugin):
             DependencyContainer.schedules.checkSchedule()
             #Reading any temperature sensors and sending notifications
             self._getTemperature()
+
+            DependencyContainer.variables.checkForExpiredVariables()
+
             time.sleep(self._sleep)
     
     def _getTemperature(self):
