@@ -1,4 +1,4 @@
-
+from time import sleep
 import threading
 import DependencyContainer
 from Devices.DeviceController import DeviceController
@@ -7,9 +7,9 @@ from Devices.Light import *
 logger = DependencyContainer.get_logger(__name__)
 
 class GloBrite(Light):
-	def __init__(self, name:str, displayName:str, controller:DeviceController):	
+	def __init__(self, name:str, displayName:str, controller:DeviceController, delay_in_seconds:float = .5):	
 		super().__init__(name, displayName)
-
+		self.delay_in_seconds = delay_in_seconds
 		self.controller = controller
 		self.lock = threading.Lock()
 
@@ -61,9 +61,11 @@ class GloBrite(Light):
 			if(len(iterations) > 1):
 				for switch_flip in iterations:
 					logger.debug(f'on') 
-					self.controller.on()			
+					self.controller.on()
+					sleep(self.delay_in_seconds)			
 					logger.debug(f'off')
 					self.controller.off()			
+					sleep(self.delay_in_seconds)			
 
 			#Always end with on
 			logger.debug(f'on')
