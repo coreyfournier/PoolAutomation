@@ -74,6 +74,7 @@ from lib.Variables import Variables
 from Devices.Valves import Valves
 from Devices.Pumps import Pumps
 from Devices.Lights import Lights
+from Devices.TemperatureSensors import TemperatureSensors
 
 lights:Lights = None
 
@@ -83,7 +84,7 @@ pumps:Pumps = None
 schedules:Schedules = None
 
 #List of devices available. key is the name of the device, second is the device
-temperatureDevices:"dict[str,Temperature]" = {}
+temperatureDevices:TemperatureSensors = None
 
 #Custom actions / code that can execute based on the environment.
 actions:Actions = None

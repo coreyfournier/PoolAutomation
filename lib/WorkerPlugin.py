@@ -77,7 +77,7 @@ class WorkerPlugin(SimplePlugin):
     def _getTemperature(self):
         if(DependencyContainer.temperatureDevices != None):
             #Read the temp for each device. if it changed it should fire and event
-            for key, device in DependencyContainer.temperatureDevices.items():
+            for device in DependencyContainer.temperatureDevices.getAll():
                 lastTemp = device.getLast()
                 if(lastTemp == None):
                     device.get(False)

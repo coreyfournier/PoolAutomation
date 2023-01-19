@@ -8,13 +8,8 @@ import datetime
 logger = DependencyContainer.get_logger(__name__)
 
 class Variables:
-    def __init__(self, variables:"list[Variable|VariableGroup]", onChangeListner:Callable, repo:VariableRepo) -> None:
-        """Class constructor
-
-        Args:
-            onChangeListner (Callable): Function accepting (Variable, oldValue). Even if this is None, it will also notify DependencyContainer.actions.notifyVariableChangeListners
-        """
-        self._onChangeListner:Callable = onChangeListner
+    def __init__(self, variables:"list[Variable|VariableGroup]", repo:VariableRepo) -> None:
+        
         self._repo:VariableRepo = repo
         self._groups:"dict[str,VariableGroup]" = {}
 
@@ -43,8 +38,8 @@ class Variables:
             if(now > item.value):
                 item.hasExpired = True
                 #Notify anyone that it expired
-                if(self._onChangeListner != None):
-                    self._onChangeListner(item, False)
+                if(DependencyContainer.actions != None):
+                    DependencyContainer.actions.nofityListners(VariableChangeEvent(None,item))
     
     def addVariable(self, variable:"Variable|VariableGroup") -> None:        
         self._repo.add(variable)
@@ -56,11 +51,8 @@ class Variables:
         self._repo.save()
 
         if(DependencyContainer.actions != None):
-            DependencyContainer.actions.notifyVariableChangeListners(variable, oldValue)
-        
-        if(self._onChangeListner != None):
-            self._onChangeListner(variable, oldValue)
-    
+            DependencyContainer.actions.nofityListners(VariableChangeEvent(None, variable))
+            
     def get(self, name:str) -> Variable:
         if(name in self._repo.get()):
             return self._repo.get()[name]

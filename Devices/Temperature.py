@@ -1,20 +1,15 @@
+from dataclasses import dataclass, field
 import DependencyContainer
-from typing import Callable
+from lib.Event import Event
 
 class Temperature:
-    def __init__(self, name:str, deviceId:str) -> None:
-        self._deviceId:str = deviceId
-        self._name:str = name
+    def __init__(self, name:str, displayName:str,deviceId:str) -> None:
+        self.deviceId:str = deviceId
+        self.name:str = name
+        self.displayName:str = displayName
         #temp tracking. used to store the last value
         self._tracked:dict[str,float] = {}
         
-    def getDeviceId(self):
-        return self._deviceId
-
-    def notifyChangeListner(self):        
-        if(DependencyContainer.actions.notifyTemperatureChangeListners != None):
-            DependencyContainer.actions.notifyTemperatureChangeListners(self._name, self)
-
     def get(self, allowCached:bool = True)-> float:
         """Gets the temp of the device id
 
@@ -40,10 +35,14 @@ class Temperature:
         Returns:
             float: _description_
         """
-        if(self._deviceId in self._tracked):            
+        if(self.deviceId in self._tracked):            
             if(DependencyContainer.tempFormat == "c"):
-                return self._tracked[self._deviceId]
+                return self._tracked[self.deviceId]
             else:
-                return self._celsiusToFahrenheit(self._tracked[self._deviceId])
+                return self._celsiusToFahrenheit(self._tracked[self.deviceId])
         else:
             return None
+
+@dataclass
+class TemperatureChangeEvent(Event):
+    device:Temperature

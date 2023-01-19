@@ -4,13 +4,13 @@ import random
 from typing import Callable
 
 class TempStub(Temperature):
-    def __init__(self,name:str, defaultTempInCelsius:float) -> None:
-        super().__init__(name, str(random.random()))
+    def __init__(self,name:str, displayName:str, defaultTempInCelsius:float) -> None:
+        super().__init__(name, displayName, str(random.random()))
         self.defaultTempInCelsius = defaultTempInCelsius
         
     def get(self, allowCached:bool = True)-> float:
         
-        self._tracked[self._deviceId] = self.defaultTempInCelsius
+        self._tracked[self.deviceId] = self.defaultTempInCelsius
 
         if(DependencyContainer.tempFormat == "c"):
             return self.defaultTempInCelsius

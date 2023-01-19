@@ -56,15 +56,13 @@ if __name__ == '__main__':
     from Devices.Schedule import *
     from IO.ScheduleRepo import ScheduleRepo
     from IO.TemperatureRepo import TemperatureRepo
+    from Devices.TemperatureSensors import TemperatureSensors
     from lib.Variables import *
     from lib.Variable import *
     from Devices.Schedules import *
     from lib.CherryPyJsonEncoder import *
 
-    DependencyContainer.temperatureDevices = TemperatureRepo(
-            os.path.join(dataPath, "sample-temperature-devices.json")
-        ).getDevices()
-    
+    DependencyContainer.temperatureDevices = TemperatureSensors(TemperatureRepo(temperatureFile))    
     DependencyContainer.schedules = Schedules(ScheduleRepo(os.path.join(dataPath, "schedule.json")))
     variableRepo = VariableRepo(os.path.join(dataPath, "variables.json"))
     

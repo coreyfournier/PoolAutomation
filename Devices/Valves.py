@@ -4,6 +4,8 @@ import builtins
 from marshmallow import Schema, fields
 from Devices.DeviceController import DeviceController
 from typing import Callable
+from lib.Actions import Event
+import DependencyContainer
 
 @dataclass
 class Valve:
@@ -21,16 +23,18 @@ class Valve:
             "isOn" : self.isOn
         }
 
+@dataclass
+class ValveChangeEvent(Event):
+    valve:Valve
+
 class Valves:
-    def __init__(self, valves:"list[Valve]", onChangeListner:Callable = None) -> None:
+    def __init__(self, valves:"list[Valve]") -> None:
         self._valves:"dict[str,Valve]" = {}
 
         for valve in valves:
             valve.isOn = valve.controller.isOn()
             self._valves[valve.apiName] = valve            
-
-        self._onChangeListner = onChangeListner
-    
+  
     def get(self, name:str)-> Valve:
         return self._valves[name]
     
@@ -40,11 +44,15 @@ class Valves:
     def on(self, name:str):
         self._valves[name].controller.on()
         self._valves[name].isOn = True
-        if(self._onChangeListner != None):
-            self._onChangeListner(self._valves[name])
+        
+        if(DependencyContainer.actions != None):
+            DependencyContainer.actions.nofityListners(ValveChangeEvent(None,self._valves[name]))
 
     def off(self, name:str):
         self._valves[name].controller.off()
         self._valves[name].isOn = False
-        if(self._onChangeListner != None):
-            self._onChangeListner(self._valves[name])
+
+        if(DependencyContainer.actions != None):
+            DependencyContainer.actions.nofityListners(ValveChangeEvent(None,self._valves[name]))
+
+        
