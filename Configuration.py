@@ -43,10 +43,11 @@ def configure(variableRepo:VariableRepo, GPIO, smbus2):
         [RelayPump("main","Main",
         {
             #Example for GPIO relay: Speed.SPEED_1: GpioController(GPIO, boardPin, 0)
-            Speed.SPEED_1: I2cController(1, relayAddress, bus),
-            Speed.SPEED_2: I2cController(2, relayAddress, bus),
-            Speed.SPEED_3: I2cController(3, relayAddress, bus),
-            Speed.SPEED_4: I2cController(4, relayAddress, bus)
+            #Speed.SPEED_1: I2cController(1, relayAddress, bus),
+            Speed.SPEED_1: GpioController(GPIO, 11, 0),
+            Speed.SPEED_2: GpioController(GPIO, 13, 0),
+            Speed.SPEED_3: GpioController(GPIO, 15, 0),
+            Speed.SPEED_4: GpioController(GPIO, 29, 0)
         },
         beforePumpChange,
         afterPumpChange)])
@@ -54,16 +55,18 @@ def configure(variableRepo:VariableRepo, GPIO, smbus2):
     DependencyContainer.valves = Valves([
         #example for using board pin (GPIO) 
         #Valve("Solar","solar",1,False, GpioController(GPIO,13,0))
+        #Valve("Solar","solar",1,False, I2cController(5, relayAddress, bus)),
         #GPIO17
-        Valve("Solar","solar",1,False, I2cController(5, relayAddress, bus)),
+        Valve("Solar","solar",1,False, GpioController(GPIO,31,0)),
         #GPIO22
-        Valve("Slide","slide",2,False, I2cController(6, relayAddress, bus))
+        Valve("Slide","slide",2,False, GpioController(GPIO,33,0))
     ])
 
     
     #Add light controller here
     DependencyContainer.lights = Lights([
-        GloBrite("main","Light", I2cController(7, relayAddress, bus))
+        #GloBrite("main","Light", I2cController(7, relayAddress, bus))
+        GloBrite("main","Light", GpioController(GPIO,35,0))
     ])
 
     DependencyContainer.variables = Variables(
