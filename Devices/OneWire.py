@@ -15,8 +15,8 @@ class OneWire(Temperature):
     Args:
         Temperature (_type_): _description_
     """
-    def __init__(self, name:str, deviceId:str, baseDeviceDirectory:str = "/sys/bus/w1/devices/", devicePrefix:str = "28*") -> None:
-        super().__init__(name, deviceId)
+    def __init__(self, name:str, displayName:str, deviceId:str, baseDeviceDirectory:str = "/sys/bus/w1/devices/", devicePrefix:str = "28*") -> None:
+        super().__init__(name, displayName, deviceId)
         self.__base_dir = baseDeviceDirectory
         self.__devicePrefix = devicePrefix
 
@@ -50,10 +50,10 @@ class OneWire(Temperature):
     
     def get(self, allowCached:bool = True)-> float:
         if(allowCached):
-            tempC = self._tracked[self._deviceId]
+            tempC = self._tracked[self.deviceId]
         else:
-            tempC = self.__read_temp(self._deviceId)
-            self._tracked[self._deviceId] = tempC
+            tempC = self.__read_temp(self.deviceId)
+            self._tracked[self.deviceId] = tempC
         
         if(DependencyContainer.tempFormat == "c"):
             return tempC

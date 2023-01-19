@@ -27,3 +27,7 @@ class Light:
             "displayName" : self.displayName,
             "lightScenes" : [x.to_dict() for x in self.lightScenes()]
         }
+
+@dataclass
+class LightChangeEvent:
+    light:Light

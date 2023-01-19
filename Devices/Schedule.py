@@ -5,6 +5,7 @@ from dataclasses_json import dataclass_json, LetterCase, config
 from typing import List as PyList
 from dataclass_wizard import JSONWizard
 from marshmallow import Schema, fields
+from lib.Actions import Event
 
 @dataclass
 class PumpControl:
@@ -109,3 +110,7 @@ class PumpSchedule(Control):
             return self.endTime.replace(year=now.year, month=now.month, day=now.day, second = 59)
         else:
             return self.endTime
+
+@dataclass
+class ScheduleChangeEvent(Event):
+    schedule:PumpSchedule

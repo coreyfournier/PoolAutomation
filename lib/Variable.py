@@ -1,15 +1,25 @@
 from dataclasses import dataclass, field
-from dataclasses_json import dataclass_json
+from dataclasses_json import dataclass_json, config
 from dataclass_wizard import JSONWizard
 import builtins 
 from marshmallow import Schema, fields
 from typing import List as PyList
+from lib.Actions import Event
+import datetime
 
 def dataTypeToString(dataType:type):
     return dataType.__name__
 
 def stringToDataType(dataType:str):
-    return getattr(builtins, dataType)
+    if(dataType == "datetime"):
+        return getattr(datetime, dataType)
+    else:
+        return getattr(builtins, dataType)
+
+def inferTypeToString(value:any):
+    pass
+    #if(value.count("-") > 2):
+
 
 @dataclass_json
 @dataclass
@@ -30,7 +40,7 @@ class Variable(Schema):
     #What will be shown to the user
     displayName:str
     #What will be stored here
-    value:any
+    value:any 
     #The intented data type
     dataType:type = field(
         metadata={'dataclasses_json': {
@@ -42,6 +52,10 @@ class Variable(Schema):
     expires:bool = False
     #Only applies when expires is true. Indicates that this should no longer be checked to see if it expired because that time already passed.
     hasExpired:bool = True
+
+@dataclass
+class VariableChangeEvent(Event):
+    variable:Variable
 
 @dataclass_json
 @dataclass
