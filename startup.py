@@ -45,9 +45,11 @@ if __name__ == '__main__':
         
         temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
         DependencyContainer.pumps = []
+        runAsDaemon = False
     else:#When running on the raspberry pi
         import RPi.GPIO as GPIO
         import smbus2
+        runAsDaemon = True
 
         #temperatureFile = os.path.join(dataPath, "temperature-devices.json")
         temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
@@ -69,11 +71,15 @@ if __name__ == '__main__':
     #All custom changes are here
     Configuration.configure(variableRepo, GPIO, smbus2)    
         
+    #Check the schedule as soon as the system starts up. something may need to be turned on or off.
+    DependencyContainer.schedules.checkSchedule()
+
     cherrypy.config.update(server_config)
 
     # before mounting anything
     #Only execute this if you are running in linux and as a service.
-    #Daemonizer(cherrypy.engine).subscribe()
+    if(runAsDaemon):
+        Daemonizer(cherrypy.engine).subscribe()
     workerPlugin = WorkerPlugin(cherrypy.engine).subscribe()
     cherrypy.config['tools.json_out.handler'] = json_handler
     cherrypy.tree.mount(Index(os.path.join("www")), config=app_conf)     

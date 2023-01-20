@@ -47,16 +47,16 @@ def configure(variableRepo:VariableRepo, GPIO, smbus2):
         #Valve("Solar","solar",1,False, GpioController(GPIO,13,0))
         #Valve("Solar","solar",1,False, I2cController(5, relayAddress, bus)),
         #GPIO17
-        Valve("Solar","solar",1,False, GpioController(GPIO,31,0)),
+        Valve("Solar","solar",1,False, GpioController(GPIO,35,0)),
         #GPIO22
-        Valve("Slide","slide",2,False, GpioController(GPIO,33,0))
+        Valve("Slide","slide",2,False, GpioController(GPIO,37,0))
     ])
 
     
     #Add light controller here
     DependencyContainer.lights = Lights([
         #GloBrite("main","Light", I2cController(7, relayAddress, bus))
-        GloBrite("main","Light", GpioController(GPIO,35,0))
+        GloBrite("main","Light", GpioController(GPIO,33,0))
     ])
 
     DependencyContainer.variables = Variables(
