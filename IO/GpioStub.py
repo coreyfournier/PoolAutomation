@@ -3,10 +3,13 @@ logger = DependencyContainer.get_logger(__name__)
 
 #Class stub of Pi GPIO for doing testing.
 class GpioStub():
+	#using board pin number
 	BOARD = 'board'
 	OUT = 'out'
 	LOW = 'low'
 	HIGH = 'high'
+	#Using the GPIO numbers in place of the board pin
+	BCM = 'gpio#'
 
 	def __init__(self) -> None:
 		self.pinState:"dict[int,bool]" = {}	
