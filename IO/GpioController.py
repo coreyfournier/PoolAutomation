@@ -5,7 +5,7 @@ logger = DependencyContainer.get_logger(__name__)
 
 #Controller as an implementation interface to the target
 class GpioController(DeviceController):
-	def __init__(self, gpio, gpio_pin:int, useBoardPins:bool = True):	
+	def __init__(self, gpio, gpio_pin:int, useBoardPins:bool = True, allowWarnings:bool = False):	
 		"""Interface to flip pins on the pie
 
 		Args:
@@ -20,16 +20,18 @@ class GpioController(DeviceController):
 		self.initial = self.gpio.HIGH
 		#What is considered on. Off will be inital
 		self.onState = self.gpio.LOW		
-
+		
 		#Set warnings to false otherwise you will get a warning when doing PIN IO after the pin was using other times.
-		self.gpio.setwarnings(False)
+		self.gpio.setwarnings(allowWarnings)
 
 		if(useBoardPins):
 			#using pin numbers and not GPIO numbers
 			self.gpio.setmode(self.gpio.BOARD)
+			logger.debug(f"Pin:{self.gpio_pin} Inital:{self.initial}")
 		else:
 			self.gpio.setmode(self.gpio.BCM)
-
+			logger.debug(f"GPIO:{self.gpio_pin} Inital:{self.initial}")		
+			
 		self.gpio.setup(self.gpio_pin, self.gpio.OUT, initial=self.initial)
 
 	def on(self):

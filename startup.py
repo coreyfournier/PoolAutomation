@@ -35,6 +35,7 @@ if __name__ == '__main__':
     import Configuration    
     
     dataPath = os.path.join("data")       
+    i2cBus = None
 
     #check to see if the environment variable is there or if its set to stub.
     if("CONTROLLER_TARGET" not in os.environ or os.environ["CONTROLLER_TARGET"] == "stub"):
@@ -44,13 +45,15 @@ if __name__ == '__main__':
         import IO.SmbusStub as smbus2
         
         temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
-        DependencyContainer.pumps = []
         runAsDaemon = False
+        i2cBus = None
     else:#When running on the raspberry pi
-        import RPi.GPIO as GPIO
-        import smbus2
+        import RPi.GPIO as GPIO        
+        #import smbus2
+        #Get the bus for i2c controls    
+        #i2cBus = smbus2.SMBus(1)
+        
         runAsDaemon = True
-
         #temperatureFile = os.path.join(dataPath, "temperature-devices.json")
         temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
         
@@ -69,10 +72,10 @@ if __name__ == '__main__':
     variableRepo = VariableRepo(os.path.join(dataPath, "variables.json"))
     
     #All custom changes are here
-    Configuration.configure(variableRepo, GPIO, smbus2)    
+    Configuration.configure(variableRepo, GPIO, i2cBus)    
         
-    #Check the schedule as soon as the system starts up. something may need to be turned on or off.
-    DependencyContainer.schedules.checkSchedule()
+    # #Check the schedule as soon as the system starts up. something may need to be turned on or off.
+    DependencyContainer.schedules.checkSchedule()    
 
     cherrypy.config.update(server_config)
 

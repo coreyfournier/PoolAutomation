@@ -1,6 +1,5 @@
-from Devices.Pump import Pump
-from typing import Callable
 import DependencyContainer
+from Devices.Pump import Pump
 
 logger = DependencyContainer.get_logger(__name__)
 

@@ -23,42 +23,41 @@ from Devices.Temperature import *
 
 logger = DependencyContainer.get_logger(__name__)
 
-def configure(variableRepo:VariableRepo, GPIO, smbus2):
-
-    #Get the bus for i2c controls    
-    bus = smbus2.SMBus(1)
+def configure(variableRepo:VariableRepo, GPIO, i2cBus):
     relayAddress = 0x3f    
-
+    
+    logger.debug("Loading pumps")
     DependencyContainer.pumps = Pumps(    
         [RelayPump("main","Main",
         {
-            #Example for GPIO relay: Speed.SPEED_1: GpioController(GPIO, boardPin, 0)
-            #Speed.SPEED_1: I2cController(1, relayAddress, bus),
-            Speed.SPEED_1: GpioController(GPIO, 11, 0),
-            Speed.SPEED_2: GpioController(GPIO, 13, 0),
-            Speed.SPEED_3: GpioController(GPIO, 15, 0),
-            Speed.SPEED_4: GpioController(GPIO, 29, 0)
+            #Example for GPIO relay: Speed.SPEED_1: GpioController(GPIO, boardPin)
+            #Speed.SPEED_1: I2cController(1, relayAddress, i2cBus),
+            Speed.SPEED_1: GpioController(GPIO, 11),
+            Speed.SPEED_2: GpioController(GPIO, 13),
+            Speed.SPEED_3: GpioController(GPIO, 15),
+            Speed.SPEED_4: GpioController(GPIO, 29)
         }
     )])
 
-
+    logger.debug("Loading valves")
     DependencyContainer.valves = Valves([
         #example for using board pin (GPIO) 
-        #Valve("Solar","solar",1,False, GpioController(GPIO,13,0))
-        #Valve("Solar","solar",1,False, I2cController(5, relayAddress, bus)),
+        #Valve("Solar","solar",1,False, GpioController(GPIO,13))
+        #Valve("Solar","solar",1,False, I2cController(5, relayAddress, i2cBus)),
         #GPIO17
-        Valve("Solar","solar",1,False, GpioController(GPIO,35,0)),
+        Valve("Solar","solar",1,False, GpioController(GPIO,35)),
         #GPIO22
-        Valve("Slide","slide",2,False, GpioController(GPIO,37,0))
+        Valve("Slide","slide",2,False, GpioController(GPIO,37))
     ])
 
     
-    #Add light controller here
+    logger.debug("Loading lights")    
     DependencyContainer.lights = Lights([
-        #GloBrite("main","Light", I2cController(7, relayAddress, bus))
-        GloBrite("main","Light", GpioController(GPIO,33,0))
+        #GloBrite("main","Light", I2cController(7, relayAddress, i2cBus))
+        GloBrite("main","Light", GpioController(GPIO,33))
     ])
 
+    logger.debug("Loading variables")
     DependencyContainer.variables = Variables(
             #default variables
             [
@@ -101,7 +100,7 @@ def configure(variableRepo:VariableRepo, GPIO, smbus2):
             ],
             variableRepo)
            
-        
+    logger.debug("Loading actions")
     DependencyContainer.actions = Actions([
         #Action("quick-clean","Quick Clean", )
         Action("slide", "Slide",
