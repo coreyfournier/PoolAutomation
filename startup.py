@@ -54,8 +54,8 @@ if __name__ == '__main__':
         #i2cBus = smbus2.SMBus(1)
         
         runAsDaemon = True
-        #temperatureFile = os.path.join(dataPath, "temperature-devices.json")
-        temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
+        temperatureFile = os.path.join(dataPath, "temperature-devices.json")
+        #temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
         
     
     from Devices.Schedule import *
