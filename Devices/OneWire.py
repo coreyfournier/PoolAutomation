@@ -17,6 +17,7 @@ class OneWire(Temperature):
     """
     def __init__(self, name:str, displayName:str, deviceId:str, baseDeviceDirectory:str = "/sys/bus/w1/devices/", devicePrefix:str = "28*") -> None:
         super().__init__(name, displayName, deviceId)
+        
         self.__base_dir = baseDeviceDirectory
         self.__devicePrefix = devicePrefix
 

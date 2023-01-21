@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from lib.Event import Event
 from lib.Action import Action
 
-
+logger = DependencyContainer.get_logger(__name__)
 
 class Actions:
     def __init__(self, actions:"list[Action]" = None, allChangeListner:Callable = None) -> None:
@@ -29,12 +29,19 @@ class Actions:
 
     def nofityListners(self, event:Event):
         if(self._allChangeListner != None):
-            self._allChangeListner(event)
+            try:
+                self._allChangeListner(event)
+            except Exception as err:
+                logger.error(f"Failed notifying all change listners. Error:{err}")
 
         for key, action in self._registered.items():
             if(action.onChange != None):
                 event.action = action
-                action.onChange(event)
+                try:
+                    action.onChange(event)
+                except Exception as err:
+                    logger.error(f"Failed onChange event notification for Action:'{action.name}'. Error:{err}")
+                
 
     def getScheduleOverrides(self)-> "list[Action]":
         """Gets any actions that need to stop the schedule from running

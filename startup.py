@@ -45,6 +45,7 @@ if __name__ == '__main__':
         import IO.SmbusStub as smbus2
         
         temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
+        
         runAsDaemon = False
         i2cBus = None
     else:#When running on the raspberry pi
@@ -53,7 +54,7 @@ if __name__ == '__main__':
         #Get the bus for i2c controls    
         #i2cBus = smbus2.SMBus(1)
         
-        runAsDaemon = True
+        runAsDaemon = False
         temperatureFile = os.path.join(dataPath, "temperature-devices.json")
         #temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
         
@@ -75,7 +76,12 @@ if __name__ == '__main__':
     Configuration.configure(variableRepo, GPIO, i2cBus)    
         
     # #Check the schedule as soon as the system starts up. something may need to be turned on or off.
-    DependencyContainer.schedules.checkSchedule()    
+    if(DependencyContainer.schedules != None):
+        DependencyContainer.schedules.checkSchedule()    
+
+    #making sure the temp sensors load and are primed
+    if(DependencyContainer.temperatureDevices != None):
+        DependencyContainer.temperatureDevices.checkAll()
 
     cherrypy.config.update(server_config)
 

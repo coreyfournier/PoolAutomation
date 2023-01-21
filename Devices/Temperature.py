@@ -42,7 +42,7 @@ class Temperature:
                 return self._celsiusToFahrenheit(self._tracked[self.deviceId])
         else:
             return None
-
+    
 @dataclass
 class TemperatureChangeEvent(Event):
     device:Temperature

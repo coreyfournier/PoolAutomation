@@ -66,26 +66,20 @@ class WorkerPlugin(SimplePlugin):
     def _target(self):
         while self._running:
             #Checking the schedules to see if any need to be active or inactive
-            DependencyContainer.schedules.checkSchedule()
-            #Reading any temperature sensors and sending notifications
-            self._getTemperature()
+            if(DependencyContainer.schedules != None):
+                DependencyContainer.schedules.checkSchedule()
+            
+            #Reading any temperature sensors
+            try:                
+                if(DependencyContainer.temperatureDevices != None):
+                    DependencyContainer.temperatureDevices.checkAll()
+            except Exception  as err:
+                logger.error(f"Failed when getting the temperature. Error:{err}")
 
-            DependencyContainer.variables.checkForExpiredVariables()
+            try:
+                if(DependencyContainer.variables != None)                :
+                    DependencyContainer.variables.checkForExpiredVariables()
+            except Exception  as err:
+                logger.error(f"Failed when checkForExpiredVariables. Error:{err}")
 
             time.sleep(self._sleep)
-    
-    def _getTemperature(self):
-        if(DependencyContainer.temperatureDevices != None):
-            #Read the temp for each device. if it changed it should fire and event
-            for device in DependencyContainer.temperatureDevices.getAll():
-                lastTemp = device.getLast()
-                if(lastTemp == None):
-                    device.get(False)
-                else:
-                    totalChange = abs(lastTemp - device.get(False))
-                    if(totalChange > 0.0):
-                        device.notifyChangeListner()   
-                       
-
-    def _do(self, arg):
-        self.bus.log('handling the message: {0}'.format(arg))
