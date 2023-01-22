@@ -7,20 +7,20 @@ No security is provided, but I used my synology nas to help me out here. I alrea
 I used Synology Application proxy to manage HTTPS and configured it to point to it's self 8081.
 You can read about how to configure it here: https://mariushosting.com/synology-how-to-use-reverse-proxy/
 1. Source
- * protocol HTTPS
- * hostname: {YouNasServerName}
- * Port: {Port you want to expose on the server}
+    * protocol HTTPS
+    * hostname: {YouNasServerName}
+    * Port: {Port you want to expose on the server}
 2. Destination
- * Protocol: HTTP
- * Hostname: {YouNasServerName}
- * Port: {The port number you are going to use in the container}
+    * Protocol: HTTP
+    * Hostname: {YouNasServerName}
+    * Port: {The port number you are going to use in the container}
 
 ### Docker Container in Synology for LDAP authentication
 reverse proxy container using: https://hub.docker.com/r/dariko/httpd-rproxy-ldap/
 
 Set the following configuration for the container:
 1. Initial screen
- * Set resource limitation to 256MB
+    * Set resource limitation to 256MB
 2. Go to advanced settings
     1. Enabled auto-restart
     2. Network - choose "Use the same network as Docker Host"
