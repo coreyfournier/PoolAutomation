@@ -6,11 +6,11 @@ No security is provided, but I used my synology nas to help me out here. I alrea
 ### Synology Reverse Proxy
 I used Synology Application proxy to manage HTTPS and configured it to point to it's self 8081.
 You can read about how to configure it here: https://mariushosting.com/synology-how-to-use-reverse-proxy/
-* Source
+1. Source
  * protocol HTTPS
  * hostname: {YouNasServerName}
  * Port: {Port you want to expose on the server}
-* Destination
+2. Destination
  * Protocol: HTTP
  * Hostname: {YouNasServerName}
  * Port: {The port number you are going to use in the container}
@@ -19,9 +19,9 @@ You can read about how to configure it here: https://mariushosting.com/synology-
 reverse proxy container using: https://hub.docker.com/r/dariko/httpd-rproxy-ldap/
 
 Set the following configuration for the container:
-* Initial screen
+1. Initial screen
  * Set resource limitation to 256MB
-* Go to advanced settings
+2. Go to advanced settings
  * Enabled auto-restart
  * Network - choose "Use the same network as Docker Host"
  * Port Settings - Container port 8081
