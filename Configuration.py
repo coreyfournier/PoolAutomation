@@ -203,7 +203,7 @@ def evaluateSolarStatus(event):
             #It's not on and it should be
             action.overrideSchedule = True
             DependencyContainer.variables.updateValue("solar-heat-on", True)
-            pumpForSolar.on(Speed.SPEED_3)
+            pumpForSolar.on(Speed.SPEED_2)
             DependencyContainer.valves.on("solar")   
 
 
