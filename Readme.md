@@ -22,11 +22,11 @@ Set the following configuration for the container:
 1. Initial screen
  * Set resource limitation to 256MB
 2. Go to advanced settings
- 1. Enabled auto-restart
- 2. Network - choose "Use the same network as Docker Host"
- 3. Port Settings - Container port 8081
- 4. Environment
-  * LDAP_URI=ldap://{DomainName.com}/dc={DomainName},dc=com?uid?sub?(objectClass=*)
-  * PROXY_URI=http://{YourPi}:8080/
-  * LISTEN_PORT=8081
-  * SERVERNAME={YouNasServerName}    
+    1. Enabled auto-restart
+    2. Network - choose "Use the same network as Docker Host"
+    3. Port Settings - Container port 8081
+    4. Environment
+        * LDAP_URI=ldap://{DomainName.com}/dc={DomainName},dc=com?uid?sub?(objectClass=*)
+        * PROXY_URI=http://{YourPi}:8080/
+        * LISTEN_PORT=8081
+        * SERVERNAME={YouNasServerName}    
