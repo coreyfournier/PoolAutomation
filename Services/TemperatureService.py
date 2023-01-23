@@ -15,7 +15,10 @@ class TemperatureService:
 
         return [
             {
-            "name": item.displayName, 
-            "temp": item.get(),
-            "unit": DependencyContainer.temperatureUnit.upper()
-                             } for item in DependencyContainer.temperatureDevices.getAll()]
+                "name": item.displayName, 
+                "temp": item.get(),
+                "unit": DependencyContainer.temperatureUnit.upper()
+            } 
+            #Loop through all the items creating the dictionary output
+            for item in DependencyContainer.temperatureDevices.getAll()
+        ]
