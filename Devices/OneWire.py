@@ -56,10 +56,13 @@ class OneWire(Temperature):
             tempC = self.__read_temp(self.deviceId)
             self._tracked[self.deviceId] = tempC
         
-        if(DependencyContainer.tempFormat == "c"):
+        if(DependencyContainer.temperatureUnit == "c"):
             return tempC
         else:
             return self._celsiusToFahrenheit(tempC)
+    
+    def __str__(self) -> str:
+        return f"{self.name} - {self.get()}"
 
 
     

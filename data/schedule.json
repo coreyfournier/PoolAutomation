@@ -27,7 +27,7 @@
     },
     {
         "startTime":"01/01/0001 13:00",
-        "endTime":"01/01/9999 20:59",
+        "endTime":"01/01/9999 16:59",
         "id":3,
         "name":"Night",
         "isActive":true,

@@ -10,7 +10,7 @@ log_level:int = None
 log_to_file:str = None
 
 #f= fahrenheit c=celsius 
-tempFormat = "f"
+temperatureUnit = "f"
 
 _nameToLevel = {
     'CRITICAL': logging.CRITICAL,

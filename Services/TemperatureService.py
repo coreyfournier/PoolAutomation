@@ -13,4 +13,9 @@ class TemperatureService:
     @cherrypy.tools.json_out()
     def sensors(self):
 
-        return [{"name": item.displayName, "temp": item.get()} for item in DependencyContainer.temperatureDevices.getAll()]
+        return [
+            {
+            "name": item.displayName, 
+            "temp": item.get(),
+            "unit": DependencyContainer.temperatureUnit.upper()
+                             } for item in DependencyContainer.temperatureDevices.getAll()]

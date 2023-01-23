@@ -36,13 +36,19 @@ class Temperature:
             float: _description_
         """
         if(self.deviceId in self._tracked):            
-            if(DependencyContainer.tempFormat == "c"):
+            if(DependencyContainer.temperatureUnit == "c"):
                 return self._tracked[self.deviceId]
             else:
                 return self._celsiusToFahrenheit(self._tracked[self.deviceId])
         else:
             return None
+        
+    def __str__(self) -> str:
+        return f"{self.name} - {self.get()}"
     
 @dataclass
 class TemperatureChangeEvent(Event):
     device:Temperature
+    
+    def __str__(self) -> str:
+        return f"{self.device.name} - {self.device.get()}{DependencyContainer.temperatureUnit}"

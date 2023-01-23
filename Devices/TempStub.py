@@ -12,7 +12,7 @@ class TempStub(Temperature):
         
         self._tracked[self.deviceId] = self.defaultTempInCelsius
 
-        if(DependencyContainer.tempFormat == "c"):
+        if(DependencyContainer.temperatureUnit == "c"):
             return self.defaultTempInCelsius
         else:
             return self._celsiusToFahrenheit(self.defaultTempInCelsius)
@@ -24,3 +24,6 @@ class TempStub(Temperature):
             list[str]: All devices and thier path
         """
         return ["Roof","Heat","Pool","Ambient"]
+
+    def __str__(self) -> str:
+        return f"{self.name} - {self.get()}"

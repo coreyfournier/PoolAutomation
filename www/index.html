@@ -290,13 +290,14 @@
                                 <h3 class="panel-title">%name%</h3>
                             </div>
                             <div class="panel-body">
-                                <div>%temperature%</div>
+                                <div>%temperature% %unit%</div>
                             </div>
                         </div>
                     </div>
                     `;
                     container = container.replaceAll("%name%", temp.name)
                     container = container.replaceAll("%temperature%", temp.temp.toFixed(2))
+                    container = container.replaceAll("%unit%", temp.unit)
                     
                     options.append(container);
                 });
