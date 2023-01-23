@@ -4,18 +4,19 @@ import random
 from typing import Callable
 
 class TempStub(Temperature):
-    def __init__(self,name:str, displayName:str, defaultTempInCelsius:float) -> None:
+    def __init__(self,name:str, displayName:str) -> None:
         super().__init__(name, displayName, str(random.random()))
-        self.defaultTempInCelsius = defaultTempInCelsius
         
     def get(self, allowCached:bool = True)-> float:
-        
-        self._tracked[self.deviceId] = self.defaultTempInCelsius
+        #change the temp randomly so events get fired
+        temp = random.random()
+
+        self._tracked[self.deviceId] = temp
 
         if(DependencyContainer.temperatureUnit == "c"):
-            return self.defaultTempInCelsius
+            return temp
         else:
-            return self._celsiusToFahrenheit(self.defaultTempInCelsius)
+            return self._celsiusToFahrenheit(temp)
     
     def getAllDevices(self)-> "list[str]":
         """Gets all one wire temp devices
