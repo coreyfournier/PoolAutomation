@@ -2,6 +2,7 @@ import json
 from typing import Callable
 import os
 from lib.Variable import *
+from marshmallow import Schema, fields, EXCLUDE
 
 class VariableRepo:
     def __init__(self, file:str) -> None:
@@ -15,7 +16,7 @@ class VariableRepo:
             with open(self.__file, mode = "r") as f:
                 varSettingsJson = f.read()
                 if(len(varSettingsJson) > 0):
-                    self._container = VariableContainer.schema().loads(varSettingsJson) 
+                    self._container = VariableContainer.schema().loads(varSettingsJson, unknown=EXCLUDE) 
                     self._variables = self._container.getAll()
 
                     #Make sure we have a list of unique groups, so they don't get added again
@@ -46,9 +47,9 @@ class VariableRepo:
 
     def getGroups(self, forUI:bool = True) -> "list[VariableGroup]":
         if(forUI):
-            return list(filter(lambda x: x.showInUi ,self._container.groups))
+            return [x for x in list(filter(lambda x: x.showInUi ,self._container.groups))]
         else:
-            return self._container.groups
+            return [x for x in self._container.groups]
     
     def save(self):
         with open(self.__file, mode = "w") as f:                        

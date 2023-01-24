@@ -25,7 +25,7 @@ class VariableService:
         if(variable == None):
             raise Exception(f"Missing variable '{name}'")
         else:
-            DependencyContainer.variables.updateValue(name, value)
+            DependencyContainer.variables.get(name).value = value
             return variable.to_dict()
     
     @cherrypy.expose

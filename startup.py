@@ -33,7 +33,7 @@ server_config = {'server.socket_host': '0.0.0.0',  'server.socket_port' : 8080}
 if __name__ == '__main__':
    
     import Configuration    
-    
+
     dataPath = os.path.join("data")       
     i2cBus = None
 
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     
     #All custom changes are here
     Configuration.configure(variableRepo, GPIO, i2cBus)    
-        
+
     # #Check the schedule as soon as the system starts up. something may need to be turned on or off.
     if(DependencyContainer.schedules != None):
         DependencyContainer.schedules.checkSchedule()    

@@ -62,47 +62,52 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
             #default variables
             [
                 VariableGroup("Quick Clean",[
-                    Variable("quick-clean-expires-in-hours","Expires in (hours)", 0, float)                        
+                    Variable("quick-clean-expires-in-hours","Expires in (hours)", float,0)                        
                     ],
                     isOnVariable="quick-clean-on"),
-                Variable("quick-clean-expires-on","Expires on", None, datetime, True),
-                Variable("quick-clean-on",None, False, bool),
+                Variable("quick-clean-expires-on","Expires on", datetime,None, True),
+                Variable("quick-clean-on",None, bool, False),
                 #Denotes if the slide is on or off. This will be a button
                 VariableGroup("Slide", [
-                    Variable("slide-on",None, False, bool)
+                    Variable("slide-on",None, bool,False)
                 ], 
                 True,
                 "slide-on"),
                 
                 VariableGroup("Solar Heater", [                
-                    Variable("solar-heat-temperature","Heater temp", 90.0, float),
-                    Variable("solar-heat-enabled","Enabled", True, bool)                
+                    Variable("solar-heat-temperature","Heater temp", float,90.0),
+                    Variable("solar-heat-enabled","Enabled", bool, True)                
                 ], 
                 True, 
                 "solar-heat-on"),
 
                 #The roof must be this temp + current pool temp before the heater turns on.
-                Variable("solar-min-roof-diff","Minimum roof temp", 3, float),
-                Variable("solar-heat-on","Heater is on", False, bool),
+                Variable("solar-min-roof-diff","Minimum roof temp", float, 3),
+                Variable("solar-heat-on","Heater is on", bool, False),
                 VariableGroup("Solar Heater", [
-                    Variable("solar-heat-enabled","Enabled", True, bool)
+                    Variable("solar-heat-enabled","Enabled", bool, True)
                 ],
                 True,
                 "solar-heat-on"),
                 VariableGroup("Freeze Prevention", [
-                    Variable("freeze-prevention-enabled","Enabled", True, bool)    
+                    Variable("freeze-prevention-enabled","Enabled", bool, True)    
                 ],
                 True,
                 "freeze-prevention-on"),
                 #Indicates if the freeze prevention is currently running/on
-                Variable("freeze-prevention-on","Freeze prevention activated", False, bool),
-                Variable("freeze-prevention-temperature","Temperature to activate prevention", 33, float)
+                Variable("freeze-prevention-on","Freeze prevention activated", bool, False),
+                Variable("freeze-prevention-temperature","Temperature to activate prevention", float, 33)
             ],
             variableRepo)
+
+
            
     logger.debug("Loading actions")
     DependencyContainer.actions = Actions([
-        #Action("quick-clean","Quick Clean", )
+        Action("quick-clean",
+            "Quick Clean", 
+            quickClean
+        ),
         Action("slide", "Slide",
             #on variable change
             slideStatusChanged, 
@@ -131,6 +136,18 @@ def allChangeNotification(event:Event):
         logger.debug("Checking to see if the schedule needs to make changes")           
         DependencyContainer.schedules.checkSchedule()
 
+def quickClean(event:Event):
+    if(isinstance(event, VariableChangeEvent) and event.variable.name in ["quick-clean-expires-on", "quick-clean-expires-in-hours", "quick-clean-on"]):
+        
+        #Update the date and time it expires if this changed
+        if(event.variable.name == "quick-clean-expires-in-hours"):
+            DependencyContainer.variables.get("quick-clean-expires-on").hasExpired = False
+            DependencyContainer.variables.get("quick-clean-expires-on").value = datetime.datetime.now() + event.variable.value
+            DependencyContainer.variables.get("quick-clean-on").value =  True
+        else:
+            pass
+
+
 def evaluateFreezePrevention(event:Event):
     action = event.action
     if(isinstance(event, TemperatureChangeEvent)):
@@ -143,14 +160,14 @@ def evaluateFreezePrevention(event:Event):
                 logger.info(f"Temp has reached freezing... Need to turn on pump to prevent freezing")
                 DependencyContainer.pumps.get("main").on(Speed.SPEED_1)
                 action.overrideSchedule = True
-                DependencyContainer.variables.updateValue("freeze-prevention-on", True)
+                DependencyContainer.variables.get("freeze-prevention-on").value =  True
             else:
                 logger.debug("Freezing, but freeze prevention disabled")
         #If it's on, but no longer freezing turn it off
         elif(DependencyContainer.variables.get("freeze-prevention-on").value):
             logger.info("Turning off freeze prevention")
             action.overrideSchedule = False
-            DependencyContainer.variables.updateValue("freeze-prevention-on", False)
+            DependencyContainer.variables.get("freeze-prevention-on").value = False
 
 def evaluateSolarStatus(event):
     action = event.action
@@ -195,14 +212,14 @@ def evaluateSolarStatus(event):
             logger.info("Turning solar OFF")
             #Turn it off, it should not be on
             action.overrideSchedule = False
-            DependencyContainer.variables.updateValue("solar-heat-on", False)
+            DependencyContainer.variables.get("solar-heat-on").value = False
             DependencyContainer.valves.off("solar")
             turnOffPumpIfNoActiveSchedule(pumpForSolar)
         elif(not isSolarHeatOn and solarShouldBeOn):
             logger.info("Turning solar ON")
             #It's not on and it should be
             action.overrideSchedule = True
-            DependencyContainer.variables.updateValue("solar-heat-on", True)
+            DependencyContainer.variables.get("solar-heat-on").value = True
             pumpForSolar.on(Speed.SPEED_2)
             DependencyContainer.valves.on("solar")   
 

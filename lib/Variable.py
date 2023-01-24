@@ -1,11 +1,14 @@
 from dataclasses import dataclass, field
-from dataclasses_json import dataclass_json, config
+from dataclasses_json import dataclass_json, config,Undefined
 from dataclass_wizard import JSONWizard
 import builtins 
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, EXCLUDE
 from typing import List as PyList
 from lib.Actions import Event
 import datetime
+import DependencyContainer
+from dataclass_wizard import property_wizard
+from typing_extensions import Annotated
 
 def dataTypeToString(dataType:type):
     return dataType.__name__
@@ -18,10 +21,9 @@ def stringToDataType(dataType:str):
 
 def inferTypeToString(value:any):
     pass
-    #if(value.count("-") > 2):
 
 
-@dataclass_json
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
 class VariableGroup(JSONWizard):   
     """Allows variables to be grouped together. This is mainly used to show in the UI.
@@ -32,32 +34,74 @@ class VariableGroup(JSONWizard):
     #If there is a variable that holds the on status. This must be a boolean
     isOnVariable:str = None
 
+
 @dataclass_json
 @dataclass
-class Variable(Schema):
-    #What this will be refered to in the back end
+class Variable(JSONWizard):
+    #Name you can use in code that will never change.
     name:str
     #What will be shown to the user
     displayName:str
-    #What will be stored here
-    value:any 
     #The intented data type
     dataType:type = field(
         metadata={'dataclasses_json': {
             'encoder': dataTypeToString,
             'decoder': stringToDataType
-            #'mm_field': fields.DateTime(format='iso')
         }})
+
+    value:any = field(
+        init=False, 
+        repr=False)
+    
+    #Abbreviated to val, because value is a reserved word. And it wasn't documented :(
+    @property
+    def value(self)-> any:
+        return self._value
+
+    @value.setter
+    def value(self, v:any)->None:
+        #If the variable does not exists, then declare it and set the value for it
+        if not hasattr(self, '_value'):
+            self._value = v
+        
+        if(v != self._value):
+            self._value = v
+            #It changed so notify everyone
+            if(DependencyContainer.actions != None):
+                DependencyContainer.actions.nofityListners(VariableChangeEvent(None, self))
+            if(DependencyContainer.variables != None):
+                DependencyContainer.variables.save()
+
+
     #Denotes that this is a date time and can expire. The set date time will then be checked to see if it has expired
     expires:bool = False
-    #Only applies when expires is true. Indicates that this should no longer be checked to see if it expired because that time already passed.
-    hasExpired:bool = True
+
+    # #Only applies when expires is true. Indicates that this should no longer be checked to see if it expired because that time already passed.
+    hasExpired:bool = True    
+
+    @property
+    def hasExpired(self) -> bool:
+        return self._hasExpired
+
+    @hasExpired.setter
+    def hasExpired(self, v:bool)->None:
+        #If the variable does not exists, then declare it and set the value for it
+        if not hasattr(self, '_hasExpired'):
+            self._hasExpired = v
+
+        if(v != self._hasExpired):
+            self._hasExpired = v
+            #It changed so notify everyone
+            if(DependencyContainer.actions != None):
+                DependencyContainer.actions.nofityListners(VariableChangeEvent(None, self))    
+            if(DependencyContainer.variables != None):
+                DependencyContainer.variables.save()
 
 @dataclass
 class VariableChangeEvent(Event):
     variable:Variable
 
-@dataclass_json
+@dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
 class VariableContainer(JSONWizard):
     groups:"PyList[VariableGroup]"
