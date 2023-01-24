@@ -22,7 +22,6 @@ def stringToDataType(dataType:str):
 def inferTypeToString(value:any):
     pass
 
-
 @dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
 class VariableGroup(JSONWizard):   
@@ -52,11 +51,27 @@ class Variable(JSONWizard):
     value:any = field(
         init=False, 
         repr=False)
+
+    #Denotes that this is a date time and can expire. The set date time will then be checked to see if it has expired
+    expires:bool = False
+
+    # #Only applies when expires is true. Indicates that this should no longer be checked to see if it expired because that time already passed.
+    hasExpired:bool = field(
+        init=True, 
+        repr=False,
+        default=True)
     
     #Abbreviated to val, because value is a reserved word. And it wasn't documented :(
     @property
     def value(self)-> any:
-        return self._value
+        if hasattr(self, '_value'):
+            #Stupid dataclasses will output the property address during serialization if it's hasen't been initalized. Took me days to figure this out.
+            if(isinstance(self._value,property)):
+                return None
+            else:
+                return self._value
+        else:
+            return None
 
     @value.setter
     def value(self, v:any)->None:
@@ -70,18 +85,17 @@ class Variable(JSONWizard):
             if(DependencyContainer.actions != None):
                 DependencyContainer.actions.nofityListners(VariableChangeEvent(None, self))
             if(DependencyContainer.variables != None):
-                DependencyContainer.variables.save()
-
-
-    #Denotes that this is a date time and can expire. The set date time will then be checked to see if it has expired
-    expires:bool = False
-
-    # #Only applies when expires is true. Indicates that this should no longer be checked to see if it expired because that time already passed.
-    hasExpired:bool = True    
+                DependencyContainer.variables.save() 
 
     @property
     def hasExpired(self) -> bool:
-        return self._hasExpired
+        if hasattr(self, '_hasExpired'):
+            #Stupid dataclasses will output the property address during serialization if it's hasen't been initalized. Took me days to figure this out.
+            if(isinstance(self._hasExpired,property)):
+                return True
+            return self._hasExpired
+        else:
+            return None
 
     @hasExpired.setter
     def hasExpired(self, v:bool)->None:

@@ -28,7 +28,6 @@ config_root = {
     'tools.staticdir.index' : 'index.html'}
 app_conf = { '/': config_root }
 server_config = {'server.socket_host': '0.0.0.0',  'server.socket_port' : 8080}
-
   
 if __name__ == '__main__':
    

@@ -20,6 +20,7 @@ from Devices.GloBrite import GloBrite
 from Devices.Lights import Lights
 from lib.Action import Action, OverrideChangeEvent
 from Devices.Temperature import *
+from datetime import timedelta
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -65,38 +66,38 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
                     Variable("quick-clean-expires-in-hours","Expires in (hours)", float,0)                        
                     ],
                     isOnVariable="quick-clean-on"),
-                Variable("quick-clean-expires-on","Expires on", datetime,None, True),
-                Variable("quick-clean-on",None, bool, False),
+                Variable("quick-clean-expires-on","Expires on", datetime, value=None, expires=True),
+                Variable("quick-clean-on",None, bool, value=False),
                 #Denotes if the slide is on or off. This will be a button
                 VariableGroup("Slide", [
-                    Variable("slide-on",None, bool,False)
+                    Variable("slide-on",None, bool,value=False)
                 ], 
                 True,
                 "slide-on"),
                 
                 VariableGroup("Solar Heater", [                
-                    Variable("solar-heat-temperature","Heater temp", float,90.0),
-                    Variable("solar-heat-enabled","Enabled", bool, True)                
+                    Variable("solar-heat-temperature","Heater temp", float,value=90.0),
+                    Variable("solar-heat-enabled","Enabled", bool, value=True)                
                 ], 
                 True, 
                 "solar-heat-on"),
 
                 #The roof must be this temp + current pool temp before the heater turns on.
-                Variable("solar-min-roof-diff","Minimum roof temp", float, 3),
-                Variable("solar-heat-on","Heater is on", bool, False),
+                Variable("solar-min-roof-diff","Minimum roof temp", float, value=3),
+                Variable("solar-heat-on","Heater is on", bool, value=False),
                 VariableGroup("Solar Heater", [
-                    Variable("solar-heat-enabled","Enabled", bool, True)
+                    Variable("solar-heat-enabled","Enabled", bool, value=True)
                 ],
                 True,
                 "solar-heat-on"),
                 VariableGroup("Freeze Prevention", [
-                    Variable("freeze-prevention-enabled","Enabled", bool, True)    
+                    Variable("freeze-prevention-enabled","Enabled", bool, value=True)    
                 ],
                 True,
                 "freeze-prevention-on"),
                 #Indicates if the freeze prevention is currently running/on
-                Variable("freeze-prevention-on","Freeze prevention activated", bool, False),
-                Variable("freeze-prevention-temperature","Temperature to activate prevention", float, 33)
+                Variable("freeze-prevention-on","Freeze prevention activated", bool, value=False),
+                Variable("freeze-prevention-temperature","Temperature to activate prevention", float, value=33)
             ],
             variableRepo)
 
@@ -137,15 +138,28 @@ def allChangeNotification(event:Event):
         DependencyContainer.schedules.checkSchedule()
 
 def quickClean(event:Event):
+    
     if(isinstance(event, VariableChangeEvent) and event.variable.name in ["quick-clean-expires-on", "quick-clean-expires-in-hours", "quick-clean-on"]):
         
         #Update the date and time it expires if this changed
         if(event.variable.name == "quick-clean-expires-in-hours"):
-            DependencyContainer.variables.get("quick-clean-expires-on").hasExpired = False
-            DependencyContainer.variables.get("quick-clean-expires-on").value = datetime.datetime.now() + event.variable.value
-            DependencyContainer.variables.get("quick-clean-on").value =  True
-        else:
-            pass
+            if(event.variable.value > 0):
+                DependencyContainer.variables.get("quick-clean-expires-on").hasExpired = False
+                DependencyContainer.variables.get("quick-clean-expires-on").value = datetime.datetime.now() + timedelta(hours=event.variable.value)
+                DependencyContainer.variables.get("quick-clean-on").value = True
+                event.action.overrideSchedule = True
+                DependencyContainer.pumps.get("main").on(Speed.SPEED_1)
+            else:
+                event.action.overrideSchedule = True
+                DependencyContainer.variables.get("quick-clean-expires-on").hasExpired = True
+                DependencyContainer.variables.get("quick-clean-on").value = False
+
+                turnOffPumpIfNoActiveSchedule(DependencyContainer.pumps.get("main"))
+        elif(event.variable.name == "quick-clean-expires-on" and event.variable.hasExpired):
+            event.action.overrideSchedule = True
+            DependencyContainer.variables.get("quick-clean-on").value = False
+
+            turnOffPumpIfNoActiveSchedule(DependencyContainer.pumps.get("main"))
 
 
 def evaluateFreezePrevention(event:Event):

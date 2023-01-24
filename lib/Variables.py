@@ -35,7 +35,7 @@ class Variables:
         """
         now = datetime.datetime.now()
         for item in self.getVariablesThatExpire():
-            if(now > item.value):
+            if(item.value != None and now > item.value):
                 item.hasExpired = True
                 #Notify anyone that it expired
                 if(DependencyContainer.actions != None):
