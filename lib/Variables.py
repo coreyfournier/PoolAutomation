@@ -35,11 +35,15 @@ class Variables:
         """
         now = datetime.datetime.now()
         for item in self.getVariablesThatExpire():
-            if(item.value != None and now > item.value):
-                item.hasExpired = True
-                #Notify anyone that it expired
-                if(DependencyContainer.actions != None):
-                    DependencyContainer.actions.nofityListners(VariableChangeEvent(None,item))
+            
+            if(item.value != None):
+                #datetime.datetime.strptime(item.value, "%Y-%m-%dT%H:%M:%S.%fZ")
+                valueAsDateTime = datetime.datetime.strptime(item.value, "%Y-%m-%dT%H:%M:%S.%f")
+                if(now > valueAsDateTime):
+                    item.hasExpired = True
+                    #Notify anyone that it expired
+                    if(DependencyContainer.actions != None):
+                        DependencyContainer.actions.nofityListners(VariableChangeEvent(None,item))
     
     def addVariable(self, variable:"Variable|VariableGroup") -> None:        
         self._repo.add(variable)

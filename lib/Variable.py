@@ -33,6 +33,11 @@ class VariableGroup(JSONWizard):
     #If there is a variable that holds the on status. This must be a boolean
     isOnVariable:str = None
 
+def valueToJson(input):
+    return input
+
+def JsonToValue(input):
+    return input
 
 @dataclass_json
 @dataclass
@@ -50,7 +55,12 @@ class Variable(JSONWizard):
 
     value:any = field(
         init=False, 
-        repr=False)
+        repr=False,
+        metadata={'dataclasses_json': {
+            'encoder': valueToJson,
+            'decoder': JsonToValue
+        }}
+        )
 
     #Denotes that this is a date time and can expire. The set date time will then be checked to see if it has expired
     expires:bool = False
@@ -75,6 +85,12 @@ class Variable(JSONWizard):
 
     @value.setter
     def value(self, v:any)->None:
+        """Value of the variable.
+        Because of seralization issues with dataclasses and python datetimes should be a string. I am tried of fighting these issues and I'm giving up.
+
+        Args:
+            v (any): bool|float|string|int
+        """
         #If the variable does not exists, then declare it and set the value for it
         if not hasattr(self, '_value'):
             self._value = v

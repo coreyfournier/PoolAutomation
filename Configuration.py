@@ -145,21 +145,20 @@ def quickClean(event:Event):
         if(event.variable.name == "quick-clean-expires-in-hours"):
             if(event.variable.value > 0):
                 DependencyContainer.variables.get("quick-clean-expires-on").hasExpired = False
-                DependencyContainer.variables.get("quick-clean-expires-on").value = datetime.datetime.now() + timedelta(hours=event.variable.value)
+                DependencyContainer.variables.get("quick-clean-expires-on").value = (datetime.datetime.now() + timedelta(hours=event.variable.value)).isoformat()
                 DependencyContainer.variables.get("quick-clean-on").value = True
                 event.action.overrideSchedule = True
                 DependencyContainer.pumps.get("main").on(Speed.SPEED_1)
             else:
-                event.action.overrideSchedule = True
-                DependencyContainer.variables.get("quick-clean-expires-on").hasExpired = True
+                event.action.overrideSchedule = False
                 DependencyContainer.variables.get("quick-clean-on").value = False
-
                 turnOffPumpIfNoActiveSchedule(DependencyContainer.pumps.get("main"))
-        elif(event.variable.name == "quick-clean-expires-on" and event.variable.hasExpired):
-            event.action.overrideSchedule = True
-            DependencyContainer.variables.get("quick-clean-on").value = False
 
+        elif(event.variable.name == "quick-clean-expires-on" and event.variable.hasExpired):
+            event.action.overrideSchedule = False
+            DependencyContainer.variables.get("quick-clean-on").value = False
             turnOffPumpIfNoActiveSchedule(DependencyContainer.pumps.get("main"))
+            DependencyContainer.variables.get("quick-clean-expires-on").value = 0
 
 
 def evaluateFreezePrevention(event:Event):
