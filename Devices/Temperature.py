@@ -10,6 +10,8 @@ class Temperature:
         self.shortDisplayName:str = shortDisplayName
         #temp tracking. used to store the last value
         self._tracked:dict[str,float] = {}
+        #Max digits after the decimal
+        self._maxDigits:int = 2
         
     def get(self, allowCached:bool = True)-> float:
         """Gets the temp of the device id
@@ -20,7 +22,7 @@ class Temperature:
         pass
     
     def _celsiusToFahrenheit(self, celsius:float) -> float:
-        return celsius * 9.0 / 5.0 + 32.0
+        return round(celsius * 9.0 / 5.0 + 32.0, self._maxDigits)
     
     def getAllDevices(self)-> "list[str]":
         """Gets all devices for this type of temp sensor

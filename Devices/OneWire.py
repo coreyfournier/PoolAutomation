@@ -53,7 +53,7 @@ class OneWire(Temperature):
         if equals_pos != -1:
             temp_string = lines[1][equals_pos+2:]
             temp_c = float(temp_string) / 1000.0                        
-            return round(temp_c, 2)
+            return round(temp_c, self._maxDigits)
     
     def get(self, allowCached:bool = True)-> float:
         if(allowCached):

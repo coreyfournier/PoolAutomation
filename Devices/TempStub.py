@@ -9,7 +9,7 @@ class TempStub(Temperature):
         
     def get(self, allowCached:bool = True)-> float:
         #change the temp randomly so events get fired
-        temp = round(random.random(), 2)
+        temp = round(random.random(), self._maxDigits)
 
         self._tracked[self.deviceId] = temp
 
