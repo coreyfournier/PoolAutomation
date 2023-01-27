@@ -4,12 +4,12 @@ import random
 from typing import Callable
 
 class TempStub(Temperature):
-    def __init__(self,name:str, displayName:str) -> None:
-        super().__init__(name, displayName, str(random.random()))
+    def __init__(self,name:str, displayName:str, shortDisplayName:str) -> None:
+        super().__init__(name, displayName, shortDisplayName, str(random.random()))
         
     def get(self, allowCached:bool = True)-> float:
         #change the temp randomly so events get fired
-        temp = random.random()
+        temp = round(random.random(), 2)
 
         self._tracked[self.deviceId] = temp
 

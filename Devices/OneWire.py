@@ -15,8 +15,8 @@ class OneWire(Temperature):
     Args:
         Temperature (_type_): _description_
     """
-    def __init__(self, name:str, displayName:str, deviceId:str, baseDeviceDirectory:str = "/sys/bus/w1/devices/", devicePrefix:str = "28*") -> None:
-        super().__init__(name, displayName, deviceId)
+    def __init__(self, name:str, displayName:str, shortDisplayName:str, deviceId:str, baseDeviceDirectory:str = "/sys/bus/w1/devices/", devicePrefix:str = "28*") -> None:
+        super().__init__(name, displayName, shortDisplayName, deviceId)
         
         self.__base_dir = baseDeviceDirectory
         self.__devicePrefix = devicePrefix
@@ -46,8 +46,8 @@ class OneWire(Temperature):
         equals_pos = lines[1].find('t=')
         if equals_pos != -1:
             temp_string = lines[1][equals_pos+2:]
-            temp_c = float(temp_string) / 1000.0            
-            return temp_c
+            temp_c = float(temp_string) / 1000.0                        
+            return round(temp_c, 2)
     
     def get(self, allowCached:bool = True)-> float:
         if(allowCached):

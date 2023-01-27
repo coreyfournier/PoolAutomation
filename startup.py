@@ -49,9 +49,9 @@ if __name__ == '__main__':
         i2cBus = None
     else:#When running on the raspberry pi
         import RPi.GPIO as GPIO        
-        #import smbus2
+        import smbus2
         #Get the bus for i2c controls    
-        #i2cBus = smbus2.SMBus(1)
+        i2cBus = smbus2.SMBus(1)
         
         runAsDaemon = False
         temperatureFile = os.path.join(dataPath, "temperature-devices.json")

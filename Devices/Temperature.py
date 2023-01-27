@@ -3,10 +3,11 @@ import DependencyContainer
 from lib.Event import Event
 
 class Temperature:
-    def __init__(self, name:str, displayName:str,deviceId:str) -> None:
+    def __init__(self, name:str, displayName:str, shortDisplayName:str,deviceId:str) -> None:
         self.deviceId:str = deviceId
         self.name:str = name
         self.displayName:str = displayName
+        self.shortDisplayName:str = shortDisplayName
         #temp tracking. used to store the last value
         self._tracked:dict[str,float] = {}
         

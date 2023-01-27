@@ -21,8 +21,11 @@ from Devices.Lights import Lights
 from lib.Action import Action, OverrideChangeEvent
 from Devices.Temperature import *
 from datetime import timedelta
+from IO.GpioStub import GpioStub
+from Devices.Display import Display
 
 logger = DependencyContainer.get_logger(__name__)
+display:Display = None
 
 def configure(variableRepo:VariableRepo, GPIO, i2cBus):
     relayAddress = 0x3f    
@@ -33,10 +36,10 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
         {
             #Example for GPIO relay: Speed.SPEED_1: GpioController(GPIO, boardPin)
             #Speed.SPEED_1: I2cController(1, relayAddress, i2cBus),
-            Speed.SPEED_1: GpioController(GPIO, 11),
-            Speed.SPEED_2: GpioController(GPIO, 13),
-            Speed.SPEED_3: GpioController(GPIO, 15),
-            Speed.SPEED_4: GpioController(GPIO, 29)
+            Speed.SPEED_1: GpioController(GPIO, 17, False),
+            Speed.SPEED_2: GpioController(GPIO, 27, False),
+            Speed.SPEED_3: GpioController(GPIO, 22, False),
+            Speed.SPEED_4: GpioController(GPIO, 5, False)
         }
     )])
 
@@ -46,16 +49,16 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
         #Valve("Solar","solar",1,False, GpioController(GPIO,13))
         #Valve("Solar","solar",1,False, I2cController(5, relayAddress, i2cBus)),
         #GPIO17
-        Valve("Solar","solar",1,False, GpioController(GPIO,35)),
+        Valve("Solar","solar",1,False, GpioController(GPIO,19, False)),
         #GPIO22
-        Valve("Slide","slide",2,False, GpioController(GPIO,37))
+        Valve("Slide","slide",2,False, GpioController(GPIO,26, False))
     ])
 
     
     logger.debug("Loading lights")    
     DependencyContainer.lights = Lights([
         #GloBrite("main","Light", I2cController(7, relayAddress, i2cBus))
-        GloBrite("main","Light", GpioController(GPIO,33))
+        GloBrite("main","Light", GpioController(GPIO,6, False))
     ])
 
     logger.debug("Loading variables")
@@ -100,9 +103,22 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
                 Variable("freeze-prevention-temperature","Temperature to activate prevention", float, value=33)
             ],
             variableRepo)
+    
+    global display
 
+    #Check to see if it's running locally or on the pi    
+    if(isinstance(GPIO, GpioStub)):
+        from Devices.Display import DisplayStub        
+        display = DisplayStub(os.path.join(os.getcwd(), "display.png"))
+    else:
+        import board
+        import busio
+        import adafruit_ssd1306
+        from Devices.Display import DisplaySSD1306
+        i2c = busio.I2C(board.SCL, board.SDA)
+        oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c, addr=0x3c)
+        display = DisplaySSD1306(oled)
 
-           
     logger.debug("Loading actions")
     DependencyContainer.actions = Actions([
         Action("quick-clean",
@@ -136,6 +152,10 @@ def allChangeNotification(event:Event):
         logger.debug(f"Action '{event.action.name}' changed to {event.action.overrideSchedule}")    
         logger.debug("Checking to see if the schedule needs to make changes")           
         DependencyContainer.schedules.checkSchedule()
+    if(isinstance(event, TemperatureChangeEvent)):
+        temps = [f"{device.shortDisplayName}: {device.get()}" for device in DependencyContainer.temperatureDevices.getAll()]
+            
+        display.write(temps)
 
 def quickClean(event:Event):
     
