@@ -3,3 +3,6 @@ dataclasses_json==0.5.7
 dataclass_wizard==0.22.2
 dataclasses==0.6
 smbus2==0.4.2
+adafruit-circuitpython-ssd1306==2.12.12
+pillow==9.4.0
+board==1.0
