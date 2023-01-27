@@ -9,13 +9,19 @@ os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
 
 class OneWire(Temperature):
-    """One wire temp sensors (DS18B20)
-    Requre DI for the temp format.
-
-    Args:
-        Temperature (_type_): _description_
-    """
     def __init__(self, name:str, displayName:str, shortDisplayName:str, deviceId:str, baseDeviceDirectory:str = "/sys/bus/w1/devices/", devicePrefix:str = "28*") -> None:
+        """One wire temp sensors (DS18B20)
+            Requre DI for the temp format.
+            See this for how the devices work and configuration on the pi
+            https://www.circuitbasics.com/raspberry-pi-ds18b20-temperature-sensor-tutorial/
+        Args:
+            name (str): api name of the device
+            displayName (str): What is displayed to the user
+            shortDisplayName (str): What is displayed to user, but a shorter version
+            deviceId (str): Id of the device on the system
+            baseDeviceDirectory (str, optional): Path of the devices. Defaults to "/sys/bus/w1/devices/".
+            devicePrefix (str, optional): What the device starts with. Defaults to "28*".
+        """
         super().__init__(name, displayName, shortDisplayName, deviceId)
         
         self.__base_dir = baseDeviceDirectory
