@@ -8,14 +8,12 @@
 #sudo apt-get install libtiff5 -y
 #
 from PIL import Image, ImageDraw, ImageFont
-import os
 
 class Display:
     def __init__(self, width, height) -> None:
         self._width = width
         self._height = height
-        self._font = ImageFont.load_default()
-        
+        self._font = ImageFont.load_default()        
 
     def _getImage(self, text:"list[str]"):
         image = Image.new("1", (self._width, self._height))
@@ -47,7 +45,6 @@ class DisplayStub(Display):
         image.save(self._saveTo)
 
 
-#d = DisplaySSD1306(oled)
 class DisplaySSD1306(Display):
     def __init__(self, oled) -> None:
         super().__init__(oled.width, oled.height)
