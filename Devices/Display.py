@@ -22,11 +22,11 @@ class Display:
 
         (font_width, font_height) = self._font.getsize(text[0])
 
-        lineNumber:int = 1
+        lineNumber:int = 0
         for row in text:
             draw.text(
                 (0, 
-                (font_height + 2) * lineNumber),
+                (font_height + 1) * lineNumber),
                 row,
                 font=self._font,
                 fill=255

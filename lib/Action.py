@@ -30,3 +30,9 @@ class Action:
 @dataclass
 class OverrideChangeEvent():
     action:Action
+
+@dataclass
+class TimerEvent():
+    """An event fired at a set time based on the worker.
+    """
+    pass

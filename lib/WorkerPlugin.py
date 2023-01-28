@@ -7,7 +7,7 @@ from cherrypy.process.plugins import SimplePlugin
 from Devices.Schedule import *
 import DependencyContainer
 from Devices.Pump import *
-from Devices.Pumps import Pumps
+from lib.Action import TimerEvent
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -82,4 +82,11 @@ class WorkerPlugin(SimplePlugin):
             except Exception  as err:
                 logger.error(f"Failed when checkForExpiredVariables. Error:{err}")
 
+            try:
+                if(DependencyContainer.actions != None):
+                    DependencyContainer.actions.nofityListners(TimerEvent())
+            except Exception  as err:
+                logger.error(f"Failed when notifying for a timer event. Error:{err}")
+
+            
             time.sleep(self._sleep)

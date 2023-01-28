@@ -19,7 +19,8 @@ class SpeedDisplay:
 class Pump:        
     #Pump Interface
     name:str
-    displayName:str    
+    displayName:str
+    currentSpeed:Speed    
 
     def on(self, speed:Speed):
         pass

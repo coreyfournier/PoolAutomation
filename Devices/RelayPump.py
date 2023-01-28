@@ -8,7 +8,7 @@ logger = DependencyContainer.get_logger(__name__)
 
 class RelayPump(Pump):
     def __init__(self, name:str, displayName:str, speedToGpio:"dict[int,DeviceController]"):
-        super().__init__(name, displayName)
+        super().__init__(name, displayName, Speed.OFF)
 
         self.speedToGpio:"dict[int,DeviceController]" = speedToGpio
         self.allSpeeds = [SpeedDisplay(Speed.OFF.name, False)]

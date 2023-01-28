@@ -51,7 +51,12 @@ class Actions:
         """
         return [x for x in self._registered.values() if x.overrideSchedule]
     
-    def hasOverrides(self):
+    def hasOverrides(self)-> bool:
+        """Checks to see if any overrides are currently active.
+
+        Returns:
+            bool: True override in place, False otherwise
+        """
         overrides = DependencyContainer.actions.getScheduleOverrides()
         return len(overrides) > 0
     

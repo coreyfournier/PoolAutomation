@@ -23,6 +23,11 @@ class Schedules:
         return self._scheduleData
 
     def getRunning(self) -> "list[PumpSchedule]" :
+        """Gets the currently running schedule
+
+        Returns:
+            list[PumpSchedule]: Running schedules
+        """
         return [x for x in DependencyContainer.schedules.get() if x.isRunning]
 
     def checkSchedule(self):

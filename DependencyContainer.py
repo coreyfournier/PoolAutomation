@@ -12,6 +12,8 @@ log_to_file:str = None
 #f= fahrenheit c=celsius 
 temperatureUnit = "f"
 
+short_time_format = "%I:%M%p"
+
 _nameToLevel = {
     'CRITICAL': logging.CRITICAL,
     'FATAL': logging.FATAL,
@@ -42,6 +44,7 @@ def get_logger(logger_name:str) -> logging.Logger:
 
     log_format = '%(asctime)s %(levelname)s: [%(name)s.%(funcName)s] %(message)s'
     date_format = '%Y-%m-%d %H:%M:%S'
+    
     logger = logging.getLogger(f'PoolAutomation.{logger_name}')    
     logger.setLevel(log_level)
     #limiting what is sent out for cherrypy
