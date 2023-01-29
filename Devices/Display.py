@@ -26,7 +26,7 @@ class Display:
         for row in text:
             draw.text(
                 (0, 
-                (font_height + 1) * lineNumber),
+                (font_height + 2) * lineNumber),
                 row,
                 font=self._font,
                 fill=255
