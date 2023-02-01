@@ -1,0 +1,16 @@
+[
+    {
+        "name":"solar",
+        "displayName":"Solar",
+        "type":"GpioController",
+        "pin":19,
+        "useBoardPins":false
+    },
+    {
+        "name":"slide",
+        "displayName":"Slide",
+        "type":"GpioController",
+        "pin":26,
+        "useBoardPins":false
+    }
+]

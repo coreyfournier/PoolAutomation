@@ -66,9 +66,23 @@ if __name__ == '__main__':
     from lib.Variable import *
     from Devices.Schedules import *
     from lib.CherryPyJsonEncoder import *
+    from IO.PumpRepo import PumpRepo
+    from Devices.Valves import Valves
+    from IO.ValveRepo import ValveRepo
 
+    logger.debug("Loading valves")
+    DependencyContainer.valves = Valves(ValveRepo(os.path.join(dataPath, "valves.json"),GPIO, i2cBus))
+
+    logger.debug("Loading pumps")
+    DependencyContainer.pumps = Pumps(PumpRepo(os.path.join(dataPath, "pumps.json"),GPIO, i2cBus))
+    
+    logger.debug("Loading temperature")
     DependencyContainer.temperatureDevices = TemperatureSensors(TemperatureRepo(temperatureFile))    
+    
+    logger.debug("Loading schedules")
     DependencyContainer.schedules = Schedules(ScheduleRepo(os.path.join(dataPath, "schedule.json")))
+    
+    logger.debug("Loading variables")
     variableRepo = VariableRepo(os.path.join(dataPath, "variables.json"))
     
     #All custom changes are here

@@ -6,34 +6,19 @@ from Devices.DeviceController import DeviceController
 from typing import Callable
 from lib.Actions import Event
 import DependencyContainer
-
-@dataclass
-class Valve:
-    name:str
-    apiName:str
-    id:int
-    isOn:bool
-    controller:DeviceController
-
-    def to_dict(self):
-        return {
-            "name": self.name,
-            "apiName" : self.apiName,
-            "id" : self.id,
-            "isOn" : self.isOn
-        }
+from IO.ValveRepo import ValveRepo
+from Devices.Valve import Valve
 
 @dataclass
 class ValveChangeEvent(Event):
     valve:Valve
 
 class Valves:
-    def __init__(self, valves:"list[Valve]") -> None:
-        self._valves:"dict[str,Valve]" = {}
+    def __init__(self, repo:ValveRepo) -> None:
+        self._valves = repo.getValves()
 
-        for valve in valves:
-            valve.isOn = valve.controller.isOn()
-            self._valves[valve.apiName] = valve            
+        for index, valve in self._valves.items():
+            valve.isOn = valve.controller.isOn()            
   
     def get(self, name:str)-> Valve:
         return self._valves[name]

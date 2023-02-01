@@ -2,7 +2,6 @@ import json
 from Devices.OneWire import OneWire
 from Devices.Temperature import Temperature
 from Devices.TempStub import TempStub
-from typing import Callable
 
 class TemperatureRepo:
     def __init__(self, file:str) -> None:

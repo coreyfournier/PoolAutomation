@@ -30,31 +30,8 @@ display:Display = None
 displayRotation:int = 0
 
 def configure(variableRepo:VariableRepo, GPIO, i2cBus):
-    relayAddress = 0x3f    
     
-    logger.debug("Loading pumps")
-    DependencyContainer.pumps = Pumps(    
-        [RelayPump("main","Main",
-        {
-            #Example for GPIO relay: Speed.SPEED_1: GpioController(GPIO, boardPin)
-            #Speed.SPEED_1: I2cController(1, relayAddress, i2cBus),
-            Speed.SPEED_1: GpioController(GPIO, 17, False),
-            Speed.SPEED_2: GpioController(GPIO, 27, False),
-            Speed.SPEED_3: GpioController(GPIO, 22, False),
-            Speed.SPEED_4: GpioController(GPIO, 5, False)
-        }
-    )])
 
-    logger.debug("Loading valves")
-    DependencyContainer.valves = Valves([
-        #example for using board pin (GPIO) 
-        #Valve("Solar","solar",1,False, GpioController(GPIO,13))
-        #Valve("Solar","solar",1,False, I2cController(5, relayAddress, i2cBus)),
-        #GPIO17
-        Valve("Solar","solar",1,False, GpioController(GPIO,19, False)),
-        #GPIO22
-        Valve("Slide","slide",2,False, GpioController(GPIO,26, False))
-    ])
 
     
     logger.debug("Loading lights")    

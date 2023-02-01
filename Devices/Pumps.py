@@ -1,14 +1,14 @@
 import DependencyContainer
 from Devices.Pump import Pump
+from IO.PumpRepo import PumpRepo
 
 logger = DependencyContainer.get_logger(__name__)
 
 class Pumps:
-    def __init__(self, pumps:"list[Pump]") -> None:
+    def __init__(self, pumpRepo:PumpRepo) -> None:
         self._pumps:"dict[str, Pump]" = {}
 
-        for pump in pumps:
-            self._pumps[pump.name] = pump
+        self._pumps = pumpRepo.getPumps()
 
     def get(self, name:str):
         if(name in self._pumps):

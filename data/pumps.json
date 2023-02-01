@@ -1,0 +1,34 @@
+[
+    {
+        "name":"main",
+        "displayName":"Main",
+        "speeds":[
+            {
+                "name":"SPEED_1",
+                "type":"GpioController",
+                "pin":17,
+                "useBoardPins":false
+            },
+            {
+                "name":"SPEED_2",
+                "type":"GpioController",
+                "pin":27,
+                "useBoardPins":false
+            },
+            {
+                "name":"SPEED_3",
+                "type":"GpioController",
+                "pin":22,
+                "useBoardPins":false
+            },
+            {
+                "name":"SPEED_4",
+                "type":"GpioController",
+                "pin":5,
+                "useBoardPins":false
+            }        
+        ],
+        "type":"RelayPump"
+    }
+
+]
