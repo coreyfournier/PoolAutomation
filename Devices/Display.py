@@ -13,7 +13,8 @@ class Display:
     def __init__(self, width, height) -> None:
         self._width = width
         self._height = height
-        self._font = ImageFont.load_default()        
+        self._font = ImageFont.truetype("www/fonts/Anonymous Pro.ttf", 10)
+        #self._font = ImageFont.load_default()        
 
     def _getImage(self, text:"list[str]"):
         image = Image.new("1", (self._width, self._height))
@@ -21,18 +22,34 @@ class Display:
         draw = ImageDraw.Draw(image)
 
         (font_width, font_height) = self._font.getsize(text[0])
+        
 
         lineNumber:int = 0
         for row in text:
+            if(lineNumber == 0):
+                position = font_height * lineNumber
+            else:
+                position = (font_height * lineNumber)  + 2
+
+
             draw.text(
                 (0, 
-                (font_height + 2) * lineNumber),
+                position),
                 row,
                 font=self._font,
                 fill=255
             )
             lineNumber +=1
+            
         return image
+
+    def write(self, text:"list[str]"):
+        """Writes the text out to the display
+
+        Args:
+            text (list[str]): Expects the first row of text to the be header. All other lines written out to the display
+        """
+        pass
 
 class DisplayStub(Display):
     def __init__(self, saveToDirectory:str) -> None:
