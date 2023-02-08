@@ -25,9 +25,10 @@ class WorkerPlugin(SimplePlugin):
     _running  = None
     _sleep = None  
 
-    def __init__(self, bus, sleep = 30):
+    def __init__(self, bus, sleepInSeconds = 5, deviceCheckCount = 6):
         SimplePlugin.__init__(self, bus)
-        self._sleep = sleep
+        self._sleep = sleepInSeconds
+        self._deviceCheckCount = deviceCheckCount
         
 
     def start(self):
@@ -64,29 +65,39 @@ class WorkerPlugin(SimplePlugin):
         self.unsubscribe()
 
     def _target(self):
+        interationCount = 0
+
         while self._running:
-            #Checking the schedules to see if any need to be active or inactive
-            if(DependencyContainer.schedules != None):
-                DependencyContainer.schedules.checkSchedule()
-            
-            #Reading any temperature sensors
-            try:                
-                if(DependencyContainer.temperatureDevices != None):
-                    DependencyContainer.temperatureDevices.checkAll()
-            except Exception  as err:
-                logger.error(f"Failed when getting the temperature. Error:{err}")
+            #I don't want to check the devices too offten, so i'm waiting until x iterations 
+            if(interationCount >= self._deviceCheckCount):
 
-            try:
-                if(DependencyContainer.variables != None)                :
-                    DependencyContainer.variables.checkForExpiredVariables()
-            except Exception  as err:
-                logger.error(f"Failed when checkForExpiredVariables. Error:{err}")
+                #Checking the schedules to see if any need to be active or inactive
+                if(DependencyContainer.schedules != None):
+                    DependencyContainer.schedules.checkSchedule()
+                
+                #Reading any temperature sensors
+                try:                
+                    if(DependencyContainer.temperatureDevices != None):
+                        DependencyContainer.temperatureDevices.checkAll()
+                except Exception  as err:
+                    logger.error(f"Failed when getting the temperature. Error:{err}")
 
+                try:
+                    if(DependencyContainer.variables != None)                :
+                        DependencyContainer.variables.checkForExpiredVariables()
+                except Exception  as err:
+                    logger.error(f"Failed when checkForExpiredVariables. Error:{err}")    
+
+                #reset it
+                interationCount = 0        
+
+            #I want this to fire more often
             try:
                 if(DependencyContainer.actions != None):
                     DependencyContainer.actions.nofityListners(TimerEvent())
             except Exception  as err:
                 logger.error(f"Failed when notifying for a timer event. Error:{err}")
 
-            
+
+            interationCount +=1
             time.sleep(self._sleep)
