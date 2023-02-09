@@ -29,7 +29,7 @@ class Display:
             if(lineNumber == 0):
                 position = font_height * lineNumber
             else:
-                position = (font_height * lineNumber)  + 2
+                position = (font_height * lineNumber)  + 3
 
 
             draw.text(

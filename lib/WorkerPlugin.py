@@ -25,10 +25,10 @@ class WorkerPlugin(SimplePlugin):
     _running  = None
     _sleep = None  
 
-    def __init__(self, bus, sleepInSeconds = 5, deviceCheckCount = 6):
+    def __init__(self, bus, sleepInSeconds = 5, deviceIntervalInSeconds = 30):
         SimplePlugin.__init__(self, bus)
         self._sleep = sleepInSeconds
-        self._deviceCheckCount = deviceCheckCount
+        self._deviceIntervalInSeconds = deviceIntervalInSeconds
         
 
     def start(self):
@@ -65,12 +65,11 @@ class WorkerPlugin(SimplePlugin):
         self.unsubscribe()
 
     def _target(self):
-        interationCount = 0
+        secondsPassed = 0
 
         while self._running:
-            #I don't want to check the devices too offten, so i'm waiting until x iterations 
-            if(interationCount >= self._deviceCheckCount):
-
+            #I don't want to check the devices too offten, so i'm waiting for a specific interval
+            if((secondsPassed % self._deviceIntervalInSeconds) == 0):
                 #Checking the schedules to see if any need to be active or inactive
                 if(DependencyContainer.schedules != None):
                     DependencyContainer.schedules.checkSchedule()
@@ -86,18 +85,20 @@ class WorkerPlugin(SimplePlugin):
                     if(DependencyContainer.variables != None)                :
                         DependencyContainer.variables.checkForExpiredVariables()
                 except Exception  as err:
-                    logger.error(f"Failed when checkForExpiredVariables. Error:{err}")    
-
-                #reset it
-                interationCount = 0        
+                    logger.error(f"Failed when checkForExpiredVariables. Error:{err}")                
 
             #I want this to fire more often
             try:
                 if(DependencyContainer.actions != None):
-                    DependencyContainer.actions.nofityListners(TimerEvent())
+                    DependencyContainer.actions.nofityListners(TimerEvent(secondsPassed))
             except Exception  as err:
                 logger.error(f"Failed when notifying for a timer event. Error:{err}")
 
 
-            interationCount +=1
+            secondsPassed += self._sleep
             time.sleep(self._sleep)
+
+            #if an hour has passed reset it
+            if(secondsPassed > (60 * 60)):
+                #reset it
+                secondsPassed = 0        
