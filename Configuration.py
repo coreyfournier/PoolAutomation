@@ -135,6 +135,14 @@ def allChangeNotification(event:Event):
         logger.debug("Checking to see if the schedule needs to make changes")           
         DependencyContainer.schedules.checkSchedule()
     if(isinstance(event, TimerEvent)):
+        if(event.secondsPassedTheHour == 0):
+            DependencyContainer.stateLogger.Add(
+                temperature1= DependencyContainer.temperatureDevices.get("solar-heat").getLast(),
+                temperature2= DependencyContainer.temperatureDevices.get("roof").getLast(),
+                temperature3= DependencyContainer.temperatureDevices.get("ambient").getLast(),
+                temperature4= DependencyContainer.temperatureDevices.get("pool-temp").getLast()
+            )
+        
         displayRotation = 1 + displayRotation
         #Using the temp ensures the display only changs every 30 seconds
         if(displayRotation == 1):

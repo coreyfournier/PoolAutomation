@@ -78,6 +78,7 @@ from Devices.Valves import Valves
 from Devices.Pumps import Pumps
 from Devices.Lights import Lights
 from Devices.TemperatureSensors import TemperatureSensors
+from IO.StateLoggerRepo import StateLoggerRepo
 
 lights:Lights = None
 
@@ -95,3 +96,5 @@ actions:Actions = None
 variables:Variables = None
 
 valves:Valves = None
+
+stateLogger:StateLoggerRepo = None

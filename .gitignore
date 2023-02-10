@@ -1,2 +1,4 @@
 *.pyc
 display.png
+*.db
+*.db.wal
