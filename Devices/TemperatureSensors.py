@@ -7,7 +7,13 @@ class TemperatureSensors:
         self._repo = repo
         self._deviceByName =  repo.getDevices()
 
-        self._allDevices = [device for key, device in self._deviceByName.items()]
+        self._allDevices:"list[Temperature]" = []
+        self._byId:"dict[int,Temperature]" = {}
+
+        for key, device in self._deviceByName.items():
+            self._byId[device.id] = device
+            self._allDevices.append(device)
+
 
     def get(self, name:str) -> Temperature:
         """Gets the devices by name
@@ -19,6 +25,9 @@ class TemperatureSensors:
             Temperature: _description_
         """
         return self._deviceByName[name]
+    
+    def getById(self, id:int) -> Temperature:
+        return self._byId[id]
     
     def getAll(self) -> "list[Temperature]":
         """Gets all devices

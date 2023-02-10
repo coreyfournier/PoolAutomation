@@ -18,9 +18,17 @@ class Schedules:
         self.__repo = scheduleRepo
         self._scheduleData = self.__repo.getSchedules()
         self.lock = threading.Lock()
+        self._byId:"dict[int,PumpSchedule]" = {}
+
+        for item in self._scheduleData:
+            self._byId[item.id] = item
 
     def get(self) -> "list[PumpSchedule]":
         return self._scheduleData
+    
+    def getById(self, id:int) -> PumpSchedule:
+        return self._byId[id]
+
 
     def getRunning(self) -> "list[PumpSchedule]" :
         """Gets the currently running schedule

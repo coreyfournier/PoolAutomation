@@ -4,8 +4,8 @@ import random
 from typing import Callable
 
 class TempStub(Temperature):
-    def __init__(self,name:str, displayName:str, shortDisplayName:str) -> None:
-        super().__init__(name, displayName, shortDisplayName, str(random.random()))
+    def __init__(self,id:int, name:str, displayName:str, shortDisplayName:str) -> None:
+        super().__init__(id, name, displayName, shortDisplayName, str(random.random()))
         
     def get(self, allowCached:bool = True)-> float:
         #change the temp randomly so events get fired

@@ -18,6 +18,7 @@ class SpeedDisplay:
 @dataclass
 class Pump:        
     #Pump Interface
+    id:int
     name:str
     displayName:str
     currentSpeed:Speed    

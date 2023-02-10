@@ -9,7 +9,7 @@ os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
 
 class OneWire(Temperature):
-    def __init__(self, name:str, displayName:str, shortDisplayName:str, deviceId:str, baseDeviceDirectory:str = "/sys/bus/w1/devices/", devicePrefix:str = "28*") -> None:
+    def __init__(self,id:int, name:str, displayName:str, shortDisplayName:str, deviceId:str, baseDeviceDirectory:str = "/sys/bus/w1/devices/", devicePrefix:str = "28*") -> None:
         """One wire temp sensors (DS18B20)
             Requre DI for the temp format.
             See this for how the devices work and configuration on the pi
@@ -22,7 +22,7 @@ class OneWire(Temperature):
             baseDeviceDirectory (str, optional): Path of the devices. Defaults to "/sys/bus/w1/devices/".
             devicePrefix (str, optional): What the device starts with. Defaults to "28*".
         """
-        super().__init__(name, displayName, shortDisplayName, deviceId)
+        super().__init__(id, name, displayName, shortDisplayName, deviceId)
         
         self.__base_dir = baseDeviceDirectory
         self.__devicePrefix = devicePrefix

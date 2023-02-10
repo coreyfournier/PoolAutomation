@@ -41,7 +41,7 @@ class PumpRepo():
                     if(row["name"] in self._pumps):
                         raise Exception(f"A pump with the name '{row['name']}' already exists. They must be unique")
 
-                    self._pumps[row["name"]] = RelayPump(row["name"], row["displayName"], allSpeeds)
+                    self._pumps[row["name"]] = RelayPump(row["id"], row["name"], row["displayName"], allSpeeds)
 
     def getPumps(self) -> "dict[str, Pump]":               
         return self._pumps

@@ -3,7 +3,8 @@ import DependencyContainer
 from lib.Event import Event
 
 class Temperature:
-    def __init__(self, name:str, displayName:str, shortDisplayName:str,deviceId:str) -> None:
+    def __init__(self, id:int, name:str, displayName:str, shortDisplayName:str,deviceId:str) -> None:
+        self.id = id
         self.deviceId:str = deviceId
         self.name:str = name
         self.displayName:str = displayName

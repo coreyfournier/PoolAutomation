@@ -19,7 +19,7 @@ class DataService():
     @cherrypy.tools.json_out()
     def get(self, query:str, table:str = "StateLogs", columns:str="*") ->"list[list[any]]":
         """_summary_
-
+            Example: /data/get?query=CreatedDate%20ge%202023-02-10&columns=temperature2,temperature2,temperature1,pumpState1,ScheduleActive1,CreatedDate
         Args:
             query (str): odata where statement
             table (str, optional): Table name. To support others in the future. Defaults to "StateLogs".

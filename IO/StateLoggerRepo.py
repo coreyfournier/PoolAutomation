@@ -17,19 +17,27 @@ class StateLoggerRepo():
             pumpState3 VARCHAR(10),
             pumpState4 VARCHAR(10),
             pumpState5 VARCHAR(10),
-            valveState1 VARCHAR(10),
-            valveState2 VARCHAR(10),
-            valveState3 VARCHAR(10),
-            valveState4 VARCHAR(10),
-            valveState5 VARCHAR(10),
-            ScheduleActive1 TINYINT,
-            ScheduleActive2 TINYINT,
-            ScheduleActive3 TINYINT,
+            valveState1 BOOLEAN,
+            valveState2 BOOLEAN,
+            valveState3 BOOLEAN,
+            valveState4 BOOLEAN,
+            valveState5 BOOLEAN,
+            ScheduleActive1 BOOLEAN,
+            ScheduleActive2 BOOLEAN,
+            ScheduleActive3 BOOLEAN,
             ActionActive1 VARCHAR(20),
             ActionActive2 VARCHAR(20),
             ActionActive3 VARCHAR(20),
             ActionActive4 VARCHAR(20),
             ActionActive5 VARCHAR(20),
+            Orp1 REAL,
+            Orp2 REAL,
+            PH1 REAL,
+            PH2 REAL,
+            Pressure1 REAL,
+            Pressure2 REAL,
+            Pressure3 REAL,
+            Pressure4 REAL,
             CreatedDate TIMESTAMP
             )
         """
@@ -62,9 +70,17 @@ class StateLoggerRepo():
         ActionActive2:str = None,
         ActionActive3:str = None,
         ActionActive4:str = None,
-        ActionActive5:str = None
+        ActionActive5:str = None,
+        Orp1:float = None,
+        Orp2:float = None,
+        PH1:float = None,
+        PH2:float = None,
+        Pressure1:float = None,
+        Pressure2:float = None,
+        Pressure3:float = None,
+        Pressure4:float = None
     ):
-        result = self.__connection.execute(f"INSERT INTO StateLogs VALUES({'?,'*23}?)",
+        result = self.__connection.execute(f"INSERT INTO StateLogs VALUES({'?,'*31}?)",
             [temperature1,
             temperature2,
             temperature3,
@@ -88,6 +104,14 @@ class StateLoggerRepo():
             ActionActive3,
             ActionActive4,
             ActionActive5,
+            Orp1,
+            Orp2,
+            PH1,
+            PH2,
+            Pressure1,
+            Pressure2,
+            Pressure3,
+            Pressure4,
             datetime.datetime.now()
             ])
 
@@ -102,7 +126,7 @@ class StateLoggerRepo():
             Exception: Columns not found
 
         Returns:
-            list: Array of arrays. I THINK in the order in which they were selected
+            list: Array of arrays. Columns are returned in the order in which they were selected.
         """
         conn = self.__connection.cursor()
         if(len(columns) > 0):

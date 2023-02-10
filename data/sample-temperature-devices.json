@@ -1,5 +1,6 @@
 [
     {
+        "id":1,
         "type":"TempStub",
         "displayName":"Solar Heat",
         "shortDisplayName":"Solar",
@@ -7,6 +8,7 @@
         "deviceId":"/sys/bus/w1/devices/28-3c9df6480338"
     },
     {
+        "id":2,
         "type":"TempStub",
         "displayName":"Roof",
         "shortDisplayName":"Roof",
@@ -14,6 +16,7 @@
         "deviceId":"/sys/bus/w1/devices/28-3cbaf648b71a"
     },
     {
+        "id":3,
         "type":"TempStub",
         "displayName":"Ambient",
         "shortDisplayName":"Ambient",
@@ -21,6 +24,7 @@
         "deviceId":"/sys/bus/w1/devices/28-3c01f0963d61"
     },
     {
+        "id":4,
         "type":"TempStub",
         "displayName":"Pump Intake (Pool temp)",
         "shortDisplayName":"Pool",

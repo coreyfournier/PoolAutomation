@@ -16,12 +16,17 @@ class ValveChangeEvent(Event):
 class Valves:
     def __init__(self, repo:ValveRepo) -> None:
         self._valves = repo.getValves()
+        self._byId:"dict[int, Valve]" = {}
 
         for index, valve in self._valves.items():
-            valve.isOn = valve.controller.isOn()            
+            valve.isOn = valve.controller.isOn()
+            self._byId[valve.id] = valve
   
     def get(self, name:str)-> Valve:
         return self._valves[name]
+    
+    def getById(self, id:int) -> Valve:
+        return self._byId[id]
     
     def getAll(self)-> "list[Valve]":
         return [item for key, item in self._valves.items()]
