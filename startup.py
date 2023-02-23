@@ -72,7 +72,7 @@ if __name__ == '__main__':
     from IO.ValveRepo import ValveRepo
     from IO.StateLoggerRepo import StateLoggerRepo
 
-    DependencyContainer.stateLogger = StateLoggerRepo(os.path.join(dataPath, "database.db"))
+    DependencyContainer.stateLogger = None #= StateLoggerRepo(os.path.join(dataPath, "database.db"))
 
     logger.debug("Loading valves")
     DependencyContainer.valves = Valves(ValveRepo(os.path.join(dataPath, "valves.json"),GPIO, i2cBus))
@@ -81,6 +81,7 @@ if __name__ == '__main__':
     DependencyContainer.pumps = Pumps(PumpRepo(os.path.join(dataPath, "pumps.json"),GPIO, i2cBus))
     
     logger.debug("Loading temperature")
+    
     DependencyContainer.temperatureDevices = TemperatureSensors(TemperatureRepo(temperatureFile))    
     
     logger.debug("Loading schedules")

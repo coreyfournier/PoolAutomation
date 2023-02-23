@@ -1,9 +1,9 @@
-import duckdb
 import datetime
 
 class StateLoggerRepo():
 
     def __init__(self, databaseFile:str) -> None:
+        import duckdb
         self.__connection = duckdb.connect(databaseFile, read_only=False)
 
         tableScript = """CREATE TABLE IF NOT EXISTS StateLogs(
