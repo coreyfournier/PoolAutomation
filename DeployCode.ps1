@@ -26,3 +26,4 @@ Invoke-Expression -Command "pscp -r -pw $($password) Devices\*.py  $($computer):
 Invoke-Expression -Command "pscp -r -pw $($password) Services\*.py  $($computer):$($targetPath)Services"
 Invoke-Expression -Command "pscp -r -pw $($password) IO\*.py  $($computer):$($targetPath)IO"
 Invoke-Expression -Command "pscp -r -pw $($password) data\*.*  $($computer):$($targetPath)data"
+Invoke-Expression -Command "pscp -r -pw $($password) apexcharts\*.*  $($computer):$($targetPath)apexcharts"

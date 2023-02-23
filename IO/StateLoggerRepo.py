@@ -144,4 +144,8 @@ class StateLoggerRepo():
         conn.execute(f"SELECT {select} FROM StateLogs WHERE {where}")
         return conn.fetchall()
 
+    def agg(self, where:str=None,columns:"list[str]" = None) -> list:
+        conn = self.__connection.cursor()
+        conn.execute(f"SELECT ROUND(AVG(temperature1),1), ROUND(AVG(temperature2),1), ROUND(AVG(temperature3),1), ROUND(AVG(temperature4),1), date_part('hour', CreatedDate) AS Hour FROM StateLogs GROUP BY date_part('hour', CreatedDate)")
+        return conn.fetchall()
         

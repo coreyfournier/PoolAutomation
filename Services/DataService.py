@@ -35,3 +35,23 @@ class DataService():
 
         return DependencyContainer.stateLogger.query(where_clause, columns.split(","))
 
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def tempStats(self):
+        data = DependencyContainer.stateLogger.agg()
+        names = [x.displayName for x in DependencyContainer.temperatureDevices.getAll()]
+        allItems = {}
+        hours = set()
+        for idx, name in enumerate(names):
+            if(name not in allItems):
+                allItems[name] = []
+            for item in data:                
+                allItems[name].append(item[idx]) 
+
+                if(data[-1] not in hours):
+                    hours.add(item[-1])
+
+        return {
+            "hours":list(hours),
+            "data" : [{"name": key, "data" : item} for key, item in allItems.items()]
+            }

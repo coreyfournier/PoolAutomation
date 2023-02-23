@@ -8,12 +8,14 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/site.css">
     <link rel="stylesheet" href="/css/bootstrap-toggle.min.css">
+    <link rel="stylesheet" href="/apexcharts/apexcharts.css">
     
    </head>
     <script src="/js/jquery-3.6.3.min.js"></script>
     <script src="/js/jquery-dateformat.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/bootstrap-toggle.min.js"></script>
+    <script src="/apexcharts/apexcharts.js"></script>
     
 	
    <body>
@@ -30,6 +32,7 @@
                 </div>
             </div>                        
         </div>
+        <div class="row"><div id="temperature-chart" class="col-sm-6"></div></div>
         <div class="row" id="temperature"></div>
         <div class="row" id="variable-groups"></div>
         <div class="row">        
@@ -142,6 +145,8 @@
                 on: 'Enabled',
                 off: 'Disabled'
             });
+
+            //loadChart();
 
             $.getJSON("/light/get",function(result){
                 var template = `<div class="panel-heading">
@@ -427,6 +432,39 @@
                     alert('turned off');
                 }
                 });
+        }
+
+        function loadChart()
+        {
+            var options = {
+                chart: {
+                width:'100%',
+                height:200,
+                id: 'temperature-chart',
+                type: 'line'
+                },
+                series: [{
+                    data: []  
+                },
+                {
+                    data: []  
+                }]
+                };
+            var chart = new ApexCharts(document.getElementById("temperature-chart"), options);
+             
+            chart.render();
+
+            $.getJSON("/data/tempStats", function(response) {
+                chart.updateOptions({
+                    xaxis: {
+                        categories: response.hours,
+                            title: {
+                                text: 'Avg Temperature by Hour'
+                            }
+                    }})
+                
+                chart.updateSeries([response.data, response.data]);                
+            });
         }
     </script>
 </html>
