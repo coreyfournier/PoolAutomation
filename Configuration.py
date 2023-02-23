@@ -136,20 +136,21 @@ def allChangeNotification(event:Event):
         DependencyContainer.schedules.checkSchedule()
     if(isinstance(event, TimerEvent)):
         if(event.secondsPassedTheHour == 0):
-            DependencyContainer.stateLogger.Add(
-                temperature1= DependencyContainer.temperatureDevices.getById(1).getLast(),
-                temperature2= DependencyContainer.temperatureDevices.getById(2).getLast(),
-                temperature3= DependencyContainer.temperatureDevices.getById(3).getLast(),
-                temperature4= DependencyContainer.temperatureDevices.getById(4).getLast(),
-                pumpState1=DependencyContainer.pumps.getById(1).currentSpeed.name,
-                valveState1=DependencyContainer.valves.getById(1).isOn,
-                valveState2=DependencyContainer.valves.getById(2).isOn,
-                ScheduleActive1=DependencyContainer.schedules.getById(1).isRunning,
-                ActionActive1= DependencyContainer.actions.get()[0].overrideSchedule,
-                ActionActive2= DependencyContainer.actions.get()[1].overrideSchedule,
-                ActionActive3= DependencyContainer.actions.get()[2].overrideSchedule,
-                ActionActive4= DependencyContainer.actions.get()[3].overrideSchedule
-            )
+            if(DependencyContainer.stateLogger != None):
+                DependencyContainer.stateLogger.Add(
+                    temperature1= DependencyContainer.temperatureDevices.getById(1).getLast(),
+                    temperature2= DependencyContainer.temperatureDevices.getById(2).getLast(),
+                    temperature3= DependencyContainer.temperatureDevices.getById(3).getLast(),
+                    temperature4= DependencyContainer.temperatureDevices.getById(4).getLast(),
+                    pumpState1=DependencyContainer.pumps.getById(1).currentSpeed.name,
+                    valveState1=DependencyContainer.valves.getById(1).isOn,
+                    valveState2=DependencyContainer.valves.getById(2).isOn,
+                    ScheduleActive1=DependencyContainer.schedules.getById(1).isRunning,
+                    ActionActive1= DependencyContainer.actions.get()[0].overrideSchedule,
+                    ActionActive2= DependencyContainer.actions.get()[1].overrideSchedule,
+                    ActionActive3= DependencyContainer.actions.get()[2].overrideSchedule,
+                    ActionActive4= DependencyContainer.actions.get()[3].overrideSchedule
+                )
         
         displayRotation = 1 + displayRotation
         #Using the temp ensures the display only changs every 30 seconds

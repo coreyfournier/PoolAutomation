@@ -1,7 +1,7 @@
 ###########################################################################################
 # Very Very simple deployment script using putty secure copy 
 #
-#
+#DeployCode.psq -password ******* -computer user@computer
 ###########################################################################################
 Param(	
 	[string]$password,
@@ -9,6 +9,7 @@ Param(
     [string]$computer,
     [string]$targetPath = "/home/pi/pool/"
 )
+
 
 #Stop execution on the first error
 $ErrorActionPreference = "Stop"

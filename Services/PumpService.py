@@ -11,7 +11,7 @@ class PumpService:
 
     @cherrypy.expose
     def on(self, pumpIndex:int, speed:str):
-        pump = self.pumps.getById(int(pumpIndex))
+        pump = self.pumps.getById(int(pumpIndex) + 1)
 
         if(Speed[speed] == Speed.OFF):
             pump.off()    

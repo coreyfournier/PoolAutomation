@@ -184,11 +184,11 @@
                 $.each(result, function(i, item) {
                     console.log(JSON.stringify(item));
                     var container = $("<div>");
-                    var toggle = $("<input type='checkbox' id='valve-"+item.apiName+"' data-apiName='"+item.apiName+"' data-style='slow'>");
+                    var toggle = $("<input type='checkbox' id='valve-"+item.id+"' data-apiName='"+item.name+"' data-style='slow'>");
 
                     
                     container.append(toggle);
-                    container.append($("<span style='margin-left:5px;'>" + item.name + "</span>"));
+                    container.append($("<span style='margin-left:5px;'>" + item.displayName + "</span>"));
 
                     toggle.bootstrapToggle({
                         on: 'On',
@@ -212,7 +212,7 @@
 
                         timeoutId = setTimeout(function(){
                             $.ajax({
-                                url: '/valve/' + (lastValue ? "on" : "off") + "?name=" + item.apiName,
+                                url: '/valve/' + (lastValue ? "on" : "off") + "?name=" + item.name,
                                 success: function(){
                                     console.log("valve: " + lastValue);
                                 }

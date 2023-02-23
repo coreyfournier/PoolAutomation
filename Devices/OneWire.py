@@ -39,15 +39,22 @@ class OneWire(Temperature):
         return deviceFolder + '/w1_slave'
 
     def __read_temp_raw(self, deviceFolder):
-        with open(self.__getDeviceFile(deviceFolder), 'r') as f:
-            lines = f.readlines()        
-            return lines
+        if(os.path.exists(deviceFolder)):
+            with open(self.__getDeviceFile(deviceFolder), 'r') as f:
+                lines = f.readlines()        
+                return lines
+        else:
+            logger.error(f"Sensor doesn't exists at {deviceFolder}")
+            return None
     
     def __read_temp(self, deviceId:str):
         lines = self.__read_temp_raw(deviceId)
-        while lines[0].strip()[-3:] != 'YES':
-            time.sleep(0.2)
-            lines = self.__read_temp_raw(deviceId)
+        if(lines == None):
+            return 0            
+        else:
+            while lines[0].strip()[-3:] != 'YES':
+                time.sleep(0.2)
+                lines = self.__read_temp_raw(deviceId)
 
         equals_pos = lines[1].find('t=')
         if equals_pos != -1:
