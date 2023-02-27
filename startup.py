@@ -13,7 +13,7 @@ from Services.ScheduleService import ScheduleService
 from Services.TemperatureService import TemperatureService
 from Services.ValveService import ValveService
 from Services.VariableService import VariableService
-from Services.DataService import DataService
+#from Services.DataService import DataService
 from Index import Index
 import DependencyContainer
 import asyncio
@@ -37,8 +37,18 @@ if __name__ == '__main__':
     dataPath = os.path.join("data")       
     i2cBus = None
 
-    #check to see if the environment variable is there or if its set to stub.
-    if("CONTROLLER_TARGET" not in os.environ or os.environ["CONTROLLER_TARGET"] == "stub"):
+    #When running on the raspberry pi
+    try:
+        import RPi.GPIO as GPIO        
+        import smbus2
+        #Get the bus for i2c controls    
+        i2cBus = smbus2.SMBus(1)
+        runAsDaemon = True
+        temperatureFile = os.path.join(dataPath, "temperature-devices.json")
+        #temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
+    except:
+        print("Running locally")
+        #Running locally
         GPIO = GpioStub()
         logger.info("Using GPIO Stub. Live pins will NOT be used.")
         from Devices.TempStub import TempStub
@@ -47,17 +57,7 @@ if __name__ == '__main__':
         temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
         
         runAsDaemon = False
-        i2cBus = None
-    else:#When running on the raspberry pi
-        import RPi.GPIO as GPIO        
-        import smbus2
-        #Get the bus for i2c controls    
-        i2cBus = smbus2.SMBus(1)
-        
-        runAsDaemon = True
-        temperatureFile = os.path.join(dataPath, "temperature-devices.json")
-        #temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
-        
+       
     
     from Devices.Schedule import *
     from IO.ScheduleRepo import ScheduleRepo
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     cherrypy.tree.mount(TemperatureService(), "/temperature", config=app_conf)
     cherrypy.tree.mount(VariableService(), "/variable", config=app_conf)
     cherrypy.tree.mount(ValveService(), "/valve", config=app_conf)
-    cherrypy.tree.mount(DataService(), "/data", config=app_conf)
+    #cherrypy.tree.mount(DataService(), "/data", config=app_conf)
     cherrypy.engine.start()
     logger.info(f"Browse to http://localhost:{server_config['server.socket_port']}")
     cherrypy.engine.block()

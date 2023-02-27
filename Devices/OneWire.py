@@ -39,7 +39,7 @@ class OneWire(Temperature):
         return deviceFolder + '/w1_slave'
 
     def __read_temp_raw(self, deviceFolder):
-        if(os.path.exists(deviceFolder)):
+        if(os.path.exists(self.__getDeviceFile(deviceFolder))):
             with open(self.__getDeviceFile(deviceFolder), 'r') as f:
                 lines = f.readlines()        
                 return lines

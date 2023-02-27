@@ -91,13 +91,15 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
         from Devices.Display import DisplayStub        
         display = DisplayStub(os.path.join(os.getcwd(), "display.png"))
     else:
-        import board
-        import busio
-        import adafruit_ssd1306
-        from Devices.Display import DisplaySSD1306
-        i2c = busio.I2C(board.SCL, board.SDA)
-        oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c, addr=0x3c)
-        display = DisplaySSD1306(oled)
+        #import board
+        #import busio
+        #import adafruit_ssd1306
+        #from Devices.Display import DisplaySSD1306
+        #i2c = busio.I2C(board.SCL, board.SDA)
+        #oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c, addr=0x3c)
+        #display = DisplaySSD1306(oled)
+        from Devices.Display import DisplayStub
+        display = DisplayStub(os.path.join(os.getcwd(), "display.png"))
 
     logger.debug("Loading actions")
     DependencyContainer.actions = Actions([
