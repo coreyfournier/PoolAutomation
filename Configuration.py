@@ -65,7 +65,7 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
                 "solar-heat-on"),
 
                 #The roof must be this temp + current pool temp before the heater turns on.
-                Variable("solar-min-roof-diff","Minimum roof temp", float, value=3),
+                Variable("solar-min-roof-diff","Minimum roof temp", float, value=10),
                 Variable("solar-heat-on","Heater is on", bool, value=False),
                 VariableGroup("Solar Heater", [
                     Variable("solar-heat-enabled","Enabled", bool, value=True)
