@@ -56,14 +56,14 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
                 Variable("solar-heat-on",None, bool, value=False),          
                 VariableGroup("Solar Heater", [                
                     Variable("solar-heat-temperature","Heater temp", float,value=90.0),
-                    Variable("solar-heat-enabled","Enabled", bool, value=True),                
+                    Variable("solar-heat-enabled","Enabled", bool, value=False),                
                     #The roof must be this temp + current pool temp before the heater turns on.
                     Variable("solar-min-roof-diff","Minimum roof temp", float, value=5)
                 ], 
                 True, 
                 "solar-heat-on"),                                
                 VariableGroup("Freeze Prevention", [
-                    Variable("freeze-prevention-enabled","Enabled", bool, value=True)    
+                    Variable("freeze-prevention-enabled","Enabled", bool, value=False)    
                 ],
                 True,
                 "freeze-prevention-on"),
