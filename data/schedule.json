@@ -1,6 +1,6 @@
 [
     {
-        "startTime":"01/01/0001 07:30",
+        "startTime":"01/01/0001 07:00",
         "endTime":"01/01/9999 09:59",
         "id":1,
         "name":"Morning",
@@ -27,7 +27,7 @@
     },
     {
         "startTime":"01/01/0001 13:00",
-        "endTime":"01/01/9999 16:59",
+        "endTime":"01/01/9999 18:59",
         "id":3,
         "name":"Night",
         "isActive":true,
