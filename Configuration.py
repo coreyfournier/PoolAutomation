@@ -55,23 +55,15 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
                     Variable("slide-on",None, bool,value=False)
                 ], 
                 True,
-                "slide-on"),
-                
+                "slide-on"),                
                 VariableGroup("Solar Heater", [                
                     Variable("solar-heat-temperature","Heater temp", float,value=90.0),
-                    Variable("solar-heat-enabled","Enabled", bool, value=True)                
+                    Variable("solar-heat-enabled","Enabled", bool, value=True),                
+                    #The roof must be this temp + current pool temp before the heater turns on.
+                    Variable("solar-min-roof-diff","Minimum roof temp", float, value=5)
                 ], 
                 True, 
-                "solar-heat-on"),
-
-                #The roof must be this temp + current pool temp before the heater turns on.
-                Variable("solar-min-roof-diff","Minimum roof temp", float, value=5),
-                Variable("solar-heat-on","Heater is on", bool, value=False),
-                VariableGroup("Solar Heater", [
-                    Variable("solar-heat-enabled","Enabled", bool, value=True)
-                ],
-                True,
-                "solar-heat-on"),
+                "solar-heat-on"),                                
                 VariableGroup("Freeze Prevention", [
                     Variable("freeze-prevention-enabled","Enabled", bool, value=True)    
                 ],
@@ -243,6 +235,7 @@ def evaluateSolarStatus(event):
         solarSetTemp = DependencyContainer.variables.get("solar-heat-temperature").value
         minRoofDifference = DependencyContainer.variables.get("solar-min-roof-diff").value
         isSolarEnabled = DependencyContainer.variables.get("solar-heat-enabled").value
+        solarHeatTemp = DependencyContainer.temperatureDevices.get("solar-heat").get(True)
         roofTemp = DependencyContainer.temperatureDevices.get("roof").get(True)
         poolTemp = DependencyContainer.temperatureDevices.get("pool-temp").get(True)
         isSolarHeatOn = DependencyContainer.variables.get("solar-heat-on").value
@@ -253,7 +246,10 @@ def evaluateSolarStatus(event):
         if(isSolarEnabled):
             #Roof must greater than this
             needRoofTemp = poolTemp + minRoofDifference
-            if(roofTemp >= needRoofTemp):
+            #if there is heat still being produced, then allow it to stay on
+            if(poolTemp + 1 < solarHeatTemp):
+                solarShouldBeOn = True
+            elif(roofTemp >= needRoofTemp):
                 if(poolTemp <= solarSetTemp):                
                     if(isSolarHeatOn):
                         logger.debug(f"Heater staying on. Pool still not warm enough {poolTemp} <= {solarSetTemp}. Roof:{roofTemp} Roof temp until off:{poolTemp-needRoofTemp}")
