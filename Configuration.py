@@ -30,10 +30,7 @@ display:Display = None
 displayRotation:int = 0
 
 def configure(variableRepo:VariableRepo, GPIO, i2cBus):
-    
 
-
-    
     logger.debug("Loading lights")    
     DependencyContainer.lights = Lights([
         #GloBrite("main","Light", I2cController(7, relayAddress, i2cBus))
@@ -52,10 +49,11 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
                 Variable("quick-clean-on",None, bool, value=False),
                 #Denotes if the slide is on or off. This will be a button
                 VariableGroup("Slide", [
-                    Variable("slide-on",None, bool,value=False)
+                    Variable("slide-on", None, bool,value=False)
                 ], 
                 True,
-                "slide-on"),                
+                "slide-on"),      
+                Variable("solar-heat-on",None, bool, value=False),          
                 VariableGroup("Solar Heater", [                
                     Variable("solar-heat-temperature","Heater temp", float,value=90.0),
                     Variable("solar-heat-enabled","Enabled", bool, value=True),                
