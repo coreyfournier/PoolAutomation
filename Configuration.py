@@ -55,10 +55,10 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
                 "slide-on"),      
                 Variable("solar-heat-on",None, bool, value=False),          
                 VariableGroup("Solar Heater", [                
-                    Variable("solar-heat-temperature","Heater temp", float,value=90.0),
-                    Variable("solar-heat-enabled","Enabled", bool, value=False),                
+                    Variable("solar-heat-temperature","Heater temp", float,value=90.0),                                    
                     #The roof must be this temp + current pool temp before the heater turns on.
-                    Variable("solar-min-roof-diff","Minimum roof temp", float, value=5)
+                    Variable("solar-min-roof-diff","Minimum roof diff", float, value=5),
+                    Variable("solar-heat-enabled","Enabled", bool, value=False)
                 ], 
                 True, 
                 "solar-heat-on"),                                
