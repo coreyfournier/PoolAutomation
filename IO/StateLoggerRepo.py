@@ -1,7 +1,10 @@
 import datetime
 
 class StateLoggerRepo():
-
+    """
+    Example command to start sql on docker
+    docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=ent3r9lex=!" -e "MSSQL_AGENT_ENABLED=True" -e "TZ=America/Chicago" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest --mount source=/volume1/docker/mssql/data,target=/var/opt/mssql/data --mount source=/volume1/docker/mssql/log,target=/var/opt/mssql/log --mount source=/volume1/docker/mssql/backups,target=/var/backups --mount source=/volume1/docker/mssql/secrets,target=/var/opt/mssql/secrets 
+    """
     def __init__(self, databaseFile:str) -> None:
         import duckdb
         self.__connection = duckdb.connect(databaseFile, read_only=False)
