@@ -237,16 +237,27 @@ def evaluateSolarStatus(event):
         roofTemp = DependencyContainer.temperatureDevices.get("roof").get(True)
         poolTemp = DependencyContainer.temperatureDevices.get("pool-temp").get(True)
         isSolarHeatOn = DependencyContainer.variables.get("solar-heat-on").value
+
         logger.debug("Seeing if solar should be on or off")
         solarShouldBeOn = False
-        pumpForSolar:DeviceController = DependencyContainer.pumps.get("main")
+        pumpForSolar:Pump = DependencyContainer.pumps.get("main")
 
         if(isSolarEnabled):
             #Roof must greater than this
             needRoofTemp = poolTemp + minRoofDifference
-            #if there is heat still being produced, then allow it to stay on
-            if(poolTemp + 1 < solarHeatTemp):
+            #If not producing heat, but the roof is still hot see if we can change the pump speed
+            if(solarHeatTemp < poolTemp and roofTemp >= needRoofTemp and pumpForSolar.currentSpeed  != Speed.SPEED_4):
+                pumpForSolar.on(Speed.SPEED_4)
                 solarShouldBeOn = True
+            #speed the pump up if it hot enough
+            elif(poolTemp + 1 < solarHeatTemp):
+                #change the speed based on the temp of the output
+                if(solarHeatTemp > poolTemp + 2 and pumpForSolar.currentSpeed == Speed.SPEED_4):
+                   pumpForSolar.on(Speed.SPEED_3)
+                elif(solarHeatTemp > poolTemp + 2 and pumpForSolar.currentSpeed == Speed.SPEED_3):
+                    pumpForSolar.on(Speed.SPEED_2)
+
+                solarShouldBeOn = False
             elif(roofTemp >= needRoofTemp):
                 if(poolTemp <= solarSetTemp):                
                     if(isSolarHeatOn):
@@ -278,7 +289,7 @@ def evaluateSolarStatus(event):
             #It's not on and it should be
             action.overrideSchedule = True
             DependencyContainer.variables.get("solar-heat-on").value = True
-            pumpForSolar.on(Speed.SPEED_2)
+            pumpForSolar.on(Speed.SPEED_3)
             DependencyContainer.valves.on("solar")   
 
 
