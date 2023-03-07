@@ -241,23 +241,28 @@ def evaluateSolarStatus(event):
         logger.debug("Seeing if solar should be on or off")
         solarShouldBeOn = False
         pumpForSolar:Pump = DependencyContainer.pumps.get("main")
+        solarVsPoolDifference = solarHeatTemp - poolTemp
 
         if(isSolarEnabled):
             #Roof must greater than this
             needRoofTemp = poolTemp + minRoofDifference
             #If not producing heat, but the roof is still hot see if we can change the pump speed
-            if(solarHeatTemp < poolTemp and roofTemp >= needRoofTemp and pumpForSolar.currentSpeed  != Speed.SPEED_4):
+            if(solarVsPoolDifference <= 0 and roofTemp >= needRoofTemp and pumpForSolar.currentSpeed != Speed.SPEED_4):
+                logger.debug(f"It's NOT hot enough, decreasing the speed to 4. Diff={solarVsPoolDifference}")
                 pumpForSolar.on(Speed.SPEED_4)
                 solarShouldBeOn = True
             #speed the pump up if it hot enough
-            elif(poolTemp + 1 < solarHeatTemp):
+            elif(solarVsPoolDifference > 0):
                 #change the speed based on the temp of the output
-                if(solarHeatTemp > poolTemp + 2 and pumpForSolar.currentSpeed == Speed.SPEED_4):
-                   pumpForSolar.on(Speed.SPEED_3)
-                elif(solarHeatTemp > poolTemp + 2 and pumpForSolar.currentSpeed == Speed.SPEED_3):
-                    pumpForSolar.on(Speed.SPEED_2)
+                if(solarVsPoolDifference > 1):
+                    if(pumpForSolar.currentSpeed == Speed.SPEED_4):
+                        logger.debug(f"It's hot enough, increasing the speed to 3. Diff={solarVsPoolDifference}")
+                        pumpForSolar.on(Speed.SPEED_3)
+                    elif(pumpForSolar.currentSpeed == Speed.SPEED_3):
+                        logger.debug(f"It's hot enough, increasing the speed 2. Diff={solarVsPoolDifference}")
+                        pumpForSolar.on(Speed.SPEED_2)
 
-                solarShouldBeOn = False
+                solarShouldBeOn = True
             elif(roofTemp >= needRoofTemp):
                 if(poolTemp <= solarSetTemp):                
                     if(isSolarHeatOn):

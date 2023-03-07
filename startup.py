@@ -43,7 +43,7 @@ if __name__ == '__main__':
         import smbus2
         #Get the bus for i2c controls    
         i2cBus = smbus2.SMBus(1)
-        runAsDaemon = True
+        runAsDaemon = False
         temperatureFile = os.path.join(dataPath, "temperature-devices.json")
         #temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
     except:
