@@ -244,9 +244,12 @@ def evaluateSolarStatus(event):
         solarVsPoolDifference = solarHeatTemp - poolTemp
 
         #if not enabled, then do nothing
-        if(isSolarEnabled):
+        if(isSolarEnabled):            
             #Roof must greater than this
             needRoofTemp = poolTemp + minRoofDifference
+
+            logger.debug(f"solarVsPoolDifference={solarVsPoolDifference} needRoofTemp={needRoofTemp}")
+
             if(isSolarHeatOn):
                 #need to check if it should stay on
                 if(poolTemp >= solarSetTemp):
@@ -271,7 +274,8 @@ def evaluateSolarStatus(event):
                             pumpForSolar.on(Speed.SPEED_2)
                     solarShouldBeOn = True
                 else:
-                    solarShouldBeOn = True
+                    logger.debug(f"It's NOT hot enough, going to turn off Diff={solarVsPoolDifference}")
+                    solarShouldBeOn = False
             #See if it should be turned on
             elif(roofTemp >= needRoofTemp and poolTemp <= solarSetTemp):
                     logger.debug(f"Heater staying on. Pool still not warm enough {poolTemp} < {solarSetTemp}. Roof:{roofTemp} Roof temp until off:{poolTemp-needRoofTemp}")
