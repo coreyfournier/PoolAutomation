@@ -70,9 +70,12 @@ if __name__ == '__main__':
     from IO.PumpRepo import PumpRepo
     from Devices.Valves import Valves
     from IO.ValveRepo import ValveRepo
-    from IO.StateLoggerRepo import StateLoggerRepo
+    from IO.StateLoggerMsSqlRepo import StateLoggerMsSqlRepo
 
-    DependencyContainer.stateLogger = None #= StateLoggerRepo(os.path.join(dataPath, "database.db"))
+    if("PoolAutomationSqlConnection" in os.environ):
+        DependencyContainer.stateLogger = StateLoggerMsSqlRepo(os.environ["PoolAutomationSqlConnection"])
+    else:
+        raise Exception(f"Missing environment variable sql connection (PoolAutomationSqlConnection)")
 
     logger.debug("Loading valves")
     DependencyContainer.valves = Valves(ValveRepo(os.path.join(dataPath, "valves.json"),GPIO, i2cBus))

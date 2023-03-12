@@ -1,55 +1,76 @@
 import datetime
+import pyodbc 
 
-class StateLoggerRepo():
+class StateLoggerMsSqlRepo():
     """
     Example command to start sql on docker
     sudo docker run -v "/volume1/docker/mssql/data:/var/opt/mssql/data" -v "/volume1/docker/mssql/log:/var/opt/mssql/log" -v "/volume1/docker/mssql/backups:/var/backups" -v "/volume1/docker/mssql/secrets:/var/opt/mssql/secrets" -e "ACCEPT_EULA=Y" -e "MSSQL_PID=standard" -e "SA_PASSWORD=ent3r9lex=!" -e "MSSQL_AGENT_ENABLED=True" -e "TZ=America/Chicago" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
     
     """
-    def __init__(self, databaseFile:str) -> None:
-        import duckdb
-        self.__connection = duckdb.connect(databaseFile, read_only=False)
+    def __init__(self, sqlConnection:str) -> None:        
+        sql_connection = sqlConnection.replace('User Id=','UID=').replace('Password=','PWD=')
+        sql_connection = f"DRIVER={{SQL Server}};{sql_connection};Trusted_Connection=No"
+        conn = pyodbc.connect(sqlConnection, autocommit=True)
+        cursor = conn.cursor()
 
-        tableScript = """CREATE TABLE IF NOT EXISTS StateLogs(
-            temperature1 REAL,
-            temperature2 REAL,
-            temperature3 REAL,
-            temperature4 REAL,
-            temperature5 REAL,
-            pumpState1 VARCHAR(10),
-            pumpState2 VARCHAR(10),
-            pumpState3 VARCHAR(10),
-            pumpState4 VARCHAR(10),
-            pumpState5 VARCHAR(10),
-            valveState1 BOOLEAN,
-            valveState2 BOOLEAN,
-            valveState3 BOOLEAN,
-            valveState4 BOOLEAN,
-            valveState5 BOOLEAN,
-            ScheduleActive1 BOOLEAN,
-            ScheduleActive2 BOOLEAN,
-            ScheduleActive3 BOOLEAN,
-            ActionActive1 VARCHAR(20),
-            ActionActive2 VARCHAR(20),
-            ActionActive3 VARCHAR(20),
-            ActionActive4 VARCHAR(20),
-            ActionActive5 VARCHAR(20),
-            Orp1 REAL,
-            Orp2 REAL,
-            PH1 REAL,
-            PH2 REAL,
-            Pressure1 REAL,
-            Pressure2 REAL,
-            Pressure3 REAL,
-            Pressure4 REAL,
-            CreatedDate TIMESTAMP
-            )
+        dbScript = """        
+            IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'PoolAutomation')
+            BEGIN
+                CREATE DATABASE PoolAutomation;
+            END;
+            GO
+        """
+        cursor.execute(dbScript)
+
+
+        tableScript = """USE PoolAutomation;
+            IF OBJECT_ID('*StateLogs*', 'U') IS NULL 
+            BEGIN
+            --CREATE COLUMNSTORE INDEX ncci ON Sales.OrderLines 
+            --(StockItemID, Quantity, UnitPrice, TaxRate)
+                CREATE TABLE StateLogs(
+                        temperature1 decimal(4,2) NULL,
+                        temperature2 decimal(4,2) NULL,
+                        temperature3 decimal(4,2) NULL,
+                        temperature4 decimal(4,2) NULL,
+                        temperature5 decimal(4,2) NULL,
+                        pumpState1 VARCHAR(10) NULL,
+                        pumpState2 VARCHAR(10) NULL,
+                        pumpState3 VARCHAR(10) NULL,
+                        pumpState4 VARCHAR(10) NULL,
+                        pumpState5 VARCHAR(10) NULL,
+                        valveState1 BIT NULL,
+                        valveState2 BIT NULL,
+                        valveState3 BIT NULL,
+                        valveState4 BIT NULL,
+                        valveState5 BIT NULL,
+                        ScheduleActive1 BIT NULL,
+                        ScheduleActive2 BIT NULL,
+                        ScheduleActive3 BIT NULL,
+                        ActionActive1 VARCHAR(20) NULL,
+                        ActionActive2 VARCHAR(20) NULL,
+                        ActionActive3 VARCHAR(20) NULL,
+                        ActionActive4 VARCHAR(20) NULL,
+                        ActionActive5 VARCHAR(20) NULL,
+                        Orp1 decimal(4,2)  NULL,
+                        Orp2 decimal(4,2) NULL,
+                        PH1 decimal(4,2) NULL,
+                        PH2 decimal(4,2) NULL,
+                        Pressure1 decimal(4,2) NULL,
+                        Pressure2 decimal(4,2) NULL,
+                        Pressure3 decimal(4,2) NULL,
+                        Pressure4 decimal(4,2) NULL,
+                        CreatedDate datetime2 
+                        )
+                        CREATE CLUSTERED COLUMNSTORE INDEX [CCI-StateLogs] ON StateLogs
+            END
         """
 
-        self.__connection.execute(tableScript)
-
-        self.__connection.execute("DESCRIBE SELECT * FROM StateLogs")
-        self.__tblColumns = [x[0].lower() for x in self.__connection.fetchall()]
+        cursor = conn.cursor()
+        cursor.execute(tableScript)
+        
+        db_cursor = cursor.execute("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'StateLogs'")
+        self.__tblColumns = [x[0].lower() for x in list(db_cursor)]
 
     def Add(self,
         temperature1:float = None,
