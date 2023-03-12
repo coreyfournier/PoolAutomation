@@ -5,7 +5,7 @@ import DependencyContainer
 import odata_query
 from odata_query.grammar import ODataParser, ODataLexer
 from odata_query.sql import AstToSqlVisitor
-from IO.StateLoggerRepo import StateLoggerRepo
+from IO.StateLoggerDuckDbRepo import StateLoggerDuckDbRepo
 
 
 
