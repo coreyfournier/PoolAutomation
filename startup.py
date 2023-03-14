@@ -75,7 +75,7 @@ if __name__ == '__main__':
     if("PoolAutomationSqlConnection" in os.environ):
         DependencyContainer.stateLogger = StateLoggerMsSqlRepo(os.environ["PoolAutomationSqlConnection"])
     else:
-        raise Exception(f"Missing environment variable sql connection (PoolAutomationSqlConnection)")
+        logger.warn(f"Missing environment variable for sql connection (PoolAutomationSqlConnection)")
 
     logger.debug("Loading valves")
     DependencyContainer.valves = Valves(ValveRepo(os.path.join(dataPath, "valves.json"),GPIO, i2cBus))
