@@ -1,5 +1,9 @@
 import datetime
 import pyodbc
+import DependencyContainer
+import re
+
+logger = DependencyContainer.get_logger(__name__)
 
 class StateLoggerMsSqlRepo():
     """
@@ -7,29 +11,32 @@ class StateLoggerMsSqlRepo():
     sudo docker run -v "/volume1/docker/mssql/data:/var/opt/mssql/data" -v "/volume1/docker/mssql/log:/var/opt/mssql/log" -v "/volume1/docker/mssql/backups:/var/backups" -v "/volume1/docker/mssql/secrets:/var/opt/mssql/secrets" -e "ACCEPT_EULA=Y" -e "MSSQL_PID=standard" -e "SA_PASSWORD=ent3r9lex=!" -e "MSSQL_AGENT_ENABLED=True" -e "TZ=America/Chicago" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
     
     """
-    def __init__(self, sqlConnection:str) -> None:    
+    def __init__(self, sqlConnection:str, databaseName = "PoolAutomation") -> None:    
         #Change the connection from a .net format to odbc
         sqlConnection = sqlConnection.replace('User Id=','UID=').replace('Password=','PWD=')
         sqlConnection = f"DRIVER={{SQL Server}};{sqlConnection};Trusted_Connection=No"
 
         try:
-            conn = pyodbc.connect(sqlConnection, autocommit=True)
+            self.__connection = pyodbc.connect(sqlConnection, autocommit=True)
         except Exception as ex:
             if(len(ex.args) > 1 and "Cannot open database" in ex.args[1]):
-                tempConnection = sqlConnection.replace("Database=PoolAutomation;","Database=master;")
+                logger.info(f"Creating database {databaseName}")
+
+                #Switch to master to create the database.
+                tempConnection = re.sub("Database=([a-zA-Z\-_]+);","Database=master;", sqlConnection)
                 conn = pyodbc.connect(tempConnection, autocommit=True)
 
                 cursor = conn.cursor()
 
-                dbScript = """        
-                    IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'PoolAutomation')
+                dbScript = f"""        
+                    IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '{databaseName}')
                     BEGIN
-                        CREATE DATABASE PoolAutomation;
+                        CREATE DATABASE {databaseName};
                     END;
                 """
                 cursor.execute(dbScript)
                 
-                conn = pyodbc.connect(sqlConnection, autocommit=True)
+                self.__connection = pyodbc.connect(sqlConnection, autocommit=True)
             else:
                 raise ex
 
@@ -79,13 +86,13 @@ class StateLoggerMsSqlRepo():
             END
         """
 
-        cursor = conn.cursor()
+        cursor = self.__connection.cursor()
         cursor.execute(tableScript)
         
         db_cursor = cursor.execute("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'StateLogs'")
         self.__tblColumns = [x[0].lower() for x in list(db_cursor)]
 
-    def Add(self,
+    def add(self,
         temperature1:float = None,
         temperature2:float = None,
         temperature3:float = None,
@@ -118,7 +125,8 @@ class StateLoggerMsSqlRepo():
         Pressure3:float = None,
         Pressure4:float = None
     ):
-        result = self.__connection.execute(f"INSERT INTO StateLogs VALUES({'?,'*31}?)",
+        cursor = self.__connection.cursor()
+        result = cursor.execute(f"INSERT INTO StateLogs VALUES({'?,'*31}?)",
             [temperature1,
             temperature2,
             temperature3,

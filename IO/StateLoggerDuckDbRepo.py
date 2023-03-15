@@ -46,7 +46,7 @@ class StateLoggerDuckDbRepo():
         self.__connection.execute("DESCRIBE SELECT * FROM StateLogs")
         self.__tblColumns = [x[0].lower() for x in self.__connection.fetchall()]
 
-    def Add(self,
+    def add(self,
         temperature1:float = None,
         temperature2:float = None,
         temperature3:float = None,
