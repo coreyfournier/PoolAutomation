@@ -1,5 +1,5 @@
 import datetime
-import pyodbc
+import pytds
 import DependencyContainer
 import re
 
@@ -8,23 +8,39 @@ logger = DependencyContainer.get_logger(__name__)
 class StateLoggerMsSqlRepo():
     """
     Example command to start sql on docker
-    sudo docker run -v "/volume1/docker/mssql/data:/var/opt/mssql/data" -v "/volume1/docker/mssql/log:/var/opt/mssql/log" -v "/volume1/docker/mssql/backups:/var/backups" -v "/volume1/docker/mssql/secrets:/var/opt/mssql/secrets" -e "ACCEPT_EULA=Y" -e "MSSQL_PID=standard" -e "SA_PASSWORD=ent3r9lex=!" -e "MSSQL_AGENT_ENABLED=True" -e "TZ=America/Chicago" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
+    sudo docker run -v "/volume1/docker/mssql/data:/var/opt/mssql/data" -v "/volume1/docker/mssql/log:/var/opt/mssql/log" -v "/volume1/docker/mssql/backups:/var/backups" -v "/volume1/docker/mssql/secrets:/var/opt/mssql/secrets" -e "ACCEPT_EULA=Y" -e "MSSQL_PID=standard" -e "SA_PASSWORD=**********" -e "MSSQL_AGENT_ENABLED=True" -e "TZ=America/Chicago" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
     
     """
-    def __init__(self, sqlConnection:str, databaseName = "PoolAutomation") -> None:    
-        #Change the connection from a .net format to odbc
-        sqlConnection = sqlConnection.replace('User Id=','UID=').replace('Password=','PWD=')
-        sqlConnection = f"DRIVER={{SQL Server}};{sqlConnection};Trusted_Connection=No"
+    def __init__(self, sqlConnection:str, databaseName = None) -> None:    
+        userId = re.findall("User Id=([a-zA-Z0-9\-_\.]+);", sqlConnection)
+        password = re.findall("Password=([a-zA-Z0-9\+\-_=!\.]+);", sqlConnection)
+        server = re.findall("Server=([a-zA-Z0-9\-_\.]+);", sqlConnection)        
+        logger.debug(f"password='{password}'")
+        if(databaseName == None):
+            databaseName = re.findall("Database=([a-zA-Z0-9\-_\.]+);", sqlConnection)
+            if(len(databaseName) == 0):
+                databaseName = None
+            else:
+                databaseName = databaseName[0]
+                
 
+        if(len(userId) == 0):
+            raise Exception("User Id=X; not found in connection string")
+        if(len(password) == 0):
+            raise Exception("Password=X; not found in connection string")        
+        if(len(server) == 0):
+            raise Exception("Server=X; not found in connection string")
+        if(databaseName == None):
+            raise Exception("Database=X; not found in connection string")
+        
         try:
-            self.__connection = pyodbc.connect(sqlConnection, autocommit=True)
+            self.__connection = pytds.connect(server[0], databaseName, userId[0], password[0], autocommit=True)
         except Exception as ex:
             if(len(ex.args) > 1 and "Cannot open database" in ex.args[1]):
                 logger.info(f"Creating database {databaseName}")
 
                 #Switch to master to create the database.
-                tempConnection = re.sub("Database=([a-zA-Z\-_]+);","Database=master;", sqlConnection)
-                conn = pyodbc.connect(tempConnection, autocommit=True)
+                conn = pytds.connect(server[0], "master", userId[0], password[0])
 
                 cursor = conn.cursor()
 
@@ -36,18 +52,13 @@ class StateLoggerMsSqlRepo():
                 """
                 cursor.execute(dbScript)
                 
-                self.__connection = pyodbc.connect(sqlConnection, autocommit=True)
+                self.__connection = pytds.connect(server[0], databaseName, userId[0], password[0], autocommit=True)
             else:
                 raise ex
 
-   
-
-
         tableScript = """USE PoolAutomation;
-            IF OBJECT_ID('*StateLogs*', 'U') IS NULL 
+            IF OBJECT_ID('StateLogs', 'U') IS NULL 
             BEGIN
-            --CREATE COLUMNSTORE INDEX ncci ON Sales.OrderLines 
-            --(StockItemID, Quantity, UnitPrice, TaxRate)
                 CREATE TABLE StateLogs(
                         temperature1 decimal(4,2) NULL,
                         temperature2 decimal(4,2) NULL,
@@ -126,8 +137,8 @@ class StateLoggerMsSqlRepo():
         Pressure4:float = None
     ):
         cursor = self.__connection.cursor()
-        result = cursor.execute(f"INSERT INTO StateLogs VALUES({'?,'*31}?)",
-            [temperature1,
+        statement = f"INSERT INTO StateLogs VALUES({'%s,'*31}%s)"
+        data = [temperature1,
             temperature2,
             temperature3,
             temperature4,
@@ -159,7 +170,9 @@ class StateLoggerMsSqlRepo():
             Pressure3,
             Pressure4,
             datetime.datetime.now()
-            ])
+            ]
+        logger.debug(statement)
+        result = cursor.execute(statement, data)
 
     def query(self, where:str, columns:"list[str]") -> list:
         """_summary_

@@ -31,6 +31,12 @@ displayRotation:int = 0
 
 def configure(variableRepo:VariableRepo, GPIO, i2cBus):
 
+    if("FONT_PATH" in os.environ):
+        fontDirectory = os.environ["FONT_PATH"]
+    else:
+        fontDirectory = "www/fonts"
+    logger.info(f"Using fonts in '{fontDirectory}'")
+
     logger.debug("Loading lights")    
     DependencyContainer.lights = Lights([
         #GloBrite("main","Light", I2cController(7, relayAddress, i2cBus))
@@ -79,7 +85,7 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
     #Check to see if it's running locally or on the pi    
     if(isinstance(GPIO, GpioStub)):
         from Devices.Display import DisplayStub        
-        display = DisplayStub(os.path.join(os.getcwd(), "display.png"))
+        display = DisplayStub(os.path.join(os.getcwd(), "display.png"), fontDirectory)
     else:
         #import board
         #import busio
@@ -87,9 +93,9 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
         #from Devices.Display import DisplaySSD1306
         #i2c = busio.I2C(board.SCL, board.SDA)
         #oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c, addr=0x3c)
-        #display = DisplaySSD1306(oled)
+        #display = DisplaySSD1306(oled, fontDirectory)
         from Devices.Display import DisplayStub
-        display = DisplayStub(os.path.join(os.getcwd(), "display.png"))
+        display = DisplayStub(os.path.join(os.getcwd(), "display.png"), fontDirectory)
 
     logger.debug("Loading actions")
     DependencyContainer.actions = Actions([
@@ -132,7 +138,7 @@ def allChangeNotification(event:Event):
             DependencyContainer.stateLogger.add(
                 temperature1= DependencyContainer.temperatureDevices.getById(1).getLast(),
                 temperature2= DependencyContainer.temperatureDevices.getById(2).getLast(),
-                temperature3= DependencyContainer.temperatureDevices.getById(3).getLast(),
+                #temperature3= DependencyContainer.temperatureDevices.getById(3).getLast(),
                 temperature4= DependencyContainer.temperatureDevices.getById(4).getLast(),
                 pumpState1=DependencyContainer.pumps.getById(1).currentSpeed.name,
                 valveState1=DependencyContainer.valves.getById(1).isOn,

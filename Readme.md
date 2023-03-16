@@ -1,14 +1,17 @@
 # Pool Automation
 
-## Duckdb requirements
-pip3 install opencv-python 
-sudo apt-get install libcblas-dev
-sudo apt-get install libhdf5-dev
-sudo apt-get install libhdf5-serial-dev
-sudo apt-get install libatlas-base-dev
-sudo apt-get install libjasper-dev 
-sudo apt-get install libqtgui4 
-sudo apt-get install libqt4-test
+## Docker on pi
+Follow the directions here: https://www.simplilearn.com/tutorials/docker-tutorial/raspberry-pi-docker
+### Testing on the pi with docker
+#### Locally
+1. docker build -f "Dockerfile" . -t "pool-automation:latest"
+2. docker save -o PoolAutomation.tar pool-automation:latest
+./DeployCode.ps1 -password **** -computer user@server
+#### On the server
+1. docker load -i PoolAutomation.tar
+
+2. With out privileged i can't get access to the temp sensors. 
+sudo docker run -it -p 8080:8080 -e 'ROOT_FOLDER=/app' -e 'PoolAutomationSqlConnection=' --device /dev/gpiomem:/dev/gpiomem -v /sys:/sys -v /dev/i2c-1:/dev/i2c-1 -v /home/pi/pool/data:/app/data --privileged pool-automation:latest
 
 ## Authentication
 No security is provided, but I used my synology nas to help me out here. I already have a certificate installed on it. The NAS also provides an option for reverse proxy, but it doesn't include authentication. I found a docker container project that provides the LDAP authentication. With the two, i piped traffice from one proxy to another. I could just use the Docker container, but then I would have to manage the cert in two places. This is a set it and forget it solution.

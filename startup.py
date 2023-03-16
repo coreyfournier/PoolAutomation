@@ -20,8 +20,15 @@ import asyncio
 from lib.WorkerPlugin import WorkerPlugin
 logger = DependencyContainer.get_logger(__name__)
 
+if("ROOT_FOLDER" in os.environ):
+    rootFolder = os.environ["ROOT_FOLDER"]
+else:
+    rootFolder = os.getcwd()
+
+logger.info(f"Using root folder '{rootFolder}'")
+
 #This directory should NEVER contain code!!
-WEB_ROOT = os.path.join(os.getcwd(),"www")
+WEB_ROOT = os.path.join(rootFolder,"www")
 config_root = { 
     'tools.encode.encoding' : 'utf-8',
     'tools.staticdir.on' : True,
@@ -33,8 +40,12 @@ server_config = {'server.socket_host': '0.0.0.0',  'server.socket_port' : 8080}
 if __name__ == '__main__':
    
     import Configuration    
+    if("DATA_PATH" in os.environ):
+        dataPath = os.environ["DATA_PATH"]
+        logger.info(f"Using data path '{dataPath}'")           
+    else:
+        dataPath = os.path.join("data")        
 
-    dataPath = os.path.join("data")       
     i2cBus = None
 
     #When running on the raspberry pi
@@ -73,6 +84,7 @@ if __name__ == '__main__':
     from IO.StateLoggerMsSqlRepo import StateLoggerMsSqlRepo
 
     if("PoolAutomationSqlConnection" in os.environ):
+        logger.debug(f'PoolAutomationSqlConnection={os.environ["PoolAutomationSqlConnection"]}')
         DependencyContainer.stateLogger = StateLoggerMsSqlRepo(os.environ["PoolAutomationSqlConnection"])
     else:
         logger.warn(f"Missing environment variable for sql connection (PoolAutomationSqlConnection)")
@@ -112,7 +124,7 @@ if __name__ == '__main__':
         Daemonizer(cherrypy.engine).subscribe()
     workerPlugin = WorkerPlugin(cherrypy.engine).subscribe()
     cherrypy.config['tools.json_out.handler'] = json_handler
-    cherrypy.tree.mount(Index(os.path.join("www")), config=app_conf)     
+    cherrypy.tree.mount(Index(os.path.join(rootFolder, "www")), config=app_conf)     
     cherrypy.tree.mount(LightService(), "/light" ,config=app_conf)
     cherrypy.tree.mount(PumpService(), "/pump", config=app_conf)
     cherrypy.tree.mount(ScheduleService(), "/schedule", config=app_conf)
