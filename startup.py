@@ -13,7 +13,7 @@ from Services.ScheduleService import ScheduleService
 from Services.TemperatureService import TemperatureService
 from Services.ValveService import ValveService
 from Services.VariableService import VariableService
-#from Services.DataService import DataService
+from Services.DataService import DataService
 from Index import Index
 import DependencyContainer
 import asyncio
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     cherrypy.tree.mount(TemperatureService(), "/temperature", config=app_conf)
     cherrypy.tree.mount(VariableService(), "/variable", config=app_conf)
     cherrypy.tree.mount(ValveService(), "/valve", config=app_conf)
-    #cherrypy.tree.mount(DataService(), "/data", config=app_conf)
+    cherrypy.tree.mount(DataService(), "/data", config=app_conf)
     cherrypy.engine.start()
     logger.info(f"Browse to http://localhost:{server_config['server.socket_port']}")
     cherrypy.engine.block()

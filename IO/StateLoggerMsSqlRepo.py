@@ -205,6 +205,6 @@ class StateLoggerMsSqlRepo():
 
     def agg(self, where:str=None,columns:"list[str]" = None) -> list:
         conn = self.__connection.cursor()
-        conn.execute(f"SELECT ROUND(AVG(temperature1),1), ROUND(AVG(temperature2),1), ROUND(AVG(temperature3),1), ROUND(AVG(temperature4),1), date_part('hour', CreatedDate) AS Hour FROM StateLogs GROUP BY date_part('hour', CreatedDate)")
+        conn.execute(f"SELECT ROUND(AVG(temperature1),1) AS temperature1, ROUND(AVG(temperature2),1) AS temperature2, ROUND(AVG(temperature3),1) AS temperature3, ROUND(AVG(temperature4),1) AS temperature4, DATEPART(HOUR, CreatedDate) AS Hour FROM StateLogs GROUP BY DATEPART(HOUR, CreatedDate)")
         return conn.fetchall()
         

@@ -5,8 +5,6 @@ import DependencyContainer
 import odata_query
 from odata_query.grammar import ODataParser, ODataLexer
 from odata_query.sql import AstToSqlVisitor
-from IO.StateLoggerDuckDbRepo import StateLoggerDuckDbRepo
-
 
 
 class DataService():
@@ -31,7 +29,8 @@ class DataService():
         ast = self.__parser.parse(self.__lexer.tokenize(query))
 
         visitor = AstToSqlVisitor()
-        where_clause = visitor.visit(ast)
+        #I have no idea why it does this
+        where_clause = visitor.visit(ast).replace(" DATE ", "")
 
         return DependencyContainer.stateLogger.query(where_clause, columns.split(","))
 

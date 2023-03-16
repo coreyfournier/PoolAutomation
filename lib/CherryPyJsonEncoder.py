@@ -1,6 +1,7 @@
 import json
 import datetime
 import cherrypy
+import decimal
 
 class JSONEncoder(json.JSONEncoder):
     """Allows cherry py to handle dates correctly
@@ -11,6 +12,8 @@ class JSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.date):
             return obj.isoformat()
+        elif(isinstance(obj,decimal.Decimal)):
+            return float(obj)
         return super().default(obj)
     def iterencode(self, value):
         # Adapted from cherrypy/_cpcompat.py
