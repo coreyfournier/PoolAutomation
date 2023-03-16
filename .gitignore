@@ -3,3 +3,4 @@ display.png
 *.db
 *.db.wal
 data/variables.json
+*.tar
