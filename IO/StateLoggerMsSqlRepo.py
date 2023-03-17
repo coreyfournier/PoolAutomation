@@ -216,7 +216,8 @@ class StateLoggerMsSqlRepo():
         query = f"""SELECT ROUND(AVG(temperature1),1) AS temperature1, ROUND(AVG(temperature2),1) AS temperature2, ROUND(AVG(temperature3),1) AS temperature3, ROUND(AVG(temperature4),1) AS temperature4, DATEPART(HOUR, CreatedDate) AS Hour 
             FROM StateLogs 
             WHERE {where}
-            GROUP BY DATEPART(HOUR, CreatedDate)"""
+            GROUP BY DATEPART(HOUR, CreatedDate)
+            ORDER BY DATEPART(HOUR, CreatedDate)"""
         logger.debug(query)
         conn.execute(query)
         return conn.fetchall()

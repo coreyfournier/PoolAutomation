@@ -138,7 +138,7 @@ def allChangeNotification(event:Event):
             DependencyContainer.stateLogger.add(
                 temperature1= DependencyContainer.temperatureDevices.getById(1).getLast(),
                 temperature2= DependencyContainer.temperatureDevices.getById(2).getLast(),
-                #temperature3= DependencyContainer.temperatureDevices.getById(3).getLast(),
+                temperature3= DependencyContainer.temperatureDevices.getById(3).getLast(),
                 temperature4= DependencyContainer.temperatureDevices.getById(4).getLast(),
                 pumpState1=DependencyContainer.pumps.getById(1).currentSpeed.name,
                 valveState1=DependencyContainer.valves.getById(1).isOn,
