@@ -146,7 +146,7 @@
                 off: 'Disabled'
             });
 
-            //loadChart();
+            loadChart();
 
             $.getJSON("/light/get",function(result){
                 var template = `<div class="panel-heading">
@@ -462,8 +462,26 @@
                                 text: 'Avg Temperature by Hour'
                             }
                     }})
+                    
+                    var itemList = [];
+                    for(var d=0;d < response.data.length; d++)
+                    { 
+                        var dataList = [];                       
+                        for(var h=0; h< response.hours.length; h++)
+                        {
+                            if(response.data[d] != null)
+                            {
+                                var expanded = { x : response.hours[h], y: response.data[d].data[h] };
+                                dataList.push(expanded);
+                            }
+                        }
+                        itemList.push({
+                            name: response.data[d].name,
+                            data: dataList
+                        });                        
+                    }
                 
-                chart.updateSeries([response.data, response.data]);                
+                chart.updateSeries(itemList);                
             });
         }
     </script>
