@@ -135,6 +135,7 @@ def allChangeNotification(event:Event):
     #log once every 5 minutes or when something changes that is not time and temp
     if((isinstance(event, TimerEvent) and event.secondsPassedTheHour % 300 == 0) or (not isinstance(event, TimerEvent) and not isinstance(event, TemperatureChangeEvent))):
         if(DependencyContainer.stateLogger != None):
+            #Using the nameing convention where the Id number matches the number of the column. Temp sensor 1 matches temperature1
             DependencyContainer.stateLogger.add(
                 temperature1= DependencyContainer.temperatureDevices.getById(1).getLast(),
                 temperature2= DependencyContainer.temperatureDevices.getById(2).getLast(),
