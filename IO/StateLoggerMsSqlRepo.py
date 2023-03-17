@@ -2,6 +2,10 @@ import datetime
 import pytds
 import DependencyContainer
 import re
+import odata_query
+from odata_query.grammar import ODataParser, ODataLexer
+from odata_query.sql import AstToSqlVisitor
+
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -12,6 +16,9 @@ class StateLoggerMsSqlRepo():
     
     """
     def __init__(self, sqlConnection:str, databaseName = None) -> None:    
+        self.__lexer = ODataLexer()
+        self.__parser = ODataParser()
+
         userId = re.findall("User Id=([a-zA-Z0-9\-_\.]+);", sqlConnection)
         password = re.findall("Password=([a-zA-Z0-9\+\-_=!\.]+);", sqlConnection)
         server = re.findall("Server=([a-zA-Z0-9\-_\.]+);", sqlConnection)        
@@ -206,6 +213,18 @@ class StateLoggerMsSqlRepo():
 
     def agg(self, where:str=None,columns:"list[str]" = None) -> list:
         conn = self.__connection.cursor()
-        conn.execute(f"SELECT ROUND(AVG(temperature1),1) AS temperature1, ROUND(AVG(temperature2),1) AS temperature2, ROUND(AVG(temperature3),1) AS temperature3, ROUND(AVG(temperature4),1) AS temperature4, DATEPART(HOUR, CreatedDate) AS Hour FROM StateLogs GROUP BY DATEPART(HOUR, CreatedDate)")
+        query = f"""SELECT ROUND(AVG(temperature1),1) AS temperature1, ROUND(AVG(temperature2),1) AS temperature2, ROUND(AVG(temperature3),1) AS temperature3, ROUND(AVG(temperature4),1) AS temperature4, DATEPART(HOUR, CreatedDate) AS Hour 
+            FROM StateLogs 
+            WHERE {where}
+            GROUP BY DATEPART(HOUR, CreatedDate)"""
+        logger.debug(query)
+        conn.execute(query)
         return conn.fetchall()
-        
+    
+    def odataQueryToWhereStatement(self, query:str) -> str:
+
+        ast = self.__parser.parse(self.__lexer.tokenize(query))
+
+        visitor = AstToSqlVisitor()
+        #I have no idea why it does this
+        return visitor.visit(ast).replace(" DATE ", "")

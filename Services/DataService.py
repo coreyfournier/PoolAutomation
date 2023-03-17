@@ -2,16 +2,11 @@ from pickle import TRUE
 import cherrypy
 import os
 import DependencyContainer
-import odata_query
-from odata_query.grammar import ODataParser, ODataLexer
-from odata_query.sql import AstToSqlVisitor
 
 
 class DataService():
     def __init__(self) -> None:
-        self.__lexer = ODataLexer()
-        self.__parser = ODataParser()
-        
+        pass        
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -26,18 +21,15 @@ class DataService():
         Returns:
             _type_: Array of arrays in json
         """
-        ast = self.__parser.parse(self.__lexer.tokenize(query))
-
-        visitor = AstToSqlVisitor()
-        #I have no idea why it does this
-        where_clause = visitor.visit(ast).replace(" DATE ", "")
-
+        where_clause = DependencyContainer.stateLogger.odataQueryToWhereStatement(query)
         return DependencyContainer.stateLogger.query(where_clause, columns.split(","))
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
-    def tempStats(self):
-        data = DependencyContainer.stateLogger.agg()
+    def tempStats(self, query:str):
+        where_clause = DependencyContainer.stateLogger.odataQueryToWhereStatement(query)
+        data = DependencyContainer.stateLogger.agg(where_clause)
+        
         names = [x.displayName for x in DependencyContainer.temperatureDevices.getAll()]
         allItems = {}
         hours = set()
