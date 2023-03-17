@@ -438,21 +438,22 @@
         {
             var options = {
                 chart: {
-                width:'100%',
-                height:200,
-                id: 'temperature-chart',
-                type: 'line'
+                    width:'100%',
+                    height:200,
+                    id: 'temperature-chart',                
+                    type: 'line'
                 },
-                series: [{
-                    data: []  
-                },
-                {
-                    data: []  
-                }]
-                };
+                noData:{text:"Loading...."},
+                series: [],
+                xaxis:{
+                    type:"category",
+                    tickAmount:'dataPoints'
+                }
+            };
             var chart = new ApexCharts(document.getElementById("temperature-chart"), options);
              
             chart.render();
+            
 
             $.getJSON("/data/tempStats", function(response) {
                 chart.updateOptions({
@@ -461,27 +462,18 @@
                             title: {
                                 text: 'Avg Temperature by Hour'
                             }
-                    }})
-                    
-                    var itemList = [];
-                    for(var d=0;d < response.data.length; d++)
-                    { 
-                        var dataList = [];                       
-                        for(var h=0; h< response.hours.length; h++)
-                        {
-                            if(response.data[d] != null)
-                            {
-                                var expanded = { x : response.hours[h], y: response.data[d].data[h] };
-                                dataList.push(expanded);
-                            }
-                        }
-                        itemList.push({
-                            name: response.data[d].name,
-                            data: dataList
-                        });                        
-                    }
+                    }});                    
                 
-                chart.updateSeries(itemList);                
+                    var list = [];
+                    for(var d=0;d < response.data.length; d++)
+                        list.push({name: response.data[d].name, data: response.data[d].data});
+
+                    ApexCharts.exec("temperature-chart","updateOptions",{
+                        xaxis:{
+                            categories: response.hours
+                        },
+                        series:  list                    
+                    });  
             });
         }
     </script>

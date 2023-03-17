@@ -136,6 +136,7 @@ class StateLoggerMsSqlRepo():
         Pressure3:float = None,
         Pressure4:float = None
     ):
+
         cursor = self.__connection.cursor()
         statement = f"INSERT INTO StateLogs VALUES({'%s,'*31}%s)"
         data = [temperature1,
