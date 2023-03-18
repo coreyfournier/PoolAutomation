@@ -195,7 +195,7 @@ class StateLoggerMsSqlRepo():
         Returns:
             list: Array of arrays. Columns are returned in the order in which they were selected.
         """
-        conn = self.__connection.cursor()
+        
         if(len(columns) > 0):
             if(len(columns) == 1 and columns[0] == "*"):
                 select = "*"
@@ -207,20 +207,22 @@ class StateLoggerMsSqlRepo():
                 select = ",".join(columns)
         else:
             raise Exception("No columns to select")
-                
-        conn.execute(f"SELECT {select} FROM StateLogs WHERE {where}")
-        return conn.fetchall()
+        
+        with self.__connection.cursor() as conn:
+            conn.execute(f"SELECT {select} FROM StateLogs WHERE {where}")
+            return conn.fetchall()
 
     def agg(self, where:str=None,columns:"list[str]" = None) -> list:
-        conn = self.__connection.cursor()
-        query = f"""SELECT ROUND(AVG(temperature1),1) AS temperature1, ROUND(AVG(temperature2),1) AS temperature2, ROUND(AVG(temperature3),1) AS temperature3, ROUND(AVG(temperature4),1) AS temperature4, DATEPART(HOUR, CreatedDate) AS Hour 
-            FROM StateLogs 
-            WHERE {where}
-            GROUP BY DATEPART(HOUR, CreatedDate)
-            ORDER BY DATEPART(HOUR, CreatedDate)"""
-        logger.debug(query)
-        conn.execute(query)
-        return conn.fetchall()
+
+        with self.__connection.cursor() as conn:
+            query = f"""SELECT ROUND(AVG(temperature1),1) AS temperature1, ROUND(AVG(temperature2),1) AS temperature2, ROUND(AVG(temperature3),1) AS temperature3, ROUND(AVG(temperature4),1) AS temperature4, DATEPART(HOUR, CreatedDate) AS Hour 
+                FROM StateLogs 
+                WHERE {where}
+                GROUP BY DATEPART(HOUR, CreatedDate)
+                ORDER BY DATEPART(HOUR, CreatedDate)"""
+            logger.debug(query)
+            conn.execute(query)
+            return conn.fetchall()
     
     def odataQueryToWhereStatement(self, query:str) -> str:
 

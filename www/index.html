@@ -454,9 +454,9 @@
              
             chart.render();
             
-            const date = new Date();
+            const date = new Date($.now());
 
-            $.getJSON("/data/tempStats?query=CreatedDate ge " + date.toJSON().slice(0, 10), function(response) {
+            $.getJSON("/data/tempStats?query=CreatedDate ge " +  $.format.date(date,"yyyy-MM-dd"), function(response) {
                 chart.updateOptions({
                     xaxis: {
                         categories: response.hours,
