@@ -1,17 +1,19 @@
 # Pool Automation
 
 ## Docker on pi
-Follow the directions here: https://www.simplilearn.com/tutorials/docker-tutorial/raspberry-pi-docker
+1. Follow the directions here: https://www.simplilearn.com/tutorials/docker-tutorial/raspberry-pi-docker
+2. Add your local repo as a trusted repository on both the build and destination machine: https://stackoverflow.com/questions/49674004/docker-repository-server-gave-http-response-to-https-client
 ### Testing on the pi with docker
 #### Locally
 1. docker build -f "Dockerfile" . -t "pool-automation:latest"
-2. docker save -o PoolAutomation.tar pool-automation:latest
-./DeployCode.ps1 -password **** -computer user@server
-#### On the server
-1. docker load -i PoolAutomation.tar
+2. docker tag "pool-automation:latest" "192.168.1.4:5050/pool-automation:latest"
+3. docker push 192.168.1.4:5050/pool-automation:latest
 
-2. With out privileged i can't get access to the temp sensors. 
-sudo docker run -it -p 8080:8080 -e 'TZ=America/Chicago' -e 'ROOT_FOLDER=/app' -e 'PoolAutomationSqlConnection=' --device /dev/gpiomem:/dev/gpiomem -v /sys:/sys -v /dev/i2c-1:/dev/i2c-1 -v /home/pi/pool/data:/app/data --privileged --name pool-automation pool-automation:latest
+#### On the server
+1. docker pull 192.168.1.4:5050/pool-automation:latest
+2. sudo docker container -rm pool-automation -f
+3. With out privileged i can't get access to the temp sensors. 
+sudo docker run -it -p 8080:8080 -e 'TZ=America/Chicago' -e 'ROOT_FOLDER=/app' -e 'PoolAutomationSqlConnection=*************' --device /dev/gpiomem:/dev/gpiomem -v /sys:/sys -v /dev/i2c-1:/dev/i2c-1 -v /home/pi/pool/data:/app/data --privileged --name pool-automation pool-automation:latest
 
 ## Authentication
 No security is provided, but I used my synology nas to help me out here. I already have a certificate installed on it. The NAS also provides an option for reverse proxy, but it doesn't include authentication. I found a docker container project that provides the LDAP authentication. With the two, i piped traffice from one proxy to another. I could just use the Docker container, but then I would have to manage the cert in two places. This is a set it and forget it solution.
