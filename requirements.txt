@@ -7,8 +7,6 @@ smbus2==0.4.2
 adafruit-circuitpython-ssd1306==2.12.12
 pillow==9.4.0
 board==1.0
-#you might need to update pip: pip3 install --upgrade pip
-#You might need to run: apt install unixodbc-dev
 pyodbc==4.0.35
 #duckdb==1.21.3
-#odata-query==2.8.2
+odata-query==2.8.2
