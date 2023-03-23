@@ -1,4 +1,14 @@
 # Pool Automation
+## Local environment setup
+1. Install latest version of VS Code
+2. Install python version that matches the version in the Dockerfile at the top. 
+    EX: FROM arm32v7/python:3.10.10-slim AS BASE 
+    3.10 is the python version
+3. Assuming you are on windows: In the VS Code terminal run "python -m pip install -r requirements.txt"
+4. Add a configuration file in VS Code to execute startup.py
+5. The log output should indicate where the site is hosted. It defaults to http://localhost:8080
+
+All devices are stubbed out when it can't find the pi libraries.
 
 ## Docker on pi
 1. Follow the directions here: https://www.simplilearn.com/tutorials/docker-tutorial/raspberry-pi-docker
