@@ -80,11 +80,11 @@ class StateLoggerDuckDbRepo():
         Pressure4:float = None
     ):
         result = self.__connection.execute(f"INSERT INTO StateLogs VALUES({'?,'*31}?)",
-            [round(temperature1, 2),
-            round(temperature2, 2),
-            round(temperature3, 2),
-            round(temperature4, 2),
-            round(temperature5, 2),
+            [temperature1,
+            temperature2,
+            temperature3,
+            temperature4,
+            temperature5,
             pumpState1,
             pumpState2,
             pumpState3,
