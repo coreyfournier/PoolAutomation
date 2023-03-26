@@ -67,11 +67,11 @@ class StateLoggerMsSqlRepo():
             IF OBJECT_ID('StateLogs', 'U') IS NULL 
             BEGIN
                 CREATE TABLE StateLogs(
-                        temperature1 decimal(4,2) NULL,
-                        temperature2 decimal(4,2) NULL,
-                        temperature3 decimal(4,2) NULL,
-                        temperature4 decimal(4,2) NULL,
-                        temperature5 decimal(4,2) NULL,
+                        temperature1 decimal(6,2) NULL,
+                        temperature2 decimal(6,2) NULL,
+                        temperature3 decimal(6,2) NULL,
+                        temperature4 decimal(6,2) NULL,
+                        temperature5 decimal(6,2) NULL,
                         pumpState1 VARCHAR(10) NULL,
                         pumpState2 VARCHAR(10) NULL,
                         pumpState3 VARCHAR(10) NULL,
@@ -90,10 +90,10 @@ class StateLoggerMsSqlRepo():
                         ActionActive3 VARCHAR(20) NULL,
                         ActionActive4 VARCHAR(20) NULL,
                         ActionActive5 VARCHAR(20) NULL,
-                        Orp1 decimal(4,2)  NULL,
-                        Orp2 decimal(4,2) NULL,
-                        PH1 decimal(4,2) NULL,
-                        PH2 decimal(4,2) NULL,
+                        Orp1 decimal(6,2)  NULL,
+                        Orp2 decimal(6,2) NULL,
+                        PH1 decimal(6,2) NULL,
+                        PH2 decimal(6,2) NULL,
                         Pressure1 decimal(4,2) NULL,
                         Pressure2 decimal(4,2) NULL,
                         Pressure3 decimal(4,2) NULL,
@@ -213,7 +213,6 @@ class StateLoggerMsSqlRepo():
             return conn.fetchall()
 
     def agg(self, where:str=None,columns:"list[str]" = None) -> list:
-
         with self.__connection.cursor() as conn:
             query = f"""SELECT ROUND(AVG(temperature1),1) AS temperature1, ROUND(AVG(temperature2),1) AS temperature2, ROUND(AVG(temperature3),1) AS temperature3, ROUND(AVG(temperature4),1) AS temperature4, DATEPART(HOUR, CreatedDate) AS Hour 
                 FROM StateLogs 
@@ -223,7 +222,70 @@ class StateLoggerMsSqlRepo():
             logger.debug(query)
             conn.execute(query)
             return conn.fetchall()
-    
+        
+    def netTemperatureChange(self, sensorColumn:str = "[temperature4]", daysFromNow:int = 30, pumpStateColumn = "[pumpState1]"):
+        """Calculates the net temperature change from day to day
+
+        Args:
+            sensorColumn (str, optional): Which sql column you are interested in. Defaults to "[temperature4]".
+            daysFromNow (int, optional): How many days in the past you want to include. Defaults to 30.
+            pumpStateColumn (str, optional): Which column tracks the pump state. This is so we don't include values when the pump is off. Defaults to "[pumpState1]".
+        """        
+        query = f"""        
+        SELECT
+            PoolTemp,
+            CreatedDate,
+            CASE WHEN HourCount = 1 THEN 'Start'
+            ELSE 'End'
+            END AS StartEnd,
+            CreatedHour
+        FROM
+        (
+            SELECT 
+                --The temp of the pool is dictated by water flowing through the pipes. It takes time for this to register and the pump
+                -- can be on and off multiple times during the day. So we take an average per hour to get the actual temp.
+                AVG({sensorColumn}) AS PoolTemp,
+                DATEPART(HOUR, [StateLogs].[CreatedDate]) as CreatedHour,
+                CAST([StateLogs].[CreatedDate] AS DATE) as CreatedDate,
+                -- this will allow me to know which is the first one for the day
+                RANK() OVER(PARTITION BY CAST([StateLogs].[CreatedDate] AS DATE) ORDER BY DATEPART(HOUR, [StateLogs].[CreatedDate])) AS HourCount
+            FROM 
+                [dbo].[StateLogs]
+                INNER JOIN (
+                    SELECT 
+                        MIN(DATEPART(HOUR, [CreatedDate])) as FirstHour,
+                        MAX(DATEPART(HOUR, [CreatedDate])) as LastHour,
+                        CAST([StateLogs].[CreatedDate] AS DATE) as CreatedDate
+                    FROM 
+                        [dbo].[StateLogs]
+                    WHERE
+                        {pumpStateColumn} != 'OFF' AND {sensorColumn} IS NOT NULL
+                        --Filter by the last 30 days
+                        AND [CreatedDate] > DATEADD(DAY,-1 * {daysFromNow}, GETDATE())
+                    GROUP BY
+                        CAST([StateLogs].[CreatedDate] AS DATE)
+                ) StartAndEnd ON 
+                    StartAndEnd.CreatedDate = CAST([StateLogs].[CreatedDate] AS DATE)
+                    AND (
+                        StartAndEnd.FirstHour = DATEPART(HOUR, [StateLogs].[CreatedDate])
+                        OR StartAndEnd.LastHour = DATEPART(HOUR, [StateLogs].[CreatedDate])
+                    )
+            WHERE
+                {pumpStateColumn} != 'OFF' AND {sensorColumn} IS NOT NULL
+            GROUP BY
+                DATEPART(HOUR, [StateLogs].[CreatedDate]),
+                CAST([StateLogs].[CreatedDate] AS DATE)
+        ) AS T
+            ORDER BY
+                CreatedDate DESC,
+                CreatedHour ASC
+        """
+
+        with self.__connection.cursor() as conn:
+            logger.debug(query)
+            conn.execute(query)
+            return conn.fetchall()
+        
     def odataQueryToWhereStatement(self, query:str) -> str:
 
         ast = self.__parser.parse(self.__lexer.tokenize(query))
