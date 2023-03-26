@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Hero } from './hero';
-import { HEROES } from './mock-heroes';
+import { Temperature } from './temperature';
+//import { HEROES } from './mock-temperature';
 import { Observable, of } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, map, tap } from 'rxjs/operators';
@@ -10,7 +10,7 @@ import { catchError, map, tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 
-export class HeroService {
+export class TemperatureService {
   private heroesUrl = 'http://localhost:8080/temperature/sensors';  // URL to web api
     constructor(
       private http: HttpClient
@@ -44,18 +44,18 @@ export class HeroService {
   }
 
   /** GET hero by id. Will 404 if id not found */
-  getHero(id: number): Observable<Hero> {
+  getHero(id: number): Observable<Temperature> {
     const url = `${this.heroesUrl}/${id}`;
-    return this.http.get<Hero>(url).pipe(
+    return this.http.get<Temperature>(url).pipe(
       tap(_ => this.log(`fetched hero id=${id}`)),
-      catchError(this.handleError<Hero>(`getHero id=${id}`))
+      catchError(this.handleError<Temperature>(`getHero id=${id}`))
     );
   }
 
-  getHeroes(): Observable<Hero[]> {
-    return this.http.get<Hero[]>(this.heroesUrl)
+  getHeroes(): Observable<Temperature[]> {
+    return this.http.get<Temperature[]>(this.heroesUrl)
     .pipe(
-      catchError(this.handleError<Hero[]>('getHeroes', []))
+      catchError(this.handleError<Temperature[]>('getHeroes', []))
     );
   }
 }

@@ -1,24 +1,24 @@
 import { Component } from '@angular/core';
-import { Hero } from '../hero';
+import { Temperature } from '../temperature';
 //import { HEROES } from '../mock-heroes';
-import { HeroService } from '../hero.service';
+import { TemperatureService } from '../temperature.service';
 
 @Component({
-  selector: 'app-heroes',
-  templateUrl: './heroes.component.html',
-  styleUrls: ['./heroes.component.css']
+  selector: 'app-temperature',
+  templateUrl: './temperature.component.html',
+  styleUrls: ['./temperature.component.css']
 })
 
-export class HeroesComponent {
+export class TemperatureComponent {
 
-  constructor(private heroService: HeroService) {
+  constructor(private heroService: TemperatureService) {
 
   }
 
   //heroes = HEROES;
-  heroes: Hero[] = [];
+  heroes: Temperature[] = [];
 
-  selectedHero?: Hero;
+  selectedHero?: Temperature;
 
   getHeroes(): void {
     this.heroService.getHeroes()
@@ -29,7 +29,7 @@ export class HeroesComponent {
     this.getHeroes();
   }
 
-  onSelect(hero: Hero): void {
+  onSelect(hero: Temperature): void {
     this.selectedHero = hero;
   }
 }
