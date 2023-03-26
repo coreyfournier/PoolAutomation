@@ -15,6 +15,7 @@ class TemperatureService:
 
         return [
             {
+                "id": item.id,
                 "name": item.displayName, 
                 "temp": item.get(),
                 "unit": DependencyContainer.temperatureUnit.upper()

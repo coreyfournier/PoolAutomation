@@ -1,6 +1,8 @@
 export interface Hero {
     id: number;
     name: string;
+    temp:number;
+    unit:string;
   }
   
   

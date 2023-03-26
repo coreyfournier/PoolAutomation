@@ -46,3 +46,11 @@ class DataService():
             "hours":list(hours),
             "data" : [{"name": key, "data" : item} for key, item in allItems.items()]
             }
+    
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def heroes(self):
+        return [
+            {"id":1, "name":"test1"},
+            {"id":2, "name":"test2"},
+            ]
