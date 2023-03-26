@@ -9,11 +9,11 @@
 4. Add a configuration file in VS Code to execute startup.py
 5. The log output should indicate where the site is hosted. It defaults to http://localhost:8080
 6. Angular setup
- * Make sure node js is installed if not see: https://nodejs.org/en
- * npm install -g @angular/cli
- * cd into www
- * run "npm install"
- * To start the front end for Angular run "ng serve --open" in the terminal while in the www/ folder
+    * Make sure node js is installed if not see: https://nodejs.org/en
+    * npm install -g @angular/cli
+    * cd into www
+    * run "npm install"
+    * To start the front end for Angular run "ng serve --open" in the terminal while in the www/ folder
 
 All devices are stubbed out when it can't find the pi libraries.
 
