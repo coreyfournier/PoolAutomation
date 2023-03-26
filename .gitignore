@@ -4,3 +4,4 @@ display.png
 *.db.wal
 data/variables.json
 *.tar
+node_modules/
