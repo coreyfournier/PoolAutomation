@@ -5,6 +5,7 @@
     EX: FROM arm32v7/python:3.10.10-slim AS BASE 
     3.10 is the python version
 3. Assuming you are on windows: In the VS Code terminal run "python -m pip install -r requirements.txt"
+ If you get an error about permissions, open a terminal as admisistrator and run the install command again.
 4. Add a configuration file in VS Code to execute startup.py
 5. The log output should indicate where the site is hosted. It defaults to http://localhost:8080
 

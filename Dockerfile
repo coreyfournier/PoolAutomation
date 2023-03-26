@@ -25,26 +25,10 @@ RUN apt-get install libtiff5 -y
 RUN apt-get install unzip
 
 
-
-RUN pip install CherryPy==18.6.1 
-RUN pip install dataclasses_json==0.5.7
-RUN pip install dataclass_wizard==0.22.2
-RUN pip install dataclasses==0.6
-RUN pip install smbus2==0.4.2
-RUN pip install adafruit-circuitpython-ssd1306==2.12.12
-RUN pip install board==1.0
-RUN pip install pillow==9.4.0
-RUN pip install python-tds==1.12.0
-RUN pip install smbus2==0.4.2
-RUN pip install RPi.GPIO
-
-#RUN pip install odata-query==2.8.2
-
-#No package available for odata, so we must manually build it
-ADD https://files.pythonhosted.org/packages/74/a2/8d6f309aecc294888f4d9fe9de3c158f5a5cc76118573ccd5f0663bf092f/odata_query-0.8.1-py3-none-any.whl /odata/odata_query-0.8.1-py3-none-any.whl
-RUN pip install /odata/odata_query-0.8.1-py3-none-any.whl
-
 RUN mkdir /app
+COPY requirements.txt /app/
+
+RUN pip install -r /app/requirements.txt
 
 #copy all of the code
 COPY *.py /app/
