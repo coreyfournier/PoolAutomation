@@ -1,11 +1,29 @@
+FROM node:18.15.0 as node
+RUN mkdir /app
+#copy all of the code
+COPY *.py /app/
+COPY www/ /app/www/
+COPY IO/*.py /app/IO/
+COPY Services/*.py /app/Services/
+COPY lib/*.py /app/lib/
+COPY data/*.json /app/data/
+COPY Devices/*.py /app/Devices/
+
+WORKDIR /app/www
+RUN npm install
+RUN npm run build --prod
+#Set the directory that contains the built angular app
+ENV STATIC_DIRECTORY=/app/www/dist/www
+
+
 FROM arm32v7/python:3.10.10-slim AS BASE
 EXPOSE 8080
 
 RUN pip install --upgrade pip setuptools wheel
 
-###############################
+##############################################################
 #Necessary for pillow (images for display)
-###############################
+##############################################################
 RUN apt update
 RUN apt -y install build-essential libwrap0-dev libssl-dev libc-ares-dev uuid-dev xsltproc
 RUN apt-get update -qq \
@@ -25,19 +43,11 @@ RUN apt-get install libtiff5 -y
 RUN apt-get install unzip
 
 
-RUN mkdir /app
 COPY requirements.txt /app/
 
 RUN pip install -r /app/requirements.txt
 
-#copy all of the code
-COPY *.py /app/
-COPY www/ /app/www/
-COPY IO/*.py /app/IO/
-COPY Services/*.py /app/Services/
-COPY lib/*.py /app/lib/
-COPY data/*.json /app/data/
-COPY Devices/*.py /app/Devices/
+
 
 ENV DATA_PATH=/app/data/
 ENV FONT_PATH=/app/www/fonts/

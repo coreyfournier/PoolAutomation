@@ -25,10 +25,17 @@ if("ROOT_FOLDER" in os.environ):
 else:
     rootFolder = os.getcwd()
 
-logger.info(f"Using root folder '{rootFolder}'")
+if("STATIC_DIRECTORY" in os.environ):
+    #This directory should NEVER contain code!!
+    WEB_ROOT = os.environ["STATIC_DIRECTORY"]
+else:
+    WEB_ROOT = os.path.join(rootFolder, "www")
 
-#This directory should NEVER contain code!!
-WEB_ROOT = os.path.join(rootFolder,"www")
+if("HOSTING_PORT" not in os.environ):
+    os.environ["HOSTING_PORT"] = "8080"
+
+logger.info(f"Using root folder:'{rootFolder}'. Port#:{os.environ['HOSTING_PORT']} Static directory:'{WEB_ROOT}'. This should never contain code!!! ")
+
 config_root = { 
     'tools.encode.encoding' : 'utf-8',
     'tools.staticdir.on' : True,
@@ -36,7 +43,7 @@ config_root = {
     'tools.staticdir.index' : 'index.html',
     'tools.response_headers.on': True}
 app_conf = { '/': config_root }
-server_config = {'server.socket_host': '0.0.0.0',  'server.socket_port' : 8080}
+server_config = {'server.socket_host': '0.0.0.0',  'server.socket_port' : int(os.environ["HOSTING_PORT"])}
   
 if __name__ == '__main__':
    
