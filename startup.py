@@ -34,9 +34,7 @@ config_root = {
     'tools.staticdir.on' : True,
     'tools.staticdir.dir' : WEB_ROOT,
     'tools.staticdir.index' : 'index.html',
-    'tools.response_headers.on': True,
-    'tools.response_headers.headers': [('Access-Control-Allow-Origin', '*')],
-    }
+    'tools.response_headers.on': True}
 app_conf = { '/': config_root }
 server_config = {'server.socket_host': '0.0.0.0',  'server.socket_port' : 8080}
   
@@ -65,12 +63,11 @@ if __name__ == '__main__':
         #Running locally
         GPIO = GpioStub()
         logger.info("Using GPIO Stub. Live pins will NOT be used.")
-        from Devices.TempStub import TempStub
-        import IO.SmbusStub as smbus2
-        
-        temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
-        
+        import IO.SmbusStub as smbus2        
+        temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")        
         runAsDaemon = False
+        #Allow all orgins when running locally
+        config_root['tools.response_headers.headers'] = [('Access-Control-Allow-Origin', '*')]
        
     
     from Devices.Schedule import *
