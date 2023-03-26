@@ -1,9 +1,9 @@
 # Pool Automation
 
-Custom schedules can be configured. You get feed back in which schedule is running and for how long.
+Custom schedules can be configured. You get feed back in which schedule is running and for how long. Actions can override the schedule at any time to prevent the pump or anything else from making changes.
 ![Alt text](assets/pool-automation-schedules.PNG "Pump Schedule")
 
-You can configure custom actions that listen for events to make decisions.
+You can configure custom actions that listen for events to make decisions. Each UI component is a variable and built dynamically. Changing any value fires an event any any component can listen to the events to change the application flow.
 ![Alt text](assets/pool-automation-actions.PNG "Custom actions")
 
 If you need to override anything at any time you get access to the individual device.
