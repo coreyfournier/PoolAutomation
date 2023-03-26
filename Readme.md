@@ -1,7 +1,10 @@
 # Pool Automation
 
+Custom schedules can be configured. You get feed back in which schedule is running and for how long.
 ![Alt text](assets/pool-automation-schedules.PNG "Title")
+You can configure custom actions that listen for events to make decisions.
 ![Alt text](assets/pool-automation-actions.PNG "Title")
+If you need to override anything at any time you get access to the individual device.
 ![Alt text](assets/pool-automation-device-control.PNG "Title")
 
 
