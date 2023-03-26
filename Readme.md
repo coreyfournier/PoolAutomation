@@ -1,4 +1,10 @@
 # Pool Automation
+
+![Alt text](assets/pool-automation-schedules.PNG "Title")
+![Alt text](assets/pool-automation-actions.PNG "Title")
+![Alt text](assets/pool-automation-device-control.PNG "Title")
+
+
 ## Local environment setup
 1. Install latest version of VS Code
 2. Install python version that matches the version in the Dockerfile at the top. 
