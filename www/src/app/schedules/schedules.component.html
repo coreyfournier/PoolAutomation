@@ -1,0 +1,45 @@
+<p>Schedules</p>
+<div>
+    <div id="schedule"></div>
+</div>
+
+<script>
+    $.getJSON("http://localhost:8080/schedule/schedules", function(result) {
+            var options = $("#schedule");
+            options.empty();
+
+            if(result.overrides.length > 0)
+            {
+                options.append($("<span>Overrides:</span>"));
+                $.each(result.overrides, function(overrideIndex, override) {
+                    options.append($("<span style='margin-left:2px;'>" + override.displayName + "</span>"));
+                });                         
+            }
+
+            var container = $("<table class='table'>");
+                container.append("<tr><th></th><th>Start</th><th>End</th><th>Pumps</th></tr>");
+
+            //don't forget error handling!
+            $.each(result.schedules, function(scheduleIndex, schedule) {                         
+                var row = "<tr id='schedule-" + schedule.id + "'>";
+                format = "hh:mm p";
+                startTime = $.format.date(new Date(schedule.scheduleStart),format);
+                endTime = $.format.date(new Date(schedule.scheduleEnd),format);
+
+                row += "<th class='" + (schedule.isRunning? "status-on" : "") + "'>" + schedule.name + "</th>";
+                row += "<td>"+startTime + "</td><td>" + endTime + " (" + schedule.duration.toFixed(1) + "hrs)</td>";
+                
+                row += "<td>";
+                $.each(schedule.pumps, function(pumpIndex, pump){
+                    row+="<div id='schdule-"+schedule.id+"-pump-" + pump.id + "'>" + pump.displayName + " (" + pump.speedName + ")</div>";
+                });
+                row += "</td>";
+                row +="</tr>";
+
+                container.append(row);                    
+            });
+
+            options.append(container);
+        });
+
+</script>

@@ -5,11 +5,13 @@ import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { TemperatureComponent } from './temperature/temperature.component';
 import { HttpClientModule } from '@angular/common/http';
+import { SchedulesComponent } from './schedules/schedules.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    TemperatureComponent
+    TemperatureComponent,
+    SchedulesComponent
   ],
   imports: [
     HttpClientModule,
