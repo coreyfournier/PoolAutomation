@@ -11,5 +11,13 @@ export interface ScheduleInfo {
     duration:number;
     scheduleStart:Date;
     scheduleEnd:Date;
-    pumps:string[];
+    pumps:Pump[];
+  }
+
+  export interface Pump
+  {
+    id: number;
+    name: string;
+    speedName:string;
+    displayName:string;
   }

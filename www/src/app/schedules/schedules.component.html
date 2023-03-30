@@ -11,9 +11,9 @@
             <tr><th></th><th>Start</th><th>End</th><th>Pumps</th></tr>
             <tr *ngFor="let row of scheduleInfo.schedules" id="schedule-{{row.id}}">
                 <th class="">{{row.name}}</th>
-                <td>07:00 a.m.</td>
-                <td>09:59 a.m. (3.0hrs)</td><td>
-                    <div id="schdule-1-pump-1">Main (SPEED_1)</div>
+                <td>{{row.scheduleStart}}</td>
+                <td>{{row.scheduleEnd}} ({{row.duration}}hrs)</td><td>
+                    <div *ngFor="let pump of row.pumps" id="schdule-{{row.id}}-pump-{{pump.id}}">{{pump.displayName}} {{pump.speedName}}</div>
                 </td>
             </tr>
         </table>
