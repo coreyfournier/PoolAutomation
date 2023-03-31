@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ScheduleInfo } from './schedule';
-import { Schedule } from './schedule';
 import { Observable } from 'rxjs';
 import { DatePipe } from '@angular/common';
 

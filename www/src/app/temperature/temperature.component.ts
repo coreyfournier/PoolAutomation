@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { Temperature } from '../temperature';
+import { Temperature } from './temperature';
 //import { HEROES } from '../mock-heroes';
-import { TemperatureService } from '../temperature.service';
+import { TemperatureService } from './temperature.service';
 
 @Component({
   selector: 'app-temperature',

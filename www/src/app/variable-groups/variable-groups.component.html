@@ -1,0 +1,9 @@
+<p>variable-groups works!</p>
+<div class="panel panel-default" *ngFor="let row of variableGroups">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{row.title}}</h3>
+    </div>
+    <div class="panel-body" *ngFor="let variable of row.variables">
+        <div>{{variable.displayName}}</div>
+    </div>
+</div>

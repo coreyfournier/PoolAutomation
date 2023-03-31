@@ -6,12 +6,14 @@ import { AppComponent } from './app.component';
 import { TemperatureComponent } from './temperature/temperature.component';
 import { HttpClientModule } from '@angular/common/http';
 import { SchedulesComponent } from './schedules/schedules.component';
+import { VariableGroupsComponent } from './variable-groups/variable-groups.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     TemperatureComponent,
-    SchedulesComponent
+    SchedulesComponent,
+    VariableGroupsComponent
   ],
   imports: [
     HttpClientModule,
