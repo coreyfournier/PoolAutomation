@@ -1,6 +1,10 @@
 export interface ScheduleInfo {
     schedules:Schedule[];
-    overrides:string[];
+    overrides:Override[];
+  }
+  export interface Override{
+    displayName:string;
+    name: string;
   }
 
   export interface Schedule {
