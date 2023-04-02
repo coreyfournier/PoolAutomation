@@ -41,7 +41,9 @@ config_root = {
     'tools.staticdir.on' : True,
     'tools.staticdir.dir' : WEB_ROOT,
     'tools.staticdir.index' : 'index.html',
-    'tools.response_headers.on': True}
+    'tools.response_headers.on': True,
+    'tools.CORS.on':True
+    }
 app_conf = { '/': config_root }
 server_config = {'server.socket_host': '0.0.0.0',  'server.socket_port' : int(os.environ["HOSTING_PORT"])}
   
@@ -73,8 +75,19 @@ if __name__ == '__main__':
         import IO.SmbusStub as smbus2        
         temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")        
         runAsDaemon = False
+        print("CORS allow all")
         #Allow all orgins when running locally
         config_root['tools.response_headers.headers'] = [('Access-Control-Allow-Origin', '*')]
+        def CORS():
+            if cherrypy.request.method == 'OPTIONS':
+                cherrypy.response.headers['Access-Control-Allow-Methods'] = 'POST'
+                cherrypy.response.headers['Access-Control-Allow-Headers'] = 'content-type'
+                cherrypy.response.headers['Access-Control-Allow-Origin']  = '*'
+                return True
+            else:
+                cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
+
+        cherrypy.tools.CORS = cherrypy._cptools.HandlerTool(CORS)   
        
     
     from Devices.Schedule import *
@@ -129,6 +142,7 @@ if __name__ == '__main__':
     #Only execute this if you are running in linux and as a service.
     if(runAsDaemon):
         Daemonizer(cherrypy.engine).subscribe()
+
     workerPlugin = WorkerPlugin(cherrypy.engine).subscribe()
     cherrypy.config['tools.json_out.handler'] = json_handler
     cherrypy.tree.mount(Index(os.path.join(rootFolder, "www")), config=app_conf)     

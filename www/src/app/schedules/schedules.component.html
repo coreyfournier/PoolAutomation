@@ -4,13 +4,13 @@
     </div>
     <div class="panel-body">
         <div id="schedule">
-            <span *ngIf="scheduleInfo.overrides.length > 0">Overrides:</span>
+            <span *ngIf="scheduleInfo.overrides.length > 0;">Overrides:</span>
             <span *ngFor="let override of scheduleInfo.overrides" style='margin-left:2px;'>{{override.displayName}}</span>
             
         <table class="table">
             <tr><th></th><th>Start</th><th>End</th><th>Pumps</th></tr>
             <tr *ngFor="let row of scheduleInfo.schedules" id="schedule-{{row.id}}">
-                <th class="">{{row.name}} <span *ngif="row.isRunning">*</span></th>
+                <th class="">{{row.name}} <span *ngIf="row.isRunning">*</span></th>
                 <td>{{datepipe.transform(row.scheduleStart, timeFormat)}}</td>
                 <td>{{datepipe.transform(row.scheduleEnd, timeFormat)}} ({{row.duration.toFixed(1)}}hrs)</td>
                 <td>

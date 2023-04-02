@@ -4,7 +4,6 @@ import { ScheduleInfo } from './schedule';
 import { Observable } from 'rxjs';
 import { DatePipe } from '@angular/common';
 
-
 @Component({
   selector: 'app-schedules',
   templateUrl: './schedules.component.html',

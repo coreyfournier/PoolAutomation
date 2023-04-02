@@ -1,5 +1,6 @@
 #https://learn.adafruit.com/circuitpython-on-raspberrypi-linux/installing-circuitpython-on-raspberry-pi
 CherryPy==18.6.1
+cherrypy-cors==1.6
 dataclasses_json==0.5.7
 dataclass_wizard==0.22.2
 dataclasses==0.6

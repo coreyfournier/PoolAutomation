@@ -1,9 +1,14 @@
-<p>variable-groups works!</p>
 <div class="panel panel-default" *ngFor="let row of variableGroups">
     <div class="panel-heading">
-        <h3 class="panel-title">{{row.title}}</h3>
+        <h3 class="panel-title" id="{{row.isOnVariable}}">{{row.title}}</h3>
     </div>
     <div class="panel-body" *ngFor="let variable of row.variables">
         <div>{{variable.displayName}}</div>
+        <span style='margin-right:5px;'>
+            <input *ngIf="variable.dataType == 'bool'; else allOthers" type='checkbox' id='{{variable.name}}' data-style='slow' (change)="variableChanged(variable)">
+            <ng-template #allOthers>
+                <input type='number' id='{{variable.name}}' step='.5' class='form-control' value='{{variable.value}}' style='width:75px;'  (change)="variableChanged(variable)">
+            </ng-template>
+        </span>
     </div>
 </div>

@@ -7,13 +7,21 @@ import { TemperatureComponent } from './temperature/temperature.component';
 import { HttpClientModule } from '@angular/common/http';
 import { SchedulesComponent } from './schedules/schedules.component';
 import { VariableGroupsComponent } from './variable-groups/variable-groups.component';
+import { LightsComponent } from './lights/lights.component';
+import { PumpsComponent } from './pumps/pumps.component';
+import { ValvesComponent } from './valves/valves.component';
+import { StatsComponent } from './stats/stats.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     TemperatureComponent,
     SchedulesComponent,
-    VariableGroupsComponent
+    VariableGroupsComponent,
+    LightsComponent,
+    PumpsComponent,
+    ValvesComponent,
+    StatsComponent
   ],
   imports: [
     HttpClientModule,
