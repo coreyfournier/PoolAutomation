@@ -10,8 +10,8 @@ class PumpService:
         self.pumps:Pumps = DependencyContainer.pumps        
 
     @cherrypy.expose
-    def on(self, pumpIndex:int, speed:str):
-        pump = self.pumps.getById(int(pumpIndex) + 1)
+    def on(self, id:int, speed:str):
+        pump = self.pumps.getById(int(id))
 
         if(Speed[speed] == Speed.OFF):
             pump.off()    
@@ -20,8 +20,8 @@ class PumpService:
     
     @cherrypy.expose
     def off(self, pumpIndex:int):
-        tuple = self.pumps[int(pumpIndex)]
-        tuple[1].off()
+        pump = self.pumps.getById(int(id))
+        pump.off()
     
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -36,6 +36,7 @@ class PumpService:
 
             display.append({
                 "index": index,
+                "id": pump.id,
                 "displayName" : pump.displayName,
                 "name" : pump.name,
                 "speeds": speeds
