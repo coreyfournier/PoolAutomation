@@ -27,7 +27,7 @@ class PumpService:
     @cherrypy.tools.json_out()
     def descriptions(self):
         #Gets the number of the pumps. 
-        display:"list[{}]" = []
+        display:"list[dict[int,str]]" = []
 
         index:int = 0
         for pump in self.pumps.getAll():
