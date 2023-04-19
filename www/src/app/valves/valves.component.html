@@ -2,5 +2,12 @@
     <div class="panel-heading">
         <h3 class="panel-title">Valves</h3>
     </div>
-    <div class="panel-body" id="valves"></div>
+    <div class="panel-body" id="valves">
+        <div class="panel-body" *ngFor="let valve of valves">
+            <div>{{valve.displayName}}</div>
+            
+            <input type='checkbox' id='valve-{{valve.id}}' data-name='{{valve.name}}' data-style='slow' (change)="valveChanged(valve, $event)" [checked]="valve.isOn">
+        </div>
+    </div>
+
 </div>

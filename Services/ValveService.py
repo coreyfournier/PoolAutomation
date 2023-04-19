@@ -10,13 +10,12 @@ class ValveService:
         pass
 
     @cherrypy.expose
-    def on(self, name:str):
-        DependencyContainer.valves.on(name)
+    def on(self, id:int):
+        DependencyContainer.valves.on(int(id))
 
     @cherrypy.expose
-    def off(self, name:str):
-        DependencyContainer.valves.off(name)
-    
+    def off(self, id:int):
+        DependencyContainer.valves.off(int(id))    
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
