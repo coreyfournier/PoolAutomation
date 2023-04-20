@@ -28,8 +28,14 @@ export class VariableGroupsComponent {
     return this.http.get<VariableGroup[]>(this.variableGroupUrl);
   }
 
-  variableChanged(item: Variable): void {
-    console.log("variable=" + item.name + " changed");
+  variableChanged(item: Variable, event:any): void {
+    
+    if(item.dataType == "bool")
+      item.value = event.target.checked;
+    else
+      item.value = event.target.value
+    
+    console.log("variable=" + item.name + " changed Value=" + item.value);
     this.changeVariable(item);
     console.log("variable=" + item.name + " after changed");    
   }
