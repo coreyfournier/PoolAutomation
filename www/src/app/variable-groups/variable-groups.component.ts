@@ -2,7 +2,8 @@ import { Observable } from 'rxjs';
 import { Component } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {VariableGroup} from './variableGroup'
-import {Variable} from './variableGroup'
+import {Variable} from './variableGroup';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-variable-groups',
@@ -17,8 +18,8 @@ export class VariableGroupsComponent {
   
   variableGroups:VariableGroup[] = []
 
-  private variableGroupUrl = 'http://localhost:8080/variable/UiVariables';  // URL to web api
-  private changeVariableUrl = "http://localhost:8080/variable/change";
+  private variableGroupUrl = environment.apiUrl + 'variable/UiVariables';  // URL to web api
+  private changeVariableUrl = environment.apiUrl + "variable/change";
 
   ngOnInit(): void {
     this.getVariableGroups().subscribe(vg=> this.variableGroups = vg);

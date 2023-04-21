@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import { Component } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Pump, Speed } from './pump';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -13,8 +14,8 @@ export class PumpsComponent {
   constructor(
     private http: HttpClient
     ) { } 
-    private pumpUrl = "http://localhost:8080/pump/descriptions";
-    private pumpChangeUrl = "http://localhost:8080/pump/on?";
+    private pumpUrl = environment.apiUrl + "pump/descriptions";
+    private pumpChangeUrl = environment.apiUrl + "pump/on?";
 
     pumps:Pump[] = [];
 

@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import { Component } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {Valve} from './valve';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-valves',
@@ -14,9 +15,9 @@ export class ValvesComponent {
   constructor(
     private http: HttpClient
     ) { } 
-    private valveUrl = "http://localhost:8080/valve/get";
-    private valveOffUrl = "http://localhost:8080/valve/off?";
-    private valveOnUrl = "http://localhost:8080/valve/on?";
+    private valveUrl = environment.apiUrl + "valve/get";
+    private valveOffUrl = environment.apiUrl + "valve/off?";
+    private valveOnUrl = environment.apiUrl + "valve/on?";
 
     valves:Valve[] = [];
 

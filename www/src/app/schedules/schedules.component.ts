@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ScheduleInfo } from './schedule';
 import { Observable } from 'rxjs';
 import { DatePipe } from '@angular/common';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-schedules',
@@ -15,7 +16,7 @@ export class SchedulesComponent {
     overrides:[]
   };
 
-  private scheduleUrl = 'http://localhost:8080/schedule/schedules';  // URL to web api
+  private scheduleUrl = environment.apiUrl + 'schedule/schedules';  // URL to web api
   datepipe: DatePipe = new DatePipe('en-US');
   timeFormat:string = 'hh:mm a';
   

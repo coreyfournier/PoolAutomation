@@ -5,13 +5,14 @@ import { Observable, of } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, map, tap } from 'rxjs/operators';
 //import { MessageService } from './message.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class TemperatureService {
-  private heroesUrl = 'http://localhost:8080/temperature/sensors';  // URL to web api
+  private heroesUrl = environment.apiUrl + 'temperature/sensors';  // URL to web api
     constructor(
       private http: HttpClient
       ) { }
