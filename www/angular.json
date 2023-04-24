@@ -27,7 +27,11 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "/js/bootstrap.min.js",
+              "/js/bootstrap-toggle.min.js",
+              "/apexcharts/apexcharts.js"
+            ]
           },
           "configurations": {
             "production": {
