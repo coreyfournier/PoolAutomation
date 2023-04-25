@@ -25,9 +25,15 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "css/bootstrap.min.css",
+              "src/styles.css",
+              "css/site.css",
+              "css/bootstrap-toggle.min.css",
+              "css/bootstrap.min.css",              
+              "apexcharts/apexcharts.css"
             ],
             "scripts": [
+              "/js/jquery-3.6.3.min.js",
               "/js/bootstrap.min.js",
               "/js/bootstrap-toggle.min.js",
               "/apexcharts/apexcharts.js"

@@ -1,8 +1,9 @@
 import { Observable } from 'rxjs';
-import { Component } from '@angular/core';
+import { Component, AfterViewInit, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {Valve} from './valve';
 import { environment } from 'src/environments/environment';
+declare var $:any;
 
 @Component({
   selector: 'app-valves',
@@ -10,16 +11,32 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./valves.component.css']
 })
 
-export class ValvesComponent {
+export class ValvesComponent implements OnInit {
 
-  constructor(
-    private http: HttpClient
-    ) { } 
+  constructor(private http: HttpClient) { 
+
+  } 
     private valveUrl = environment.apiUrl + "valve/get";
     private valveOffUrl = environment.apiUrl + "valve/off?";
     private valveOnUrl = environment.apiUrl + "valve/on?";
 
     valves:Valve[] = [];
+
+    ngAfterContentChecked() {
+      
+      this.setToggleButton();
+    }
+
+    setToggleButton():void{
+      $.each($('[id^=valve-]'), (index:number, element:any) => {
+        console.log(JSON.stringify(element));
+
+          $(element).bootstrapToggle({
+            on: 'Enabled',
+            off: 'Disabled'
+        });
+      });
+    }
 
     ngOnInit(): void {
       this.getValves().subscribe(p=> this.valves = p);
