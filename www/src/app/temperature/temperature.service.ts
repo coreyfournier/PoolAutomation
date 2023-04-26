@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
 })
 
 export class TemperatureService {
-  private heroesUrl = environment.apiUrl + 'temperature/sensors';  // URL to web api
+  private sensorUrl = environment.apiUrl + 'temperature/sensors';  // URL to web api
     constructor(
       private http: HttpClient
       ) { }
@@ -44,17 +44,18 @@ export class TemperatureService {
     };
   }
 
+  
   /** GET hero by id. Will 404 if id not found */
   getHero(id: number): Observable<Temperature> {
-    const url = `${this.heroesUrl}/${id}`;
+    const url = `${this.sensorUrl}/${id}`;
     return this.http.get<Temperature>(url).pipe(
       tap(_ => this.log(`fetched hero id=${id}`)),
       catchError(this.handleError<Temperature>(`getHero id=${id}`))
     );
   }
 
-  getHeroes(): Observable<Temperature[]> {
-    return this.http.get<Temperature[]>(this.heroesUrl)
+  getSensors(): Observable<Temperature[]> {
+    return this.http.get<Temperature[]>(this.sensorUrl)
     .pipe(
       catchError(this.handleError<Temperature[]>('getHeroes', []))
     );

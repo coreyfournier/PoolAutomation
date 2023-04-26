@@ -15,28 +15,14 @@ export class TemperatureComponent {
 
   }
 
-  //heroes = HEROES;
-  heroes: Temperature[] = [];
+  sensors: Temperature[] = [];
 
-  selectedHero?: Temperature;
-
-  getHeroes(): void {
-    this.heroService.getHeroes()
-        .subscribe(heroes => this.heroes = heroes);
+  getSensors(): void {
+    this.heroService.getSensors()
+        .subscribe(heroes => this.sensors = heroes);
   }
   
   ngOnInit(): void {
-    this.getHeroes();
-  }
-
-  onSelect(hero: Temperature): void {
-    this.selectedHero = hero;
+    this.getSensors();
   }
 }
-
-
-/*
-Copyright Google LLC. All Rights Reserved.
-Use of this source code is governed by an MIT-style license that
-can be found in the LICENSE file at https://angular.io/license
-*/
