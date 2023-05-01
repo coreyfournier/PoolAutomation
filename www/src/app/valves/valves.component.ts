@@ -29,11 +29,11 @@ export class ValvesComponent implements OnInit {
 
     setToggleButton():void{
       $.each($('[id^=valve-]'), (index:number, element:any) => {
-        console.log(JSON.stringify(element));
+        //console.log(JSON.stringify(element));
 
           $(element).bootstrapToggle({
-            on: 'Enabled',
-            off: 'Disabled'
+            on: 'On',
+            off: 'Off'
         });
       });
     }

@@ -44,16 +44,6 @@ export class TemperatureService {
     };
   }
 
-  
-  /** GET hero by id. Will 404 if id not found */
-  getHero(id: number): Observable<Temperature> {
-    const url = `${this.sensorUrl}/${id}`;
-    return this.http.get<Temperature>(url).pipe(
-      tap(_ => this.log(`fetched hero id=${id}`)),
-      catchError(this.handleError<Temperature>(`getHero id=${id}`))
-    );
-  }
-
   getSensors(): Observable<Temperature[]> {
     return this.http.get<Temperature[]>(this.sensorUrl)
     .pipe(

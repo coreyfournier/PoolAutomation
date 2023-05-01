@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {VariableGroup} from './variableGroup'
 import {Variable} from './variableGroup';
 import { environment } from 'src/environments/environment';
+declare var $:any;
 
 @Component({
   selector: 'app-variable-groups',
@@ -23,6 +24,21 @@ export class VariableGroupsComponent {
 
   ngOnInit(): void {
     this.getVariableGroups().subscribe(vg=> this.variableGroups = vg);
+  }
+
+  ngAfterContentChecked() {      
+    this.setToggleButton();
+  }
+
+  setToggleButton():void{
+    $.each($('[id^=variable-][type=checkbox]'), (index:number, element:any) => {
+      //console.log(JSON.stringify(element));
+
+        $(element).bootstrapToggle({
+          on: 'On',
+          off: 'Off'
+      });
+    });
   }
 
   getVariableGroups():Observable<VariableGroup[]>{
