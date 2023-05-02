@@ -1,1 +1,16 @@
-<p>lights works!</p>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Light</h3>
+    </div>
+    <div class="panel-body" id="lights">
+        <div class="panel-body" *ngFor="let light of lights">
+            <p>Choose A Scene for {{light.name}}</p>
+            
+            <select id="light-scene-{{light.name}}" style="width: 250px;" (change)="sceneChanged(light, $event)">
+                <option value="off">Off</option>>
+                <option *ngFor="let scene of light.lightScenes" [value]="scene.name">{{scene.name}} - {{scene.description}}</option>
+            </select>
+        </div>
+    </div>
+
+</div>
