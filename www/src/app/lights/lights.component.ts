@@ -33,9 +33,22 @@ export class LightsComponent {
 
   sceneChanged(light:Light, event:any):void{
     let index:number = event.target["selectedIndex"];
-    if(index > 0)
-      console.log("Light:" + light.name + " Scene:" + this.lights[0].lightScenes[index -1].name + " changed");
-    else
-    console.log("Light:" + light.name + " Scene: Off changed");
+
+    if(index > 1)
+    {
+      var sceneIndex:number = index -1;
+
+      console.log("Light:" + light.name + " Scene:" + light.lightScenes[sceneIndex].name + " changed");
+      const req = this.http.get<Light>(this.lightSceneChangeUrl + "?name=" + light.name + "&sceneIndex=" + sceneIndex);
+
+      req.subscribe();
+    }
+    else if(index == 1)
+    {
+      console.log("Light:" + light.name + " Scene: Off changed");
+
+      const req = this.http.get<Light>(this.lightOffUrl + "?name=" + light.name);
+      req.subscribe();
+    }
   }
 }

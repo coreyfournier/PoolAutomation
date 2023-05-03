@@ -21,11 +21,13 @@ class LightService:
         light = self.lights.get(name)
         light.change(int(sceneIndex))
 
-        return "OK"
+        return light.to_dict()
 
     @cherrypy.expose
+    @cherrypy.tools.json_out()
     def off(self, name:str):
-        self.lights.get(name).off()
-        return "OK"
+        light = self.lights.get(name)
+        light.off()
+        return light.to_dict()
 
 
