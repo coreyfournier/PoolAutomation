@@ -11,6 +11,8 @@ import { LightsComponent } from './lights/lights.component';
 import { PumpsComponent } from './pumps/pumps.component';
 import { ValvesComponent } from './valves/valves.component';
 import { StatsComponent } from './stats/stats.component';
+import { NgApexchartsModule } from "ng-apexcharts";
+
 
 @NgModule({
   declarations: [
@@ -26,7 +28,8 @@ import { StatsComponent } from './stats/stats.component';
   imports: [
     HttpClientModule,
     BrowserModule,
-    FormsModule
+    FormsModule,
+    NgApexchartsModule
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA],
   providers: [],

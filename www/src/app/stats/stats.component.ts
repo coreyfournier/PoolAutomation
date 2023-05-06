@@ -7,6 +7,7 @@ import {
   ApexAxisChartSeries,
   ApexChart,
   ApexXAxis,
+  ApexTooltip,
   ApexTitleSubtitle
 } from "ng-apexcharts";
 import { DatePipe } from '@angular/common';
@@ -29,7 +30,7 @@ export type ChartOptions = {
 export class StatsComponent {
   datepipe: DatePipe = new DatePipe('en-US');
   @ViewChild("chart", { static: false }) chart!: ChartComponent;
-  public chartOptions: Partial<ChartOptions>;
+  public chartOptions: Partial<ChartOptions> | any;
   
   constructor(private http: HttpClient) { 
     this.chartOptions = {
@@ -39,16 +40,14 @@ export class StatsComponent {
         id: 'temperature-chart',                
         type: 'line'
       },
-      series: [{
-        name: "kg/hr",
-        data: ([10, 41, 35, 51, 49, 62, 69, 91, 148])
-      }],
+      series: [],
       xaxis:{
           type:"category",
           tickAmount:'dataPoints',
           title:{text:""},
           categories:[]
-      }
+      },
+      title:{text:"Avg Temperature by Hour"}
     };
     
   }
@@ -68,7 +67,6 @@ export class StatsComponent {
           list.push({name: response.data[d].name, data: response.data[d].data});
       
         options.xaxis.categories= response.hours;
-        options.xaxis.title.text = 'Avg Temperature by Hour';
         options.series = list;          
     });
     return req; 
