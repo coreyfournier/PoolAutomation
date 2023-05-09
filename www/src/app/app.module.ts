@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule  } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { TemperatureComponent } from './temperature/temperature.component';
@@ -12,7 +12,10 @@ import { PumpsComponent } from './pumps/pumps.component';
 import { ValvesComponent } from './valves/valves.component';
 import { StatsComponent } from './stats/stats.component';
 import { NgApexchartsModule } from "ng-apexcharts";
-
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @NgModule({
   declarations: [
@@ -29,7 +32,12 @@ import { NgApexchartsModule } from "ng-apexcharts";
     HttpClientModule,
     BrowserModule,
     FormsModule,
-    NgApexchartsModule
+    NgApexchartsModule,
+    BrowserAnimationsModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    FormsModule,
+    ReactiveFormsModule 
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA],
   providers: [],

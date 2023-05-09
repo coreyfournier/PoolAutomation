@@ -11,6 +11,8 @@ import {
   ApexTitleSubtitle
 } from "ng-apexcharts";
 import { DatePipe } from '@angular/common';
+import {FormGroup, FormControl} from '@angular/forms';
+import {MatDatepickerModule} from '@angular/material/datepicker';
 
 declare var $:any;
 
@@ -27,11 +29,16 @@ export type ChartOptions = {
   styleUrls: ['./stats.component.css']
 })
 
+
 export class StatsComponent {
   datepipe: DatePipe = new DatePipe('en-US');
   @ViewChild("chart", { static: false }) chart!: ChartComponent;
   public chartOptions: Partial<ChartOptions> | any;
-  
+
+  myGroup = new FormGroup({
+    start : new FormControl(new Date(new Date()).toISOString().slice(0, -1))
+  });
+
   constructor(private http: HttpClient) { 
     this.chartOptions = {
       chart: {
@@ -51,13 +58,17 @@ export class StatsComponent {
     };
     
   }
+  
+  updateTemperatureChart(value:Date) : void{
+    
+    this.getChartData(this.chartOptions, value);
+  } 
 
   ngOnInit(): void {
-    this.getChartData(this.chartOptions);                
+    this.getChartData(this.chartOptions, new Date());                
   }
 
-  getChartData(options:any):Observable<any>{
-    const now = new Date();
+  getChartData(options:any, now:Date):Observable<any>{
     var statusUrl = environment.apiUrl + "data/tempStats?query=CreatedDate ge " +  this.datepipe.transform(now,"yyyy-MM-dd");
     const req = this.http.get<any>(statusUrl);
 

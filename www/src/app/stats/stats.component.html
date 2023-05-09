@@ -1,9 +1,20 @@
 <div id="temperature-chart" >
-    <apx-chart 
-    
-    [series]="chartOptions.series"
-    [chart]="chartOptions.chart"
-    [xaxis]="chartOptions.xaxis"
-    [title]="chartOptions.title"
+    <div [formGroup]="myGroup">
+        <mat-form-field class="example-full-width" appearance="fill">
+            <mat-label>Choose a date</mat-label>
+            <input matInput 
+                formControlName="start" 
+                (ngModelChange)="updateTemperatureChart($event)" 
+                [matDatepicker]="picker">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      </mat-form-field>
+    </div>
+    <apx-chart    
+        [series]="chartOptions.series"
+        [chart]="chartOptions.chart"
+        [xaxis]="chartOptions.xaxis"
+        [title]="chartOptions.title"
     ></apx-chart>
 </div>
