@@ -125,9 +125,12 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
         )
 
 def allChangeNotification(event:Event):
-    global displayRotation
+    global displayRotation    
 
     logger.debug(f"Change detected ---- {event}")           
+
+    DependencyContainer.serverSentEvents.raiseEvent(event)
+
     if(isinstance(event, OverrideChangeEvent)):
         logger.debug(f"Action '{event.action.name}' changed to {event.action.overrideSchedule}")    
         logger.debug("Checking to see if the schedule needs to make changes")           

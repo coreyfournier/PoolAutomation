@@ -31,3 +31,7 @@ class Light:
 @dataclass
 class LightChangeEvent:
     light:Light
+
+    def to_dict(self):
+        return self.light.to_dict()
+    

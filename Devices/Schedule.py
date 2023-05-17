@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 import datetime
 from Devices import Pump
+import dataclasses
 from dataclasses_json import dataclass_json, LetterCase, config
 from typing import List as PyList
 from dataclass_wizard import JSONWizard
@@ -114,3 +115,6 @@ class PumpSchedule(Control):
 @dataclass
 class ScheduleChangeEvent(Event):
     schedule:PumpSchedule
+
+    def to_dict(self):
+        return dataclasses.asdict(self.schedule)

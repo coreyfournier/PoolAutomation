@@ -79,6 +79,10 @@ from Devices.Pumps import Pumps
 from Devices.Lights import Lights
 from Devices.TemperatureSensors import TemperatureSensors
 from IO.StateLoggerDuckDbRepo import StateLoggerDuckDbRepo
+from IO.SeverSentEvents import *
+
+#Global event handler to broker events for SSE
+serverSentEvents:ServerSentEvents = ServerSentEvents()
 
 lights:Lights = None
 

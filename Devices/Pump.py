@@ -31,9 +31,24 @@ class Pump:
 
     def speeds(self) ->"list[SpeedDisplay]":
         pass
+
+    def to_dict(self):
+        return {
+                "id": self.id,
+                "name": self.name, 
+                "displayName": self.displayName,
+                "currentSpeed": self.currentSpeed.name
+            }
     
 @dataclass
 class PumpChangeEvent(Event):
     newSpeed:Speed
     oldSpeed:Speed
     pump:Pump
+
+    def to_dict(self):
+        return {
+                "newSpeed": self.newSpeed.name,
+                "oldSpeed": self.oldSpeed.name, 
+                "pump": self.pump.to_dict()
+            }

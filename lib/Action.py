@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 import DependencyContainer
 from typing import Callable
-
-
+import dataclasses
 
 @dataclass
 class Action:
@@ -26,10 +25,20 @@ class Action:
             #notify of the change with the old a new
             if(DependencyContainer.actions != None):
                 DependencyContainer.actions.nofityListners(OverrideChangeEvent(self))
+    
+    def to_dict(self):
+        return {
+            "name":self.name,
+            "displayName":self.displayName,
+            "overrideSchedule":self._overrideSchedule
+        }
 
 @dataclass
 class OverrideChangeEvent():
     action:Action
+
+    def to_dict(self):
+        return self.action.to_dict()
 
 @dataclass
 class TimerEvent():

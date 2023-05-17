@@ -8,10 +8,14 @@ from lib.Actions import Event
 import DependencyContainer
 from IO.ValveRepo import ValveRepo
 from Devices.Valve import Valve
+import dataclasses
 
 @dataclass
 class ValveChangeEvent(Event):
     valve:Valve
+
+    def to_dict(self):
+        return self.valve.to_dict()
 
 class Valves:
     def __init__(self, repo:ValveRepo) -> None:

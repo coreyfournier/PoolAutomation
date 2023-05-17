@@ -2,11 +2,28 @@ from pickle import TRUE
 import cherrypy
 import os
 import DependencyContainer
+import json
 
 
 class DataService():
     def __init__(self) -> None:
-        pass        
+        pass
+
+   
+    @cherrypy.expose
+    def getUpdate(self, _=None):
+        cherrypy.response.headers["Content-Type"] = "text/event-stream;charset=utf-8"
+        cherrypy.response.headers['Cache-Control'] = 'no-cache'
+
+        def content(event:any):
+            print(f"New event '{type(event).__name__}'")
+            data = 'retry: 200\ndata: ' + json.dumps(event.to_dict()) +  '\n\n'
+            print(data)
+            return data
+       
+        return DependencyContainer.serverSentEvents.getEvents(content)
+
+    getUpdate._cp_config = {'response.stream': True, 'tools.encode.encoding':'utf-8'}
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -46,3 +63,5 @@ class DataService():
             "hours":list(hours),
             "data" : [{"name": key, "data" : item} for key, item in allItems.items()]
             }
+    
+    

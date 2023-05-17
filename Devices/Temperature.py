@@ -2,7 +2,15 @@ from dataclasses import dataclass, field
 import DependencyContainer
 from lib.Event import Event
 
-class Temperature:
+@dataclass
+class TemperatureDevice:
+    id:int
+    displayName:str
+    shortDisplayName:str
+    unit:str = DependencyContainer.temperatureUnit.upper()
+
+
+class Temperature(TemperatureDevice):
     def __init__(self, id:int, name:str, displayName:str, shortDisplayName:str,deviceId:str) -> None:
         self.id = id
         self.deviceId:str = deviceId
@@ -50,9 +58,21 @@ class Temperature:
     def __str__(self) -> str:
         return f"{self.name} - {self.get()}"
     
+    def to_dict(self):
+        return {
+                "id": self.id,
+                "name": self.displayName, 
+                "shortName": self.shortDisplayName,
+                "temp": self.getLast(),
+                "unit": self.unit
+            }
+    
 @dataclass
 class TemperatureChangeEvent(Event):
     device:Temperature
     
     def __str__(self) -> str:
         return f"{self.device.name} - {self.device.get()}{DependencyContainer.temperatureUnit}"
+    
+    def to_dict(self):
+        return self.device.to_dict()

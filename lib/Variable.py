@@ -1,4 +1,6 @@
 from dataclasses import dataclass, field
+import dataclasses
+from dataclass_wizard.type_def import JSONObject
 from dataclasses_json import dataclass_json, config,Undefined
 from dataclass_wizard import JSONWizard
 import builtins 
@@ -127,10 +129,24 @@ class Variable(JSONWizard):
             if(DependencyContainer.variables != None):
                 DependencyContainer.variables.save()
 
+    def to_dict(self):
+        return {
+            "hasExpired":self.hasExpired,
+            "name" : self.name,
+            "dataType": self.dataType,
+            "displayName": self.displayName,
+            "expires": self.expires,
+            "value": self.value
+
+        }
+
 @dataclass
 class VariableChangeEvent(Event):
     variable:Variable
 
+    def to_dict(self):
+        return self.variable.to_dict()
+    
 @dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass
 class VariableContainer(JSONWizard):
