@@ -1,5 +1,5 @@
-import { Observable } from 'rxjs';
-import { Component, AfterViewInit, OnInit, ViewChild  } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
+import { Component, AfterViewInit, OnInit, ViewChild, Input  } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
@@ -13,6 +13,7 @@ import {
 import { DatePipe } from '@angular/common';
 import {FormGroup, FormControl} from '@angular/forms';
 import {MatDatepickerModule} from '@angular/material/datepicker';
+import { AppComponent } from '../app.component';
 
 declare var $:any;
 
@@ -31,6 +32,9 @@ export type ChartOptions = {
 
 
 export class StatsComponent {
+  private eventsSubscription!: Subscription;
+  @Input() events!: Observable<void>;
+  @Input('statInfo') statInfo = '';
   datepipe: DatePipe = new DatePipe('en-US');
   @ViewChild("chart", { static: false }) chart!: ChartComponent;
   public chartOptions: Partial<ChartOptions> | any;
@@ -65,7 +69,11 @@ export class StatsComponent {
   } 
 
   ngOnInit(): void {
-    this.getChartData(this.chartOptions, new Date());                
+    this.getChartData(this.chartOptions, new Date());     
+    this.eventsSubscription = this.events.subscribe(() => {
+      console.log("Event occured");
+
+    });           
   }
 
   getChartData(options:any, now:Date):Observable<any>{

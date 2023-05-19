@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Observable, Subscription, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -19,5 +20,19 @@ import { environment } from 'src/environments/environment';
 */
 export class AppComponent {
   title = 'Pool Automation';
+  statInfo = "some data here";
+  eventsSubject: Subject<void> = new Subject<void>();
+
+  emitEventToChild() {
+    
+  }
+
+  buttonClick() : void{
+    
+    this.eventsSubject.next();
+
+    this.statInfo = "button clicked";
+    console.log("Button CLicked");
+  } 
 }
 
