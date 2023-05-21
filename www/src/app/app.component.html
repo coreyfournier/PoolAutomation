@@ -1,6 +1,4 @@
 <h1>{{title}}</h1>
-<button (click)="buttonClick()">Special Button</button>
-
 <div class="container">
     <div class="row">
         <div class="col-sm-6">
@@ -9,11 +7,11 @@
     </div>
     <div class="row">
         <div class="col-sm-6">
-            <app-stats [statInfo]="statInfo" [events]="eventsSubject.asObservable()"></app-stats>
+            <app-stats [events]="eventsSubject.asObservable()"></app-stats>
         </div>
     </div>
     <div class="row">
-            <app-temperature></app-temperature>
+            <app-temperature [events]="eventsSubject.asObservable()"></app-temperature>
     </div>
     <div class="row">
         <div class="col-sm-6">

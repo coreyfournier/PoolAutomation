@@ -17,7 +17,10 @@ class DataService():
 
         def content(event:any):
             print(f"New event '{type(event).__name__}'")
-            data = 'retry: 200\ndata: ' + json.dumps(event.to_dict()) +  '\n\n'
+            eventDict = event.to_dict()
+            #Inject the data type, so the client knows what it is.
+            eventDict["dataType"] = type(event).__name__
+            data = 'retry: 200\ndata: ' + json.dumps(eventDict) +  '\n\n'
             print(data)
             return data
        

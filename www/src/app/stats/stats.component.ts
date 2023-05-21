@@ -13,7 +13,7 @@ import {
 import { DatePipe } from '@angular/common';
 import {FormGroup, FormControl} from '@angular/forms';
 import {MatDatepickerModule} from '@angular/material/datepicker';
-import { AppComponent } from '../app.component';
+import { AppComponent, EventInfo } from '../app.component';
 
 declare var $:any;
 
@@ -33,11 +33,11 @@ export type ChartOptions = {
 
 export class StatsComponent {
   private eventsSubscription!: Subscription;
-  @Input() events!: Observable<void>;
-  @Input('statInfo') statInfo = '';
+  @Input() events!: Observable<EventInfo>;
   datepipe: DatePipe = new DatePipe('en-US');
   @ViewChild("chart", { static: false }) chart!: ChartComponent;
   public chartOptions: Partial<ChartOptions> | any;
+  private lastDate:Date = new Date();
 
   myGroup = new FormGroup({
     start : new FormControl(new Date(new Date()).toISOString().slice(0, -1))
@@ -63,16 +63,21 @@ export class StatsComponent {
     
   }
   
-  updateTemperatureChart(value:Date) : void{
-    
+  updateTemperatureChart(value:Date) : void{    
+    this.lastDate = value;
     this.getChartData(this.chartOptions, value);
   } 
 
   ngOnInit(): void {
     this.getChartData(this.chartOptions, new Date());     
-    this.eventsSubscription = this.events.subscribe(() => {
-      console.log("Event occured");
 
+    this.eventsSubscription = this.events.subscribe((d) => {
+      
+      if(d.dataType == "TemperatureChangeEvent")
+      {
+        console.log("Reloading the temp chart");      
+        this.getChartData(this.chartOptions, this.lastDate);
+      }
     });           
   }
 
