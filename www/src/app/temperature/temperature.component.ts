@@ -14,15 +14,15 @@ export class TemperatureComponent {
   @Input() events!: Observable<EventInfo>;
   private eventsSubscription!: Subscription;
 
-  constructor(private heroService: TemperatureService, public zone: NgZone) {
+  constructor(private sensorService: TemperatureService, public zone: NgZone) {
 
   }
 
   sensors: Temperature[] = [];
 
   getSensors(): void {
-    this.heroService.getSensors()
-        .subscribe(heroes => this.sensors = heroes);
+    this.sensorService.getSensors()
+        .subscribe(s => this.sensors = s);
   }
   
   ngOnInit(): void {
