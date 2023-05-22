@@ -9,17 +9,21 @@ COPY lib/*.py /app/lib/
 COPY data/*.json /app/data/
 COPY Devices/*.py /app/Devices/
 
+#Angular project
 WORKDIR /app/www
 RUN npm install
 RUN npm run build --prod
 #Set the directory that contains the built angular app
 ENV STATIC_DIRECTORY=/app/www/dist/www
 
-
+#Python project
 FROM arm32v7/python:3.10.10-slim AS BASE
 EXPOSE 8080
 
 RUN pip install --upgrade pip setuptools wheel
+
+COPY requirements.txt /app/
+RUN pip install -r /app/requirements.txt
 
 ##############################################################
 #Necessary for pillow (images for display)
@@ -43,18 +47,13 @@ RUN apt-get install libtiff5 -y
 RUN apt-get install unzip
 
 
-COPY requirements.txt /app/
-
-RUN pip install -r /app/requirements.txt
-
-
-
 ENV DATA_PATH=/app/data/
 ENV FONT_PATH=/app/www/fonts/
 ENV ROOT_FOLDER=/app
 #docker build -f "Dockerfile" . -t "pool-automation:latest"
 
 RUN cd /app
+#Use for troubleshooting
 #ENTRYPOINT ["tail", "-f", "/dev/null"]
 
 ENTRYPOINT ["python3","-u","/app/startup.py"]
