@@ -2,7 +2,7 @@ import { Component, Input, ChangeDetectorRef ,NgZone  } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Temperature } from './temperature';
 import { TemperatureService } from './temperature.service';
-import { AppComponent, EventInfo, TemperatureChangeEvent } from '../app.component';
+import { EventInfo, TemperatureChangeEvent } from '../app.events';
 
 @Component({
   selector: 'app-temperature',

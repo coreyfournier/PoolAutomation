@@ -13,7 +13,7 @@ import {
 import { DatePipe } from '@angular/common';
 import {FormGroup, FormControl} from '@angular/forms';
 import {MatDatepickerModule} from '@angular/material/datepicker';
-import { AppComponent, EventInfo } from '../app.component';
+import { EventInfo } from '../app.events';
 
 declare var $:any;
 

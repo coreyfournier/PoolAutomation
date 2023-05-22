@@ -2,6 +2,7 @@ import { Component, NgZone } from '@angular/core';
 import { Observable, Subscription, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { EventInfo } from './app.events';
 
 @Component({
   selector: 'app-root',
@@ -43,37 +44,4 @@ export class AppComponent {
       };
     });
  }
-
-  buttonClick() : void{    
-    //this.eventsSubject.next(new EventInfo("It's here"));
-    console.log("Button CLicked");
-  } 
-}
-
-export class EventInfo{  
-  dataType:string = "";
-  dataParsed:any = "";
-
-  constructor(payload:string)
-  {
-    this.dataParsed = JSON.parse(payload);
-    this.dataType = this.dataParsed.dataType;
-  }
-}
-
-export class TemperatureChangeEvent
-{
-  id:number;
-  name:string;
-  shortName:string;
-  temp:number;
-  unit:string;
-
-  constructor(jsonParsed:any){
-    this.id = jsonParsed.id;
-    this.name = jsonParsed.name;
-    this.shortName = jsonParsed.shortName;
-    this.temp = jsonParsed.temp;
-    this.unit = jsonParsed.unit;
-  }
 }
