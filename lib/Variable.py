@@ -137,7 +137,6 @@ class Variable(JSONWizard):
             "displayName": self.displayName,
             "expires": self.expires,
             "value": self.value
-
         }
 
 @dataclass
