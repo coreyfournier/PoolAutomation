@@ -1,4 +1,6 @@
-FROM node:18.15.0 as node
+FROM arm32v7/python:3.10.10-slim AS BASE
+EXPOSE 8080
+
 RUN mkdir /app
 #copy all of the code
 COPY *.py /app/
@@ -9,21 +11,8 @@ COPY lib/*.py /app/lib/
 COPY data/*.json /app/data/
 COPY Devices/*.py /app/Devices/
 
-#Angular project
-WORKDIR /app/www
-RUN npm install
-RUN npm run build --prod
-#Set the directory that contains the built angular app
-ENV STATIC_DIRECTORY=/app/www/dist/www
-
-#Python project
-FROM arm32v7/python:3.10.10-slim AS BASE
-EXPOSE 8080
 
 RUN pip install --upgrade pip setuptools wheel
-
-COPY requirements.txt /app/
-RUN pip install -r /app/requirements.txt
 
 ##############################################################
 #Necessary for pillow (images for display)
@@ -46,6 +35,22 @@ RUN apt-get install libopenjp2-7 -y
 RUN apt-get install libtiff5 -y
 RUN apt-get install unzip
 
+#Node requirements
+RUN apt-get update -yq \
+    && apt-get install curl gnupg -yq \
+    && curl -sL https://deb.nodesource.com/setup_18.x | bash \
+    && apt-get install nodejs -yq
+
+#Angular project
+WORKDIR /app/www
+RUN npm install
+RUN npm run build --prod
+#Set the directory that contains the built angular app
+ENV STATIC_DIRECTORY=/app/www/dist/www
+
+#Python project
+COPY requirements.txt /app/
+RUN pip install -r /app/requirements.txt
 
 ENV DATA_PATH=/app/data/
 ENV FONT_PATH=/app/www/fonts/

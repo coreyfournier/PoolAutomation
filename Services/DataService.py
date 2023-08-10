@@ -47,6 +47,10 @@ class DataService():
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def tempStats(self, query:str):
+        #No state logger, so don't try to query it.
+        if(DependencyContainer.stateLogger == None):
+            return { "hours":[], "data" : [] }        
+
         where_clause = DependencyContainer.stateLogger.odataQueryToWhereStatement(query)
         data = DependencyContainer.stateLogger.agg(where_clause)
         

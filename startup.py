@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
     if("PoolAutomationSqlConnection" in os.environ):
         logger.debug(f'PoolAutomationSqlConnection={os.environ["PoolAutomationSqlConnection"]}')
-        DependencyContainer.stateLogger = StateLoggerMsSqlRepo(os.environ["PoolAutomationSqlConnection"])
+        #DependencyContainer.stateLogger = StateLoggerMsSqlRepo(os.environ["PoolAutomationSqlConnection"])
     else:
         logger.warn(f"Missing environment variable for sql connection (PoolAutomationSqlConnection)")
 

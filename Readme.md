@@ -25,6 +25,8 @@ If you need to override anything at any time you get access to the individual de
     * cd into www
     * run "npm install"
     * To start the front end for Angular run "ng serve --open" in the terminal while in the www/ folder
+### Running docker image locally
+    docker run -p 8080:8080 -e 'TZ=America/Chicago' -e 'ROOT_FOLDER=/app' pool-automation:latest
 
 All devices are stubbed out when it can't find the pi libraries.
 
