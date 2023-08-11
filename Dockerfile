@@ -2,15 +2,6 @@ FROM arm32v7/python:3.10.10-slim AS BASE
 EXPOSE 8080
 
 RUN mkdir /app
-#copy all of the code
-COPY *.py /app/
-COPY www/ /app/www/
-COPY IO/*.py /app/IO/
-COPY Services/*.py /app/Services/
-COPY lib/*.py /app/lib/
-COPY data/*.json /app/data/
-COPY Devices/*.py /app/Devices/
-
 
 RUN pip install --upgrade pip setuptools wheel
 
@@ -42,15 +33,30 @@ RUN apt-get update -yq \
     && apt-get install nodejs -yq
 
 #Angular project
+COPY www/ /app/www/
 WORKDIR /app/www
 RUN npm install
 RUN npm run build --prod
 #Set the directory that contains the built angular app
 ENV STATIC_DIRECTORY=/app/www/dist/www
 
+WORKDIR /
 #Python project
 COPY requirements.txt /app/
 RUN pip install -r /app/requirements.txt
+
+#copy all of the code
+COPY *.py /app/
+
+COPY IO/*.py /app/IO/
+COPY Services/*.py /app/Services/
+COPY lib/*.py /app/lib/
+COPY data/*.json /app/data/
+COPY Devices/*.py /app/Devices/
+
+
+
+
 
 ENV DATA_PATH=/app/data/
 ENV FONT_PATH=/app/www/fonts/

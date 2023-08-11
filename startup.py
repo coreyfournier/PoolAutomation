@@ -40,7 +40,7 @@ config_root = {
     'tools.staticdir.dir' : WEB_ROOT,
     'tools.staticdir.index' : 'index.html',
     'tools.response_headers.on': True,
-    'tools.CORS.on':True
+    'tools.CORS.on': True
     }
 app_conf = { '/': config_root }
 server_config = {'server.socket_host': '0.0.0.0',  'server.socket_port' : int(os.environ["HOSTING_PORT"])}
@@ -67,8 +67,9 @@ if __name__ == '__main__':
         runAsDaemon = False
         temperatureFile = os.path.join(dataPath, "temperature-devices.json")
         #temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
-    except:
-        print("Running locally")
+        config_root['tools.CORS.on'] = False
+    except Exception as e:
+        print(f"Running locally - {e}")
         #Running locally
         GPIO = GpioStub()
         logger.info("Using GPIO Stub. Live pins will NOT be used.")

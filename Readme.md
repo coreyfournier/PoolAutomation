@@ -43,7 +43,7 @@ All devices are stubbed out when it can't find the pi libraries.
 1. docker pull 192.168.1.4:5050/pool-automation:latest
 2. sudo docker rm pool-automation -f
 3. With out privileged i can't get access to the temp sensors. 
-sudo docker run -it -p 8080:8080 -e 'TZ=America/Chicago' -e 'ROOT_FOLDER=/app' -e 'PoolAutomationSqlConnection=*************' --device /dev/gpiomem:/dev/gpiomem -v /sys:/sys -v /dev/i2c-1:/dev/i2c-1 -v /home/pi/pool/data:/app/data --privileged --name pool-automation pool-automation:latest
+sudo docker run -it -p 8080:8080 -e 'TZ=America/Chicago' -e 'ROOT_FOLDER=/app' -e 'PoolAutomationSqlConnection=*************' --device /dev/gpiomem:/dev/gpiomem -v /sys:/sys -v /dev/i2c-1:/dev/i2c-1 -v /home/pi/pool/data:/app/data --privileged --name pool-automation 192.168.1.4:5050/pool-automation:latest
 
 Viewing logs
  docker logs pool-automation
