@@ -70,7 +70,7 @@ class OneWire(Temperature):
             self._tracked[self.deviceId] = tempC
         
         if(DependencyContainer.temperatureUnit == "c"):
-            return tempC
+            return round(tempC, self._maxDigits)
         else:
             return self._celsiusToFahrenheit(tempC)
     

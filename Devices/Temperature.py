@@ -20,7 +20,7 @@ class Temperature(TemperatureDevice):
         #temp tracking. used to store the last value
         self._tracked:dict[str,float] = {}
         #Max digits after the decimal
-        self._maxDigits:int = 2
+        self._maxDigits:int = 1
         
     def get(self, allowCached:bool = True)-> float:
         """Gets the temp of the device id
