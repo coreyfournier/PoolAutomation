@@ -1,12 +1,15 @@
 # Pool Automation
 
 Custom schedules can be configured. You get feed back in which schedule is running and for how long. Actions can override the schedule at any time to prevent the pump or anything else from making changes.
+
 ![Alt text](assets/pool-automation-schedules.PNG "Pump Schedule")
 
-You can configure custom actions that listen for events to make decisions. Each UI component is a variable and built dynamically. Changing any value fires an event any any component can listen to the events to change the application flow.
+You can configure custom actions that listen for events to make decisions. Each UI component is a variable and built dynamically. Changing any value fires an event and any component can listen to the events to change the application flow.
+
 ![Alt text](assets/pool-automation-actions.PNG "Custom actions")
 
-If you need to override anything at any time you get access to the individual device.
+If you need to override anything at any time you get access to the individual devices.
+
 ![Alt text](assets/pool-automation-device-control.PNG "Device Control")
 
 
@@ -41,12 +44,13 @@ All devices are stubbed out when it can't find the pi libraries.
 
 #### On the server
 1. docker pull 192.168.1.4:5050/pool-automation:latest
-2. sudo docker rm pool-automation -f
+2. sudo docker container rm pool-automation -f
 3. With out privileged i can't get access to the temp sensors. 
 sudo docker run -it -p 8080:8080 -e 'TZ=America/Chicago' -e 'ROOT_FOLDER=/app' -e 'PoolAutomationSqlConnection=*************' --device /dev/gpiomem:/dev/gpiomem -v /sys:/sys -v /dev/i2c-1:/dev/i2c-1 -v /home/pi/pool/data:/app/data --privileged --name pool-automation 192.168.1.4:5050/pool-automation:latest
 
-Viewing logs
- docker logs pool-automation
+##### Troubleshooting 
+* Viewing logs
+    docker logs pool-automation
 
 ## Authentication
 No security is provided, but I used my synology nas to help me out here. I already have a certificate installed on it. The NAS also provides an option for reverse proxy, but it doesn't include authentication. I found a docker container project that provides the LDAP authentication. With the two, i piped traffice from one proxy to another. I could just use the Docker container, but then I would have to manage the cert in two places. This is a set it and forget it solution.
