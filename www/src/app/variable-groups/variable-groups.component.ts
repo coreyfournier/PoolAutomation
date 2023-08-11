@@ -31,6 +31,7 @@ export class VariableGroupsComponent {
   }
 
   setToggleButton():void{
+   /* 
     $.each($('[id^=variable-][type=checkbox]'), (index:number, element:any) => {
       //console.log(JSON.stringify(element));
 
@@ -39,6 +40,7 @@ export class VariableGroupsComponent {
           off: 'Off'
       });
     });
+    */    
   }
 
   getVariableGroups():Observable<VariableGroup[]>{
@@ -46,7 +48,8 @@ export class VariableGroupsComponent {
   }
 
   variableChanged(item: Variable, event:any): void {
-    
+    console.log("Variable changed clicked");
+
     if(item.dataType == "bool")
       item.value = event.target.checked;
     else

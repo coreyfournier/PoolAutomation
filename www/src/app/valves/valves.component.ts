@@ -28,6 +28,7 @@ export class ValvesComponent implements OnInit {
     }
 
     setToggleButton():void{
+      /*
       $.each($('[id^=valve-]'), (index:number, element:any) => {
         //console.log(JSON.stringify(element));
 
@@ -36,6 +37,7 @@ export class ValvesComponent implements OnInit {
             off: 'Off'
         });
       });
+      */
     }
 
     ngOnInit(): void {
