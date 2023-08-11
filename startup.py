@@ -34,8 +34,6 @@ else:
 if("HOSTING_PORT" not in os.environ):
     os.environ["HOSTING_PORT"] = "8080"
 
-logger.info(f"Using root folder:'{rootFolder}'. Port#:{os.environ['HOSTING_PORT']} Static directory:'{WEB_ROOT}'. This should never contain code!!! ")
-
 config_root = { 
     'tools.encode.encoding' : 'utf-8',
     'tools.staticdir.on' : True,
@@ -49,6 +47,8 @@ server_config = {'server.socket_host': '0.0.0.0',  'server.socket_port' : int(os
   
 if __name__ == '__main__':
    
+    logger.info(f"Using root folder:'{rootFolder}'. Port#:{os.environ['HOSTING_PORT']} Static directory:'{WEB_ROOT}'. This should never contain code!!! ")
+
     import Configuration    
     if("DATA_PATH" in os.environ):
         dataPath = os.environ["DATA_PATH"]
