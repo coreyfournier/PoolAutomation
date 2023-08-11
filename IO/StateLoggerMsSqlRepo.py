@@ -144,43 +144,43 @@ class StateLoggerMsSqlRepo():
         Pressure4:float = None
     ):
 
-        cursor = self.__connection.cursor()
-        statement = f"INSERT INTO StateLogs VALUES({'%s,'*31}%s)"
-        data = [temperature1,
-            temperature2,
-            temperature3,
-            temperature4,
-            temperature5,
-            pumpState1,
-            pumpState2,
-            pumpState3,
-            pumpState4,
-            pumpState5,
-            valveState1,
-            valveState2,
-            valveState3,
-            valveState4,
-            valveState5,
-            ScheduleActive1,
-            ScheduleActive2,
-            ScheduleActive3,
-            ActionActive1,
-            ActionActive2,
-            ActionActive3,
-            ActionActive4,
-            ActionActive5,
-            Orp1,
-            Orp2,
-            PH1,
-            PH2,
-            Pressure1,
-            Pressure2,
-            Pressure3,
-            Pressure4,
-            datetime.datetime.now()
-            ]
-        logger.debug(statement)
-        result = cursor.execute(statement, data)
+        with self.__connection.cursor() as cursor:
+            statement = f"INSERT INTO StateLogs VALUES({'%s,'*31}%s)"
+            data = [temperature1,
+                temperature2,
+                temperature3,
+                temperature4,
+                temperature5,
+                pumpState1,
+                pumpState2,
+                pumpState3,
+                pumpState4,
+                pumpState5,
+                valveState1,
+                valveState2,
+                valveState3,
+                valveState4,
+                valveState5,
+                ScheduleActive1,
+                ScheduleActive2,
+                ScheduleActive3,
+                ActionActive1,
+                ActionActive2,
+                ActionActive3,
+                ActionActive4,
+                ActionActive5,
+                Orp1,
+                Orp2,
+                PH1,
+                PH2,
+                Pressure1,
+                Pressure2,
+                Pressure3,
+                Pressure4,
+                datetime.datetime.now()
+                ]
+            logger.debug(statement)
+            result = cursor.execute(statement, data)
 
     def query(self, where:str, columns:"list[str]") -> list:
         """_summary_
