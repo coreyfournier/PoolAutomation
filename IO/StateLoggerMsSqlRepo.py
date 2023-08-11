@@ -40,8 +40,13 @@ class StateLoggerMsSqlRepo():
         if(databaseName == None):
             raise Exception("Database=X; not found in connection string")
         
+        self._server = server[0]
+        self._databaseName = databaseName
+        self._userName = userId[0]
+        self._userPassword = password[0]
+
         try:
-            self.__connection = pytds.connect(server[0], databaseName, userId[0], password[0], autocommit=True)
+            connection = pytds.connect(self._server, self._databaseName, self._userName, self._userPassword, autocommit=True)
         except Exception as ex:
             if(len(ex.args) > 1 and "Cannot open database" in ex.args[1]):
                 logger.info(f"Creating database {databaseName}")
@@ -59,7 +64,7 @@ class StateLoggerMsSqlRepo():
                 """
                 cursor.execute(dbScript)
                 
-                self.__connection = pytds.connect(server[0], databaseName, userId[0], password[0], autocommit=True)
+                connection = pytds.connect(self._server, self._databaseName, self._userName, self._userPassword, autocommit=True)
             else:
                 raise ex
 
@@ -104,11 +109,11 @@ class StateLoggerMsSqlRepo():
             END
         """
 
-        cursor = self.__connection.cursor()
-        cursor.execute(tableScript)
-        
-        db_cursor = cursor.execute("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'StateLogs'")
-        self.__tblColumns = [x[0].lower() for x in list(db_cursor)]
+        with connection.cursor() as cursor:
+            cursor.execute(tableScript)
+            
+            db_cursor = cursor.execute("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'StateLogs'")
+            self.__tblColumns = [x[0].lower() for x in list(db_cursor)]
 
     def add(self,
         temperature1:float = None,
@@ -144,43 +149,44 @@ class StateLoggerMsSqlRepo():
         Pressure4:float = None
     ):
 
-        with self.__connection.cursor() as cursor:
-            statement = f"INSERT INTO StateLogs VALUES({'%s,'*31}%s)"
-            data = [temperature1,
-                temperature2,
-                temperature3,
-                temperature4,
-                temperature5,
-                pumpState1,
-                pumpState2,
-                pumpState3,
-                pumpState4,
-                pumpState5,
-                valveState1,
-                valveState2,
-                valveState3,
-                valveState4,
-                valveState5,
-                ScheduleActive1,
-                ScheduleActive2,
-                ScheduleActive3,
-                ActionActive1,
-                ActionActive2,
-                ActionActive3,
-                ActionActive4,
-                ActionActive5,
-                Orp1,
-                Orp2,
-                PH1,
-                PH2,
-                Pressure1,
-                Pressure2,
-                Pressure3,
-                Pressure4,
-                datetime.datetime.now()
-                ]
-            logger.debug(statement)
-            result = cursor.execute(statement, data)
+        with pytds.connect(self._server, self._databaseName, self._userName, self._userPassword, autocommit=True) as connection:
+            with connection.cursor() as cursor:
+                statement = f"INSERT INTO StateLogs VALUES({'%s,'*31}%s)"
+                data = [temperature1,
+                    temperature2,
+                    temperature3,
+                    temperature4,
+                    temperature5,
+                    pumpState1,
+                    pumpState2,
+                    pumpState3,
+                    pumpState4,
+                    pumpState5,
+                    valveState1,
+                    valveState2,
+                    valveState3,
+                    valveState4,
+                    valveState5,
+                    ScheduleActive1,
+                    ScheduleActive2,
+                    ScheduleActive3,
+                    ActionActive1,
+                    ActionActive2,
+                    ActionActive3,
+                    ActionActive4,
+                    ActionActive5,
+                    Orp1,
+                    Orp2,
+                    PH1,
+                    PH2,
+                    Pressure1,
+                    Pressure2,
+                    Pressure3,
+                    Pressure4,
+                    datetime.datetime.now()
+                    ]
+                logger.debug(statement)
+                result = cursor.execute(statement, data)
 
     def query(self, where:str, columns:"list[str]") -> list:
         """_summary_
@@ -207,21 +213,22 @@ class StateLoggerMsSqlRepo():
                 select = ",".join(columns)
         else:
             raise Exception("No columns to select")
-        
-        with self.__connection.cursor() as conn:
-            conn.execute(f"SELECT {select} FROM StateLogs WHERE {where}")
-            return conn.fetchall()
+        with pytds.connect(self._server, self._databaseName, self._userName, self._userPassword, autocommit=True) as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT {select} FROM StateLogs WHERE {where}")
+                return cursor.fetchall()
 
     def agg(self, where:str=None,columns:"list[str]" = None) -> list:
-        with self.__connection.cursor() as conn:
-            query = f"""SELECT ROUND(AVG(temperature1),1) AS temperature1, ROUND(AVG(temperature2),1) AS temperature2, ROUND(AVG(temperature3),1) AS temperature3, ROUND(AVG(temperature4),1) AS temperature4, DATEPART(HOUR, CreatedDate) AS Hour 
-                FROM StateLogs 
-                WHERE {where}
-                GROUP BY DATEPART(HOUR, CreatedDate)
-                ORDER BY DATEPART(HOUR, CreatedDate)"""
-            logger.debug(query)
-            conn.execute(query)
-            return conn.fetchall()
+        with pytds.connect(self._server, self._databaseName, self._userName, self._userPassword, autocommit=True) as connection:
+            with connection.cursor() as cursor:
+                query = f"""SELECT ROUND(AVG(temperature1),1) AS temperature1, ROUND(AVG(temperature2),1) AS temperature2, ROUND(AVG(temperature3),1) AS temperature3, ROUND(AVG(temperature4),1) AS temperature4, DATEPART(HOUR, CreatedDate) AS Hour 
+                    FROM StateLogs 
+                    WHERE {where}
+                    GROUP BY DATEPART(HOUR, CreatedDate)
+                    ORDER BY DATEPART(HOUR, CreatedDate)"""
+                logger.debug(query)
+                cursor.execute(query)
+                return cursor.fetchall()
         
     def netTemperatureChange(self, sensorColumn:str = "[temperature4]", daysFromNow:int = 30, pumpStateColumn = "[pumpState1]"):
         """Calculates the net temperature change from day to day
@@ -280,11 +287,11 @@ class StateLoggerMsSqlRepo():
                 CreatedDate DESC,
                 CreatedHour ASC
         """
-
-        with self.__connection.cursor() as conn:
-            logger.debug(query)
-            conn.execute(query)
-            return conn.fetchall()
+        with pytds.connect(self._server, self._databaseName, self._userName, self._userPassword, autocommit=True) as connection:
+            with self.__connection.cursor() as cursor:
+                logger.debug(query)
+                cursor.execute(query)
+                return cursor.fetchall()
         
     def odataQueryToWhereStatement(self, query:str) -> str:
 
