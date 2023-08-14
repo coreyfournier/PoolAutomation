@@ -25,7 +25,13 @@ class VariableService:
         if(variable == None):
             raise Exception(f"Missing variable '{name}'")
         else:
-            DependencyContainer.variables.get(name).value = value
+            #Make sure the value from the client matches the expected data type
+            if(variable.dataType is int):
+                variable.value = int(value)
+            elif(variable.dataType is float):
+                variable.value = float(value)
+            else:
+                variable.value = value
             return variable.to_dict()
     
     @cherrypy.expose

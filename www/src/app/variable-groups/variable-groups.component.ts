@@ -50,10 +50,15 @@ export class VariableGroupsComponent {
   variableChanged(item: Variable, event:any): void {
     console.log("Variable changed clicked");
 
+    //If the data types are not correct, then
     if(item.dataType == "bool")
       item.value = event.target.checked;
+    else if(item.dataType == "float")
+      item.value = parseFloat(event.target.value);
+    else if(item.dataType == "int")
+      item.value = parseInt(event.target.value);
     else
-      item.value = event.target.value
+      item.value = event.target.value;
     
     console.log("variable=" + item.name + " changed Value=" + item.value);
     this.changeVariable(item);
