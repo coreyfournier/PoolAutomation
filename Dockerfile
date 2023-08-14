@@ -35,7 +35,7 @@ RUN apt-get update -yq \
 #Angular project
 COPY www/ /app/www/
 WORKDIR /app/www
-RUN npm install
+RUN npm clean-install
 RUN npm run build --prod
 #Set the directory that contains the built angular app
 ENV STATIC_DIRECTORY=/app/www/dist/www
