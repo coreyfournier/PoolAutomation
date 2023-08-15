@@ -6,7 +6,12 @@
         <div *ngFor="let variable of row.variables">
             <div>{{variable.displayName}}</div>
             <span style='margin-right:5px;'>
-                <input *ngIf="variable.dataType == 'bool'; else allOthers" type='checkbox' id='variable-{{variable.name}}' data-style='slow' (change)="variableChanged(variable, $event)" [checked]="variable.value">
+                <mat-slide-toggle 
+                    *ngIf="variable.dataType == 'bool'; else allOthers" 
+                    id='variable-{{variable.name}}'
+                    (toggleChange)="variableChanged(variable, $event)" 
+                    [(ngModel)]="variable.value">
+                </mat-slide-toggle>
                 <ng-template #allOthers>
                     <input type='number' id='variable-{{variable.name}}' step='.5' class='form-control' value='{{variable.value}}' style='width:75px;'  (change)="variableChanged(variable, $event)">
                 </ng-template>

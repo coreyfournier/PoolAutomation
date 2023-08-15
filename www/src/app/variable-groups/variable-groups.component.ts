@@ -4,12 +4,13 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {VariableGroup} from './variableGroup'
 import {Variable} from './variableGroup';
 import { environment } from 'src/environments/environment';
+
 declare var $:any;
 
 @Component({
   selector: 'app-variable-groups',
   templateUrl: './variable-groups.component.html',
-  styleUrls: ['./variable-groups.component.css']
+  styleUrls: ['./variable-groups.component.css']  
 })
 
 export class VariableGroupsComponent {
@@ -31,16 +32,7 @@ export class VariableGroupsComponent {
   }
 
   setToggleButton():void{
-   /* 
-    $.each($('[id^=variable-][type=checkbox]'), (index:number, element:any) => {
-      //console.log(JSON.stringify(element));
-
-        $(element).bootstrapToggle({
-          on: 'On',
-          off: 'Off'
-      });
-    });
-    */    
+   
   }
 
   getVariableGroups():Observable<VariableGroup[]>{
@@ -52,7 +44,10 @@ export class VariableGroupsComponent {
 
     //If the data types are not correct, then
     if(item.dataType == "bool")
-      item.value = event.target.checked;
+    {
+      //Reverse the value due to the way the toggle works
+      item.value = !item.value;
+    }
     else if(item.dataType == "float")
       item.value = parseFloat(event.target.value);
     else if(item.dataType == "int")

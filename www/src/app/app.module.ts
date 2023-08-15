@@ -38,7 +38,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     MatDatepickerModule,
     MatNativeDateModule,
     FormsModule,
-    ReactiveFormsModule 
+    ReactiveFormsModule,
+    MatSlideToggleModule 
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA],
   providers: [],

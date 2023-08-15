@@ -27,17 +27,7 @@ export class ValvesComponent implements OnInit {
       this.setToggleButton();
     }
 
-    setToggleButton():void{
-      /*
-      $.each($('[id^=valve-]'), (index:number, element:any) => {
-        //console.log(JSON.stringify(element));
-
-          $(element).bootstrapToggle({
-            on: 'On',
-            off: 'Off'
-        });
-      });
-      */
+    setToggleButton():void{     
     }
 
     ngOnInit(): void {
@@ -49,11 +39,13 @@ export class ValvesComponent implements OnInit {
     }
     
     valveChanged(valve:Valve, event:any):void{
+      //Reverse the value due to the way the toggle works
+      valve.isOn = !valve.isOn;
       this.toggleValve(valve, event)      
     }
 
     toggleValve(valve:Valve, event:any):Observable<Valve>{      
-      const url = event.target.checked ? this.valveOnUrl : this.valveOffUrl;
+      const url = valve.isOn ? this.valveOnUrl : this.valveOffUrl;
       const req = this.http.get<Valve>(url + "id=" + valve.id);
 
       req.subscribe();
