@@ -48,23 +48,19 @@ class StateLoggerMsSqlRepo():
         try:
             connection = pytds.connect(self._server, self._databaseName, self._userName, self._userPassword, autocommit=True)
         except Exception as ex:
-            if(len(ex.args) > 1 and "Cannot open database" in ex.args[1]):
+            if(len(ex.args) > 0 and "Cannot open database" in ex.args[0]):
                 logger.info(f"Creating database {databaseName}")
 
                 #Switch to master to create the database.
-                conn = pytds.connect(server[0], "master", userId[0], password[0])
-
-                cursor = conn.cursor()
-
-                dbScript = f"""        
-                    IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '{databaseName}')
-                    BEGIN
-                        CREATE DATABASE {databaseName};
-                    END;
-                """
-                cursor.execute(dbScript)
-                
-                connection = pytds.connect(self._server, self._databaseName, self._userName, self._userPassword, autocommit=True)
+                with pytds.connect(server[0], "master", userId[0], password[0], autocommit=True) as conn:
+                    cursor = conn.cursor()
+                    dbScript = f"""        
+                        IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '{databaseName}')
+                        BEGIN
+                            CREATE DATABASE {databaseName};
+                        END;
+                    """
+                    cursor.execute(dbScript)                                       
             else:
                 raise ex
 
@@ -108,12 +104,13 @@ class StateLoggerMsSqlRepo():
                         CREATE CLUSTERED COLUMNSTORE INDEX [CCI-StateLogs] ON StateLogs
             END
         """
-
-        with connection.cursor() as cursor:
-            cursor.execute(tableScript)
-            
-            db_cursor = cursor.execute("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'StateLogs'")
-            self.__tblColumns = [x[0].lower() for x in list(db_cursor)]
+        with pytds.connect(self._server, self._databaseName, self._userName, self._userPassword, autocommit=True) as connection:
+            with connection.cursor() as cursor:
+                #Create the table
+                cursor.execute(tableScript)
+                #get all of the columns
+                db_cursor = cursor.execute("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'StateLogs'")
+                self.__tblColumns = [x[0].lower() for x in list(db_cursor)]
 
     def add(self,
         temperature1:float = None,

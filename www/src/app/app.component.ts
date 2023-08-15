@@ -8,10 +8,6 @@ import { EventInfo } from './app.events';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: [
-    './app.component.css',
-    '../../css/bootstrap.min.css',
-    '../../css/site.css',
-    '../../css/bootstrap-toggle.min.css'
   ]
 })
 

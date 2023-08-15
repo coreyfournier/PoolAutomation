@@ -38,8 +38,3 @@ body {
     content: "";
     display: inline-block;
   }
-
-  h3{
-    line-height: normal;    
-    margin: 0 0 5px;
-  }
