@@ -6,6 +6,8 @@ class TemperatureSensors:
     def __init__(self, repo:TemperatureRepo) -> None:
         self._repo = repo
         self._deviceByName =  repo.getDevices()
+        #How many digits are used to look for changes.
+        self.maxPrecisionForChange = 1
 
         self._allDevices:"list[Temperature]" = []
         self._byId:"dict[int,Temperature]" = {}
@@ -47,7 +49,7 @@ class TemperatureSensors:
             if(lastTemp == None):
                 device.get(False)
             else:
-                totalChange = abs(lastTemp - device.get(False))
+                totalChange = round(abs(lastTemp - device.get(False)), self.maxPrecisionForChange)
 
                 if(totalChange > 0.0):
                     if(DependencyContainer.actions != None):

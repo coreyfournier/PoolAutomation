@@ -25,6 +25,13 @@
               "src/assets"
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/pink-bluegrey.css",
+              "css/bootstrap.min.css",              
+              "css/bootstrap-toggle.min.css",
+              "css/bootstrap.min.css",
+              "apexcharts/apexcharts.css",
+              "css/bootstrap-toggle.min.css",
+              "css/site.css",
               "src/styles.css"
             ],
             "scripts": [
