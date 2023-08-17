@@ -1,12 +1,42 @@
+//import { Action } from 'rxjs/internal/scheduler/Action';
+import { Schedule, Pump } from './schedules/schedule';
+
 export class EventInfo{  
     dataType:string = "";
-    dataParsed:any = "";
+    data:any = "";
   
     constructor(payload:string)
     {
-      this.dataParsed = JSON.parse(payload);
-      this.dataType = this.dataParsed.dataType;
+      let dataParsed = JSON.parse(payload);
+      this.dataType = dataParsed.dataType;
+
+      if(dataParsed.dataType == "TemperatureChangeEvent")
+        this.data = dataParsed.data as TemperatureChangeEvent;
+      else if(dataParsed.dataType == "ValveChangeEvent")
+        this.data = dataParsed as ValveChangeEvent;
+      else if(dataParsed.dataType == "PumpChangeEvent")
+        this.data = dataParsed.data as PumpChangeEvent;
+      else if(dataParsed.dataType == "LightChangeEvent")
+        this.data = dataParsed.data as LightChangeEvent;
+      else if(dataParsed.dataType == "VariableChangeEvent")
+        this.data = dataParsed.data as VariableChangeEvent;
+      else if(dataParsed.dataType == "ScheduleChangeEvent")
+        this.data = dataParsed.data as ScheduleChangeEvent;
+      else if(dataParsed.dataType == "OverrideChangeEvent")        
+        this.data = dataParsed.data as OverrideChangeEvent;
+      else //Some unknown type
+        this.data = dataParsed.data
     }
+  }
+
+  export class OverrideChangeEvent
+  {
+    data : Action|null = null;
+  }
+
+  export class Action {
+    name:string = "";
+    displayName:string = "";
   }
   
   export class TemperatureChangeEvent
@@ -52,21 +82,6 @@ export class EventInfo{
       }
   }
 
-  export class Pump
-  {
-    name:string;
-    id:number;
-    displayName:string;
-    currentSpeed:string;
-
-    constructor(jsonParsed:any){
-        this.id = jsonParsed.id;
-        this.name = jsonParsed.name;
-        this.currentSpeed = jsonParsed.currentSpeed;
-        this.displayName = jsonParsed.displayName;
-      }
-  }
-
   export class LightChangeEvent{
     constructor(jsonParsed:any){
         this.name = jsonParsed.name;
@@ -95,22 +110,18 @@ export class EventInfo{
       }
   }
 
-  export class ScheduleChangeEvent{
-    name:string;
-    id:number;
-    isActive:boolean;
-    isRunning:boolean;
-    duration:number;
-    scheduleStart:Date;
-    scheduleEnd:Date;
+  export class ScheduleChangeEvent  {
+    data:Schedule;
 
     constructor(jsonParsed:any){
-        this.name = jsonParsed.name;
-        this.id = jsonParsed.id;
-        this.isActive = jsonParsed.isActive;
-        this.isRunning = jsonParsed.isRunning;
-        this.duration = jsonParsed.duration;
-        this.scheduleStart = jsonParsed.scheduleStart;
-        this.scheduleEnd = jsonParsed.scheduleEnd;
+      this.data = new Schedule();
+        this.data.name = jsonParsed.name;
+        this.data.id = jsonParsed.id;
+        this.data.isActive = jsonParsed.isActive;
+        this.data.isRunning = jsonParsed.isRunning;
+        this.data.duration = jsonParsed.duration;
+        this.data.scheduleStart = jsonParsed.scheduleStart;
+        this.data.scheduleEnd = jsonParsed.scheduleEnd;
+        this.data.pumps = jsonParsed.pumps;
       }
   }

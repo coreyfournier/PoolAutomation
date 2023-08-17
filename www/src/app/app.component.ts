@@ -21,7 +21,7 @@ export class AppComponent {
     this.createEventSource().subscribe(
       (e: EventInfo) => {
         this.eventsSubject.next(e);
-        console.log('Message received: ' + e);
+        console.log('Message received: ' + JSON.stringify(e));
       }
     );
 

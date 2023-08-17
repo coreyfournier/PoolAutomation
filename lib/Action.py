@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import DependencyContainer
 from typing import Callable
+from lib.Event import Event
 import dataclasses
 
 @dataclass
@@ -24,7 +25,7 @@ class Action:
             self._overrideSchedule = v
             #notify of the change with the old a new
             if(DependencyContainer.actions != None):
-                DependencyContainer.actions.nofityListners(OverrideChangeEvent(self))
+                DependencyContainer.actions.nofityListners(OverrideChangeEvent(data=self))
     
     def to_dict(self):
         return {
@@ -34,18 +35,27 @@ class Action:
         }
 
 @dataclass
-class OverrideChangeEvent():
-    action:Action
+class OverrideChangeEvent(Event):
+    data:Action = None
 
     def to_dict(self):
-        return self.action.to_dict()
+        return {
+            "data":  self.data.to_dict(),
+            "dataType": self.dataType
+        }
 
 @dataclass
-class TimerEvent():
+class TimerEvent(Event):
     """An event fired at a set time based on the worker.
     """
     #Number of seconds passed the hour
     #If you want to do something every 20 seconds then take
     # secondsPassedTheHour % 20 and check for the result of zero.
     #This lets you use any interval as long as it 5 or more
-    secondsPassedTheHour:int
+    secondsPassedTheHour:int = 0
+
+    def to_dict(self):
+        return {
+            "data":  self.secondsPassedTheHour,
+            "dataType": self.dataType
+        }

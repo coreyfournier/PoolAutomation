@@ -4,8 +4,12 @@ COPY www/ /app/www/
 WORKDIR /app/www
 #Disable the progress bar to hopefully decrease build times
 RUN npm set progress=false
-RUN npm clean-install
+RUN npm install -g modclean
+RUN npm install-clean
 RUN npm run build --prod
+#Try to reduce the size of the node modules
+RUN modclean -n default:caution -r
+
 
 FROM arm32v7/python:3.10.10-slim AS PYTHON_BASE
 WORKDIR /app/

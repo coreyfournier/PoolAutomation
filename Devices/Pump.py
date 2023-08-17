@@ -1,7 +1,7 @@
 from enum import Enum
 from dataclasses import dataclass
 from typing import Callable
-from lib.Actions import Event
+from lib.Event import Event
 
 class Speed(Enum):
     OFF = 0
@@ -42,13 +42,14 @@ class Pump:
     
 @dataclass
 class PumpChangeEvent(Event):
-    newSpeed:Speed
-    oldSpeed:Speed
-    pump:Pump
+    data:Pump = None
+    newSpeed:Speed = None
+    oldSpeed:Speed = None
 
     def to_dict(self):
         return {
+                "dataType": self.dataType,
+                "data": self.data.to_dict(),
                 "newSpeed": self.newSpeed.name,
-                "oldSpeed": self.oldSpeed.name, 
-                "pump": self.pump.to_dict()
+                "oldSpeed": self.oldSpeed.name                
             }

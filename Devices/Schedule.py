@@ -114,7 +114,11 @@ class PumpSchedule(Control):
 
 @dataclass
 class ScheduleChangeEvent(Event):
-    schedule:PumpSchedule
+    data:PumpSchedule = None
 
     def to_dict(self):
-        return dataclasses.asdict(self.schedule)
+        return {
+            "data":  dataclasses.asdict(self.data),
+            "dataType": self.dataType
+        }
+   

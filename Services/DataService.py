@@ -3,25 +3,24 @@ import cherrypy
 import os
 import DependencyContainer
 import json
+from lib.Event import Event
 
+logger = DependencyContainer.get_logger(__name__)
 
 class DataService():
     def __init__(self) -> None:
         pass
-
    
     @cherrypy.expose
     def getUpdate(self, _=None):
         cherrypy.response.headers["Content-Type"] = "text/event-stream;charset=utf-8"
         cherrypy.response.headers['Cache-Control'] = 'no-cache'
 
-        def content(event:any):
-            print(f"New event '{type(event).__name__}'")
-            eventDict = event.to_dict()
-            #Inject the data type, so the client knows what it is.
-            eventDict["dataType"] = type(event).__name__
+        def content(event:Event):
+            logger.debug(f"New event '{event.dataType}'")
+            eventDict = event.to_dict()            
             data = 'retry: 200\ndata: ' + json.dumps(eventDict) +  '\n\n'
-            print(data)
+            logger.debug(data)
             return data
        
         return DependencyContainer.serverSentEvents.getEvents(content)

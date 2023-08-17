@@ -11,6 +11,8 @@ class ServerSentEvents:
 
     def raiseEvent(self, event:Event):
         if(not isinstance(event, TimerEvent)):
+            #set the full name of the data type
+            event.dataType = type(event).__name__
             self._queue.put(event)
 
     def getEvents(self, caller:Callable):

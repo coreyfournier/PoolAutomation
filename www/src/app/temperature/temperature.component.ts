@@ -36,13 +36,11 @@ export class TemperatureComponent {
         var sensorCopy = this.sensors.map(x=> x);
         
         for(var i = 0; i< sensorCopy.length; i++)
-        {
-            var data:TemperatureChangeEvent = new TemperatureChangeEvent(d.dataParsed);
-            if(sensorCopy[i].id == data.id)
-            {
-              
-              console.log("Changing "+ data.id + " " + data.name + " from " + sensorCopy[i].temp + " to " + data.temp);
-              sensorCopy[i].temp = data.temp;
+        {            
+            if(sensorCopy[i].id == d.data.id)
+            {              
+              console.log("Changing "+ d.data.id + " " + d.data.name + " from " + sensorCopy[i].temp + " to " + d.data.temp);
+              sensorCopy[i].temp = d.data.temp;
             }
         }
         console.log("resetting array");

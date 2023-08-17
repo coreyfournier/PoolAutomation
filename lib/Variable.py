@@ -141,10 +141,13 @@ class Variable(JSONWizard):
 
 @dataclass
 class VariableChangeEvent(Event):
-    variable:Variable
+    data:Variable = None
 
     def to_dict(self):
-        return self.variable.to_dict()
+        return {
+            "data":  self.data.to_dict(),
+            "dataType": self.dataType
+        }
     
 @dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass

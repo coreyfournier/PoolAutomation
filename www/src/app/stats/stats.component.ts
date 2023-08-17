@@ -1,5 +1,5 @@
 import { Observable, Subscription } from 'rxjs';
-import { Component, AfterViewInit, OnInit, ViewChild, Input  } from '@angular/core';
+import { Component, AfterViewInit, OnInit, ViewChild, Input, NgZone  } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
@@ -43,7 +43,7 @@ export class StatsComponent {
     start : new FormControl(new Date(new Date()).toISOString().slice(0, -1))
   });
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient, public zone: NgZone) { 
     this.chartOptions = {
       chart: {
         width:'100%',

@@ -1,6 +1,10 @@
 from dataclasses import dataclass
-from lib.Action import Action
 
 @dataclass
 class Event:
-    action:Action
+    def __init__(self) -> None:
+        pass
+    dataType:str = ""
+
+    def to_dict():
+        pass

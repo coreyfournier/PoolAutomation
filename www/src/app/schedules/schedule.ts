@@ -7,21 +7,28 @@ export interface ScheduleInfo {
     name: string;
   }
 
-  export interface Schedule {
-    id: number;
-    name: string;
-    isActive:boolean;
-    isRunning:boolean;
-    duration:number;
-    scheduleStart:Date;
-    scheduleEnd:Date;
-    pumps:Pump[];
+  export class Schedule {
+    id: number = 0;
+    name: string = '';
+    isActive:boolean = false;
+    isRunning:boolean = false;
+    duration:number = 0;
+    scheduleStart:Date = new Date();
+    scheduleEnd:Date = new Date();
+    pumps:Pump[] = [];    
   }
 
-  export interface Pump
+  export class Pump
   {
     id: number;
     name: string;
     speedName:string;
     displayName:string;
+
+    constructor(jsonParsed:any){
+      this.id = jsonParsed.id;
+      this.name = jsonParsed.name;
+      this.speedName = jsonParsed.speedName;
+      this.displayName = jsonParsed.displayName;
+    }
   }

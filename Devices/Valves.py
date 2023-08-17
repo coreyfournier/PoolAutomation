@@ -12,10 +12,13 @@ import dataclasses
 
 @dataclass
 class ValveChangeEvent(Event):
-    valve:Valve
+    data:Valve = None
 
     def to_dict(self):
-        return self.valve.to_dict()
+        return {
+            "data":  self.data.to_dict(),
+            "dataType": self.dataType
+        }
 
 class Valves:
     def __init__(self, repo:ValveRepo) -> None:

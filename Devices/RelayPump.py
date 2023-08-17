@@ -35,7 +35,7 @@ class RelayPump(Pump):
             self.currentSpeed = speed
 
             if(DependencyContainer.actions != None):
-                DependencyContainer.actions.nofityListners(PumpChangeEvent(None,speed, currentSpeed, self))
+                DependencyContainer.actions.nofityListners(PumpChangeEvent(dataType=None, newSpeed=speed, oldSpeed=currentSpeed, data=self))
 
         else:
             raise Exception(f"No mapped speed for '{speed.name}'")         

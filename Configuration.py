@@ -132,7 +132,7 @@ def allChangeNotification(event:Event):
     DependencyContainer.serverSentEvents.raiseEvent(event)
 
     if(isinstance(event, OverrideChangeEvent)):
-        logger.debug(f"Action '{event.action.name}' changed to {event.action.overrideSchedule}")    
+        logger.debug(f"Action '{event.data.name}' changed to {event.data.overrideSchedule}")    
         logger.debug("Checking to see if the schedule needs to make changes")           
         DependencyContainer.schedules.checkSchedule()
     #log once every 5 minutes or when something changes that is not time and temp
@@ -190,13 +190,13 @@ def allChangeNotification(event:Event):
 
 def quickClean(event:Event):
     
-    if(isinstance(event, VariableChangeEvent) and event.variable.name in ["quick-clean-expires-on", "quick-clean-expires-in-hours", "quick-clean-on"]):
+    if(isinstance(event, VariableChangeEvent) and event.data.name in ["quick-clean-expires-on", "quick-clean-expires-in-hours", "quick-clean-on"]):
         
         #Update the date and time it expires if this changed
-        if(event.variable.name == "quick-clean-expires-in-hours"):
-            if(event.variable.value > 0):
+        if(event.data.name == "quick-clean-expires-in-hours"):
+            if(event.data.value > 0):
                 DependencyContainer.variables.get("quick-clean-expires-on").hasExpired = False
-                DependencyContainer.variables.get("quick-clean-expires-on").value = (datetime.datetime.now() + timedelta(hours=event.variable.value)).isoformat()
+                DependencyContainer.variables.get("quick-clean-expires-on").value = (datetime.datetime.now() + timedelta(hours=event.data.value)).isoformat()
                 DependencyContainer.variables.get("quick-clean-on").value = True
                 event.action.overrideSchedule = True
                 DependencyContainer.pumps.get("main").on(Speed.SPEED_1)
@@ -205,7 +205,7 @@ def quickClean(event:Event):
                 DependencyContainer.variables.get("quick-clean-on").value = False
                 turnOffPumpIfNoActiveSchedule(DependencyContainer.pumps.get("main"))
 
-        elif(event.variable.name == "quick-clean-expires-on" and event.variable.hasExpired):
+        elif(event.data.name == "quick-clean-expires-on" and event.data.hasExpired):
             event.action.overrideSchedule = False
             DependencyContainer.variables.get("quick-clean-on").value = False
             turnOffPumpIfNoActiveSchedule(DependencyContainer.pumps.get("main"))
@@ -218,7 +218,7 @@ def evaluateFreezePrevention(event:Event):
         
         #TODO: this needs to be made into a configuration. Not sure how to architect it yet.
         freezePreventionTemp = DependencyContainer.variables.get("freeze-prevention-temperature").value
-        if("ambient" in event.device.name.lower() and event.device.getLast() <= freezePreventionTemp):        
+        if("ambient" in event.data.name.lower() and event.data.getLast() <= freezePreventionTemp):        
             isFreezePreventionEnabled = DependencyContainer.variables.get("freeze-prevention-enabled").value
             if(isFreezePreventionEnabled):
                 logger.info(f"Temp has reached freezing... Need to turn on pump to prevent freezing")
@@ -236,8 +236,8 @@ def evaluateFreezePrevention(event:Event):
 def evaluateSolarStatus(event):
     action = event.action
     shouldCheck = \
-        (isinstance(event, TemperatureChangeEvent) and event.device.name in ["roof","solar-heat", "pool-temp"]) or  \
-        (isinstance(event, VariableChangeEvent) and event.variable.name in ["solar-min-roof-diff", "solar-heat-temperature", "solar-heat-enabled"])
+        (isinstance(event, TemperatureChangeEvent) and event.data.name in ["roof","solar-heat", "pool-temp"]) or  \
+        (isinstance(event, VariableChangeEvent) and event.data.name in ["solar-min-roof-diff", "solar-heat-temperature", "solar-heat-enabled"])
     
     if(shouldCheck):
         solarSetTemp = DependencyContainer.variables.get("solar-heat-temperature").value
@@ -318,8 +318,8 @@ def evaluateSolarStatus(event):
 def slideStatusChanged(event:Event):    
 #variable:Variable, oldValue:any, action:Action
     if(isinstance(event, VariableChangeEvent)):
-        if(event.variable.name in ["slide-on"]):
-            if(event.variable.value):
+        if(event.data.name in ["slide-on"]):
+            if(event.data.value):
                 event.action.overrideSchedule = True
                 logger.info(f"Slide turning on")
                 #I know the first pump is main
