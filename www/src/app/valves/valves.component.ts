@@ -1,8 +1,9 @@
-import { Observable } from 'rxjs';
-import { Component, AfterViewInit, OnInit } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
+import { Component, AfterViewInit, OnInit, Input } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {Valve} from './valve';
 import { environment } from 'src/environments/environment';
+import { EventInfo, ScheduleChangeEvent } from '../app.events';
 declare var $:any;
 
 @Component({
@@ -12,6 +13,8 @@ declare var $:any;
 })
 
 export class ValvesComponent implements OnInit {
+  private eventsSubscription!: Subscription;
+  @Input() events!: Observable<EventInfo>;
 
   constructor(private http: HttpClient) { 
 
@@ -32,6 +35,18 @@ export class ValvesComponent implements OnInit {
 
     ngOnInit(): void {
       this.getValves().subscribe(p=> this.valves = p);
+
+   
+
+      this.eventsSubscription = this.events.subscribe((d) => {
+        if(d.dataType == "ValveChangeEvent")
+        {
+          console.log(JSON.stringify(d.data));
+          console.log(d.dataType);
+          var valveChanged = this.valves.filter((element, index, array)=> element.id == d.data.id);
+          valveChanged[0].isOn = d.data.isOn;          
+        }
+        });
     }
 
     getValves():Observable<Valve[]>{

@@ -30,7 +30,7 @@
     </div>
     <div class="row">
         <div class="col-sm-6">
-            <app-valves></app-valves>
+            <app-valves  [events]="eventsSubject.asObservable()"></app-valves>
         </div>
     </div>
 </div>

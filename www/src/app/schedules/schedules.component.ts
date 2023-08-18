@@ -27,8 +27,7 @@ export class SchedulesComponent {
   private scheduleUrl = environment.apiUrl + 'schedule/schedules';  // URL to web api
   datepipe: DatePipe = new DatePipe('en-US');
   timeFormat:string = 'hh:mm a';
-  
-    
+   
 
   ngOnInit(): void {
     this.getSchedules().subscribe(s=> this.scheduleInfo = s);
@@ -73,8 +72,7 @@ export class SchedulesComponent {
         var copy = this.scheduleInfo;
 
         this.zone.run(() => this.scheduleInfo = copy);
-      }
-      
+      }      
     });
   }
 

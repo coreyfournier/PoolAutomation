@@ -13,7 +13,7 @@ export class EventInfo{
       if(dataParsed.dataType == "TemperatureChangeEvent")
         this.data = dataParsed.data as TemperatureChangeEvent;
       else if(dataParsed.dataType == "ValveChangeEvent")
-        this.data = dataParsed as ValveChangeEvent;
+        this.data = dataParsed.data as ValveChangeEvent;
       else if(dataParsed.dataType == "PumpChangeEvent")
         this.data = dataParsed.data as PumpChangeEvent;
       else if(dataParsed.dataType == "LightChangeEvent")
