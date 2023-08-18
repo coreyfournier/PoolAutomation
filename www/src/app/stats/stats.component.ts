@@ -82,8 +82,9 @@ export class StatsComponent {
   }
 
   getChartData(options:any, now:Date):Observable<any>{
-    var startDate = this.datepipe.transform(now,"yyyy-MM-dd");
-    var endDate = this.datepipe.transform(now.setDate(now.getDate() + 1),"yyyy-MM-dd");
+    var nowCopy = new Date(now.valueOf())
+    var startDate = this.datepipe.transform(nowCopy, "yyyy-MM-dd");
+    var endDate = this.datepipe.transform(nowCopy.setDate(nowCopy.getDate() + 1), "yyyy-MM-dd");
     var statusUrl = environment.apiUrl + "data/tempStats?query=CreatedDate ge " +  startDate + "T01:01:01 and CreatedDate lt " + endDate;
     const req = this.http.get<any>(statusUrl);
 
