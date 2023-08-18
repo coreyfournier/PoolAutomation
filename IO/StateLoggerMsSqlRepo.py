@@ -296,4 +296,4 @@ class StateLoggerMsSqlRepo():
 
         visitor = AstToSqlVisitor()
         #I have no idea why it does this
-        return visitor.visit(ast).replace(" DATE ", "")
+        return visitor.visit(ast).replace(" DATE ", "").replace(" TIMESTAMP ","")
