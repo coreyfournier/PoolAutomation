@@ -182,7 +182,7 @@ class StateLoggerMsSqlRepo():
                     Pressure4,
                     datetime.datetime.now()
                     ]
-                logger.debug(statement)
+                
                 result = cursor.execute(statement, data)
 
     def query(self, where:str, columns:"list[str]") -> list:

@@ -24,6 +24,30 @@ _nameToLevel = {
     'DEBUG': logging.DEBUG,
     'NOTSET': logging.NOTSET,
 }
+_log_format = '%(asctime)s %(levelname)s: [%(name)s.%(funcName)s] %(message)s'
+_date_format = '%Y-%m-%d %H:%M:%S'
+_loggersToWarn = ['pytds.tds.', 'cherrypy.','pytds.tds.submit_rpc','pytds.tds.parse_prelogin','pytds._connect','pytds.tds.process_env_chg']
+
+
+if log_to_file == None:
+    logging.basicConfig(
+        level = log_level, 
+        format = _log_format,
+        datefmt = _date_format,
+        force=True)
+else:
+    logging.basicConfig(
+        filename = log_to_file,
+        #new file for each logger created
+        filemode='w',
+        level = log_level, 
+        format = _log_format,
+        datefmt = _date_format,
+        force=True)
+
+for logger_name in _loggersToWarn:
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.WARN)
 
 def get_logger(logger_name:str) -> logging.Logger:
     """Gets a universal logger specific to the caller
@@ -41,31 +65,10 @@ def get_logger(logger_name:str) -> logging.Logger:
         log_level = logging.DEBUG
     elif 'LOG_LEVEL' in os.environ:
         log_level = _nameToLevel[os.environ['LOG_LEVEL']]
-
-    log_format = '%(asctime)s %(levelname)s: [%(name)s.%(funcName)s] %(message)s'
-    date_format = '%Y-%m-%d %H:%M:%S'
-    
+   
     logger = logging.getLogger(f'PoolAutomation.{logger_name}')    
     logger.setLevel(log_level)
-    #limiting what is sent out for cherrypy
-    cherrypyLogger = logging.getLogger('cherrypy.')
-    cherrypyLogger.setLevel(logging.WARN)
-
-    if log_to_file == None:
-        logging.basicConfig(
-            level = log_level, 
-            format = log_format,
-            datefmt = date_format,
-            force=True)
-    else:
-        logging.basicConfig(
-            filename = log_to_file,
-            #new file for each logger created
-            filemode='w',
-            level = log_level, 
-            format = log_format,
-            datefmt = date_format,
-            force=True)
+   
     return logger
 
 #from Lights.GloBrite import GloBrite 
@@ -80,6 +83,8 @@ from Devices.Lights import Lights
 from Devices.TemperatureSensors import TemperatureSensors
 from IO.StateLoggerDuckDbRepo import StateLoggerDuckDbRepo
 from IO.SeverSentEvents import *
+
+
 
 #Global event handler to broker events for SSE
 serverSentEvents:ServerSentEvents = ServerSentEvents()
