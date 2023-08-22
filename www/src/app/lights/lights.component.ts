@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, Input } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Scene } from './scene';
 import { Light } from './light';
+import { EventInfo, LightChangeEvent } from '../app.events';
 
 @Component({
   selector: 'app-lights',
@@ -12,19 +13,27 @@ import { Light } from './light';
 })
 
 export class LightsComponent {
-  constructor(private http: HttpClient) { 
-
-  } 
-  //'/light/change?name='+name+'&sceneIndex=' + selectedValue
-  //'/light/off?name=' + name,
+  private eventsSubscription!: Subscription;
+  @Input() events!: Observable<EventInfo>;
   private lightUrl = environment.apiUrl + "light/get";
   private lightOffUrl = environment.apiUrl + "light/off";
   private lightSceneChangeUrl = environment.apiUrl + "light/change";
-
   lights:Light[] = []
+
+  constructor(private http: HttpClient) { 
+
+  }   
+  
 
   ngOnInit(): void {
     this.getLights().subscribe(l=> this.lights = l);
+
+    this.eventsSubscription = this.events.subscribe((d) => {
+      if(d.dataType == "LightChangeEvent")
+      {
+        console.log(`Event=${d.dataType}`);
+      }
+    });
   }
 
   getLights():Observable<Light[]>{

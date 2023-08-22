@@ -15,10 +15,7 @@ import { EventInfo, ScheduleChangeEvent } from '../app.events';
 export class SchedulesComponent {
   private eventsSubscription!: Subscription;
   @Input() events!: Observable<EventInfo>;
-  constructor(private http: HttpClient, public zone: NgZone) { 
-
-  }  
-
+  
   scheduleInfo:ScheduleInfo = {
     schedules:[],
     overrides:[]
@@ -27,7 +24,10 @@ export class SchedulesComponent {
   private scheduleUrl = environment.apiUrl + 'schedule/schedules';  // URL to web api
   datepipe: DatePipe = new DatePipe('en-US');
   timeFormat:string = 'hh:mm a';
-   
+
+  constructor(private http: HttpClient, public zone: NgZone) { 
+
+  }     
 
   ngOnInit(): void {
     this.getSchedules().subscribe(s=> this.scheduleInfo = s);

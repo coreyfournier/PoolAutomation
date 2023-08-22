@@ -15,22 +15,22 @@
     </div>
     <div class="row">
         <div class="col-sm-6">
-            <app-variable-groups></app-variable-groups>
+            <app-variable-groups [events]="eventsSubject.asObservable()"></app-variable-groups>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-6">
-            <app-lights></app-lights>
+            <app-lights [events]="eventsSubject.asObservable()"></app-lights>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-6">
-            <app-pumps></app-pumps>
+            <app-pumps [events]="eventsSubject.asObservable()"></app-pumps>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-6">
-            <app-valves  [events]="eventsSubject.asObservable()"></app-valves>
+            <app-valves [events]="eventsSubject.asObservable()"></app-valves>
         </div>
     </div>
 </div>

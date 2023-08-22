@@ -1,9 +1,10 @@
-import { Observable } from 'rxjs';
-import { Component } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
+import { Component, Input } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {VariableGroup} from './variableGroup'
 import {Variable} from './variableGroup';
 import { environment } from 'src/environments/environment';
+import { EventInfo, VariableChangeEvent } from '../app.events';
 
 declare var $:any;
 
@@ -14,17 +15,25 @@ declare var $:any;
 })
 
 export class VariableGroupsComponent {
-  constructor(
-    private http: HttpClient
-    ) { } 
-  
+  private eventsSubscription!: Subscription;
+  @Input() events!: Observable<EventInfo>;
   variableGroups:VariableGroup[] = []
-
   private variableGroupUrl = environment.apiUrl + 'variable/UiVariables';  // URL to web api
   private changeVariableUrl = environment.apiUrl + "variable/change";
 
+  constructor(private http: HttpClient) { 
+
+  }   
+
   ngOnInit(): void {
     this.getVariableGroups().subscribe(vg=> this.variableGroups = vg);
+
+    this.eventsSubscription = this.events.subscribe((d) => {
+      if(d.dataType == "VariableChangeEvent")
+      {
+        console.log(`Variable event=${d.dataType}`);
+      }
+    });
   }
 
   ngAfterContentChecked() {      

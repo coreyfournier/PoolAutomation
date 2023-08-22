@@ -69,7 +69,10 @@ class GloBrite(Light):
 
 			#Always end with on
 			logger.debug(f'on')
-			self.controller.on()	
+			self.controller.on()
+
+			if(DependencyContainer.actions != None):
+				DependencyContainer.actions.nofityListners(LightChangeEvent(dataType=None, data=self))	
 	
 
 	#turns the pin off
