@@ -4,7 +4,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {Valve} from './valve';
 import { environment } from 'src/environments/environment';
 import { EventInfo, ScheduleChangeEvent } from '../app.events';
-declare var $:any;
 
 @Component({
   selector: 'app-valves',

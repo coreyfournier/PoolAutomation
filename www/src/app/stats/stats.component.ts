@@ -15,8 +15,6 @@ import {FormGroup, FormControl} from '@angular/forms';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { EventInfo } from '../app.events';
 
-declare var $:any;
-
 export type ChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;

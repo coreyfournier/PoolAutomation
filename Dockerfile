@@ -1,15 +1,18 @@
 FROM node:20.5-slim AS NODE_BASE
-#Angular project
-COPY www/ /app/www/
+#Only copy over the packages so we don't change the layer unless the packages change.
+COPY www/package-lock.json /app/www/package-lock.json
+COPY www/package.json /app/www/package.json
 WORKDIR /app/www
 #Disable the progress bar to hopefully decrease build times
 RUN npm set progress=false
 RUN npm install -g modclean
 RUN npm install-clean
-RUN npm run build --prod
 #Try to reduce the size of the node modules
-RUN modclean -n default:caution -r
+RUN modclean -n default:safe -r
 
+#Now build the application
+COPY www/ /app/www/
+RUN npm run build --prod
 
 FROM arm32v7/python:3.10.10-slim AS PYTHON_BASE
 WORKDIR /app/

@@ -6,8 +6,6 @@ import {Variable} from './variableGroup';
 import { environment } from 'src/environments/environment';
 import { EventInfo, VariableChangeEvent } from '../app.events';
 
-declare var $:any;
-
 @Component({
   selector: 'app-variable-groups',
   templateUrl: './variable-groups.component.html',
