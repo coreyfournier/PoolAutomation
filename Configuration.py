@@ -87,15 +87,17 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
         from Devices.Display import DisplayStub        
         display = DisplayStub(os.path.join(os.getcwd(), "display.png"), fontDirectory)
     else:
-        #import board
-        #import busio
-        #import adafruit_ssd1306
-        #from Devices.Display import DisplaySSD1306
-        #i2c = busio.I2C(board.SCL, board.SDA)
-        #oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c, addr=0x3c)
-        #display = DisplaySSD1306(oled, fontDirectory)
-        from Devices.Display import DisplayStub
-        display = DisplayStub(os.path.join(os.getcwd(), "display.png"), fontDirectory)
+        logger.info("Display setup")
+        try:
+            import board
+            import busio
+            import adafruit_ssd1306
+            from Devices.Display import DisplaySSD1306
+            i2c = busio.I2C(board.SCL, board.SDA)
+            oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c, addr=0x3c)
+            display = DisplaySSD1306(oled, fontDirectory)
+        except Exception as ex:
+            logger.error(f"Failed when setting up the display: {ex}")        
 
     logger.debug("Loading actions")
     DependencyContainer.actions = Actions([
@@ -135,6 +137,7 @@ def allChangeNotification(event:Event):
         logger.debug(f"Action '{event.data.name}' changed to {event.data.overrideSchedule}")    
         logger.debug("Checking to see if the schedule needs to make changes")           
         DependencyContainer.schedules.checkSchedule()
+
     #log once every 5 minutes or when something changes that is not time and temp
     if((isinstance(event, TimerEvent) and event.secondsPassedTheHour % 300 == 0) or (not isinstance(event, TimerEvent) and not isinstance(event, TemperatureChangeEvent))):
         if(DependencyContainer.stateLogger != None):
@@ -153,40 +156,41 @@ def allChangeNotification(event:Event):
                 ActionActive3 = DependencyContainer.actions.get()[2].overrideSchedule,
                 ActionActive4 = DependencyContainer.actions.get()[3].overrideSchedule
             )
-        
-        displayRotation = 1 + displayRotation
-        #Using the temp ensures the display only changs every 30 seconds
-        if(displayRotation == 1):
-            toDisplay = ["Temperatures"]
-            temps = [f"{(device.shortDisplayName + ':').ljust(13)}{round(device.get(),1)}{DependencyContainer.temperatureUnit}" for device in DependencyContainer.temperatureDevices.getAll()]
-            toDisplay+= temps    
-            display.write(toDisplay)            
-        elif(displayRotation == 2):
-            toDisplay = ["Schedule Running"]
-            runningSchedules = DependencyContainer.schedules.getRunning()
-            if(len(runningSchedules) > 0):
-                toDisplay.append(f"{runningSchedules[0].startTime.strftime(DependencyContainer.short_time_format)}-{runningSchedules[0].endTime.strftime(DependencyContainer.short_time_format)}")
-            else:
-                toDisplay.append(f"No schedules running")
-            
-            if(DependencyContainer.actions.hasOverrides()):
-                toDisplay.append("Overrides:")
-                toDisplay.append(", ".join([x.displayName for x in DependencyContainer.actions.getScheduleOverrides()]))
-            else:
-                toDisplay.append("No schedule overrides")
 
-            display.write(toDisplay)
-        elif(displayRotation == 3):
-            toDisplay = ["Pumps"]
-            for pump in DependencyContainer.pumps.getAll():
-                toDisplay.append(f"{pump.displayName}: {pump.currentSpeed.name}")
-            display.write(toDisplay)
-        elif(displayRotation == 4):            
-            displayRotation = 0
-            toDisplay = ["Valves"]
-            for valve in DependencyContainer.valves.getAll():
-                toDisplay.append(f"{valve.name}: {'On' if valve.isOn else 'Off'}")
-            display.write(toDisplay)
+        if(display != None):
+            displayRotation = 1 + displayRotation
+            #Using the temp ensures the display only changs every 30 seconds
+            if(displayRotation == 1):
+                toDisplay = ["Temperatures"]
+                temps = [f"{(device.shortDisplayName + ':').ljust(13)}{round(device.get(),1)}{DependencyContainer.temperatureUnit}" for device in DependencyContainer.temperatureDevices.getAll()]
+                toDisplay+= temps    
+                display.write(toDisplay)            
+            elif(displayRotation == 2):
+                toDisplay = ["Schedule Running"]
+                runningSchedules = DependencyContainer.schedules.getRunning()
+                if(len(runningSchedules) > 0):
+                    toDisplay.append(f"{runningSchedules[0].startTime.strftime(DependencyContainer.short_time_format)}-{runningSchedules[0].endTime.strftime(DependencyContainer.short_time_format)}")
+                else:
+                    toDisplay.append(f"No schedules running")
+                
+                if(DependencyContainer.actions.hasOverrides()):
+                    toDisplay.append("Overrides:")
+                    toDisplay.append(", ".join([x.displayName for x in DependencyContainer.actions.getScheduleOverrides()]))
+                else:
+                    toDisplay.append("No schedule overrides")
+
+                display.write(toDisplay)
+            elif(displayRotation == 3):
+                toDisplay = ["Pumps"]
+                for pump in DependencyContainer.pumps.getAll():
+                    toDisplay.append(f"{pump.displayName}: {pump.currentSpeed.name}")
+                display.write(toDisplay)
+            elif(displayRotation == 4):            
+                displayRotation = 0
+                toDisplay = ["Valves"]
+                for valve in DependencyContainer.valves.getAll():
+                    toDisplay.append(f"{valve.name}: {'On' if valve.isOn else 'Off'}")
+                display.write(toDisplay)
 
 def quickClean(event:Event):
     

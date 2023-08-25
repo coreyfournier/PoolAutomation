@@ -52,7 +52,7 @@ class RelayPump(Pump):
         self.currentSpeed = Speed.OFF
 
         if(DependencyContainer.actions != None):
-            DependencyContainer.actions.nofityListners(PumpChangeEvent(None, Speed.OFF, currentSpeed, self))
+            DependencyContainer.actions.nofityListners(PumpChangeEvent(dataType=None, newSpeed=Speed.OFF, oldSpeed=currentSpeed, data=self))
     
     def speeds(self) ->"list[SpeedDisplay]":
         areAnyOn:bool = False
