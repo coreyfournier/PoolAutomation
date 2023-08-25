@@ -156,41 +156,41 @@ def allChangeNotification(event:Event):
                 ActionActive3 = DependencyContainer.actions.get()[2].overrideSchedule,
                 ActionActive4 = DependencyContainer.actions.get()[3].overrideSchedule
             )
+    #update the display every 5 seconds
+    if(isinstance(event, TimerEvent) and display != None):
+        displayRotation = 1 + displayRotation
+        #Using the temp ensures the display only changs every 30 seconds
+        if(displayRotation == 1):
+            toDisplay = ["Temperatures"]
+            temps = [f"{(device.shortDisplayName + ':').ljust(13)}{round(device.get(),1)}{DependencyContainer.temperatureUnit}" for device in DependencyContainer.temperatureDevices.getAll()]
+            toDisplay+= temps    
+            display.write(toDisplay)            
+        elif(displayRotation == 2):
+            toDisplay = ["Schedule Running"]
+            runningSchedules = DependencyContainer.schedules.getRunning()
+            if(len(runningSchedules) > 0):
+                toDisplay.append(f"{runningSchedules[0].startTime.strftime(DependencyContainer.short_time_format)}-{runningSchedules[0].endTime.strftime(DependencyContainer.short_time_format)}")
+            else:
+                toDisplay.append(f"No schedules running")
+            
+            if(DependencyContainer.actions.hasOverrides()):
+                toDisplay.append("Overrides:")
+                toDisplay.append(", ".join([x.displayName for x in DependencyContainer.actions.getScheduleOverrides()]))
+            else:
+                toDisplay.append("No schedule overrides")
 
-        if(display != None):
-            displayRotation = 1 + displayRotation
-            #Using the temp ensures the display only changs every 30 seconds
-            if(displayRotation == 1):
-                toDisplay = ["Temperatures"]
-                temps = [f"{(device.shortDisplayName + ':').ljust(13)}{round(device.get(),1)}{DependencyContainer.temperatureUnit}" for device in DependencyContainer.temperatureDevices.getAll()]
-                toDisplay+= temps    
-                display.write(toDisplay)            
-            elif(displayRotation == 2):
-                toDisplay = ["Schedule Running"]
-                runningSchedules = DependencyContainer.schedules.getRunning()
-                if(len(runningSchedules) > 0):
-                    toDisplay.append(f"{runningSchedules[0].startTime.strftime(DependencyContainer.short_time_format)}-{runningSchedules[0].endTime.strftime(DependencyContainer.short_time_format)}")
-                else:
-                    toDisplay.append(f"No schedules running")
-                
-                if(DependencyContainer.actions.hasOverrides()):
-                    toDisplay.append("Overrides:")
-                    toDisplay.append(", ".join([x.displayName for x in DependencyContainer.actions.getScheduleOverrides()]))
-                else:
-                    toDisplay.append("No schedule overrides")
-
-                display.write(toDisplay)
-            elif(displayRotation == 3):
-                toDisplay = ["Pumps"]
-                for pump in DependencyContainer.pumps.getAll():
-                    toDisplay.append(f"{pump.displayName}: {pump.currentSpeed.name}")
-                display.write(toDisplay)
-            elif(displayRotation == 4):            
-                displayRotation = 0
-                toDisplay = ["Valves"]
-                for valve in DependencyContainer.valves.getAll():
-                    toDisplay.append(f"{valve.name}: {'On' if valve.isOn else 'Off'}")
-                display.write(toDisplay)
+            display.write(toDisplay)
+        elif(displayRotation == 3):
+            toDisplay = ["Pumps"]
+            for pump in DependencyContainer.pumps.getAll():
+                toDisplay.append(f"{pump.displayName}: {pump.currentSpeed.name}")
+            display.write(toDisplay)
+        elif(displayRotation == 4):            
+            displayRotation = 0
+            toDisplay = ["Valves"]
+            for valve in DependencyContainer.valves.getAll():
+                toDisplay.append(f"{valve.name}: {'On' if valve.isOn else 'Off'}")
+            display.write(toDisplay)
 
 def quickClean(event:Event):
     
