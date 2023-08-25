@@ -37,15 +37,6 @@ RUN apt-get install libopenjp2-7 -y
 RUN apt-get install libtiff5 -y
 RUN apt-get install unzip
 
-# COPY requirements.txt /app/
-# RUN pip install --target=/packages -r /app/requirements.txt
-
-# FROM arm32v7/python:3.10.10-slim AS BASE
-# RUN pip install --upgrade pip setuptools wheel
-# COPY --from=PYTHON_BASE /packages /packages
-# ENV PYTHONPATH=/packages
-# ENV PATH="${PATH}:/packages"
-
 COPY requirements.txt /app/
 RUN pip install -r /app/requirements.txt
 
