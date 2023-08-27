@@ -63,10 +63,10 @@ class DataService():
                 allItems[name].append(item[idx]) 
 
                 if(data[-1] not in hours):
-                    hours.add(item[-1].strftime(DependencyContainer.hour_format))
+                    hours.add(item[-1])
 
         return {
-            "hours":sorted(list(hours)),
+            "hours":[x.strftime(DependencyContainer.hour_format) for x in sorted(list(hours))],
             "data" : [{"name": key, "data" : item} for key, item in allItems.items()]
             }
     
