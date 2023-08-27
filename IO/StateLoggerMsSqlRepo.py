@@ -218,7 +218,12 @@ class StateLoggerMsSqlRepo():
     def agg(self, where:str=None,columns:"list[str]" = None) -> list:
         with pytds.connect(self._server, self._databaseName, self._userName, self._userPassword, autocommit=True) as connection:
             with connection.cursor() as cursor:
-                query = f"""SELECT ROUND(AVG(temperature1),1) AS temperature1, ROUND(AVG(temperature2),1) AS temperature2, ROUND(AVG(temperature3),1) AS temperature3, ROUND(AVG(temperature4),1) AS temperature4, DATEPART(HOUR, CreatedDate) AS Hour 
+                query = f"""SELECT 
+                ROUND(AVG(temperature1),1) AS temperature1, 
+                ROUND(AVG(temperature2),1) AS temperature2, 
+                ROUND(AVG(temperature3),1) AS temperature3, 
+                ROUND(AVG(temperature4),1) AS temperature4, 
+                CAST(CAST(DATEPART(HOUR, CreatedDate) AS VARCHAR(2)) + ':00:00' AS TIME) AS [Time] 
                     FROM StateLogs 
                     WHERE {where}
                     GROUP BY DATEPART(HOUR, CreatedDate)

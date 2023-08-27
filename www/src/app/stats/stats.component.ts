@@ -14,6 +14,7 @@ import { DatePipe } from '@angular/common';
 import {FormGroup, FormControl} from '@angular/forms';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { EventInfo } from '../app.events';
+import * as ApexCharts from 'apexcharts';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -42,23 +43,32 @@ export class StatsComponent {
   });
 
   constructor(private http: HttpClient, public zone: NgZone) { 
-    this.chartOptions = {
+    this.chartOptions = this.getChart([], []);
+  }
+
+  getChart(categoryData:any, seriesData:any):any{
+    return {
       chart: {
         width:'100%',
         height:200,
         id: 'temperature-chart',                
-        type: 'line'
+        type: 'line',
+        zoom: {
+          enabled: false
+        }
       },
-      series: [],
+      series: seriesData,
       xaxis:{
-          type:"category",
-          tickAmount:'dataPoints',
-          title:{text:""},
-          categories:[]
+        categories: categoryData,
+        tickAmount: 1 ,
+        type:'category',
+        labels: {
+          show: true          
+        }
       },
       title:{text:"Avg Temperature by Hour"}
     };
-    
+
   }
   
   updateTemperatureChart(value:Date) : void{    
@@ -88,12 +98,22 @@ export class StatsComponent {
 
     req.subscribe(response=> {
       var list = [];
-      for(var d=0;d < response.data.length; d++)
-          list.push({name: response.data[d].name, data: response.data[d].data});
       
-        options.xaxis.categories= response.hours;
-        options.series = list;          
+      for(var d=0;d < response.data.length; d++)
+      {
+          list.push({name: response.data[d].name, data: response.data[d].data});     
+      }     
+      
+      options.series = list;       
+
+      ApexCharts.exec("temperature-chart", "updateOptions", {
+        xaxis: {
+          categories: response.hours
+        }
+      });
     });
+
+    //options.chart.updateOptions(options);
     return req; 
   } 
 }

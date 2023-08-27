@@ -12,7 +12,10 @@ log_to_file:str = None
 #f= fahrenheit c=celsius 
 temperatureUnit = "f"
 
+#format to show when it hours and minutes
 short_time_format = "%I:%M%p"
+#format to show for just an hour
+hour_format = "%I %p"
 
 _nameToLevel = {
     'CRITICAL': logging.CRITICAL,
