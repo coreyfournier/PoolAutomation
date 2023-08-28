@@ -66,6 +66,7 @@ class DataService():
                     hours.add(item[-1])
 
         return {
+            #sort the list by time, then convert it to the format to show the user.
             "hours":[x.strftime(DependencyContainer.hour_format) for x in sorted(list(hours))],
             "data" : [{"name": key, "data" : item} for key, item in allItems.items()]
             }
