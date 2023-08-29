@@ -3,9 +3,9 @@
         <h3 class="panel-title">Pump</h3>
     </div>
     <div class="panel-body" id="pumps">
-        <div class="panel-body" *ngFor="let pump of pumps">
-            <div>{{pump.displayName}}</div>
-            <select style="width: 250px;" (change)="speedChanged(pump, $event)">
+        <div class="panel-body form-group" *ngFor="let pump of pumps">
+            <label for="pump-{{pump.name}}">{{pump.displayName}}</label> 
+            <select (change)="speedChanged(pump, $event)" id="pump-{{pump.name}}" class="form-control">
                 <option *ngFor="let speed of pump.speeds" [selected]="speed.isActive == true" [value]="speed.name">{{speed.name}}</option>
             </select>
         </div>

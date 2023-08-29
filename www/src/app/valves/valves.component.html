@@ -3,14 +3,15 @@
         <h3 class="panel-title">Valves</h3>
     </div>
     <div class="panel-body" id="valves">
-        <div class="panel-body" *ngFor="let valve of valves">
-            <div></div>
-            {{valve.displayName}}
+        <div class="panel-body form-group" *ngFor="let valve of valves">
+            <label for="valve-{{valve.id}}">{{valve.displayName}}</label> 
+            
             <mat-slide-toggle 
                     id='valve-{{valve.id}}'
                     data-name='{{valve.name}}'
                     (toggleChange)="valveChanged(valve, $event)" 
-                    [(ngModel)]="valve.isOn">
+                    [(ngModel)]="valve.isOn"
+                    class="form-control">
                     {{valve.name}}
             </mat-slide-toggle>            
         </div>

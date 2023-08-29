@@ -1,21 +1,28 @@
 
-<div id="temperature-chart" >
-    <div [formGroup]="myGroup">
-        <mat-form-field class="example-full-width" appearance="outline">
-            <mat-label>Choose a date</mat-label>
-            <input matInput 
-                formControlName="start" 
-                (ngModelChange)="updateTemperatureChart($event)" 
-                [matDatepicker]="picker">
-            <mat-hint>MM/DD/YYYY</mat-hint>
-            <mat-datepicker #picker></mat-datepicker>
-            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-      </mat-form-field>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Stats</h3>
     </div>
-    <apx-chart    
-        [series]="chartOptions.series"
-        [chart]="chartOptions.chart"
-        [xaxis]="chartOptions.xaxis"
-        [title]="chartOptions.title"
-    ></apx-chart>
+    <div class="panel-body">
+        <div [formGroup]="myGroup">
+            <mat-form-field  appearance="outline">
+                <mat-label>Choose a date</mat-label>
+                <input matInput 
+                    formControlName="start" 
+                    (ngModelChange)="updateTemperatureChart($event)" 
+                    [matDatepicker]="picker">
+                <mat-datepicker #picker>Date</mat-datepicker>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          </mat-form-field>
+        </div>
+
+        <div id="temperature-chart" >            
+            <apx-chart    
+                [series]="chartOptions.series"
+                [chart]="chartOptions.chart"
+                [xaxis]="chartOptions.xaxis"
+                [title]="chartOptions.title"
+            ></apx-chart>
+        </div>
+    </div>
 </div>

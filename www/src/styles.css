@@ -89,3 +89,20 @@
   */
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+label
+{
+  display: block;
+  font-weight: 500;
+}
+.form-group
+{
+  margin-bottom: 0px;
+}
+.panel-body {
+  padding: 10px;
+}
+.form-group mat-slide-toggle {
+  border: 0px;
+  box-shadow:none;
+}

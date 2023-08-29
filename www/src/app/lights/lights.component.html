@@ -3,10 +3,10 @@
         <h3 class="panel-title">Light</h3>
     </div>
     <div class="panel-body" id="lights">
-        <div class="panel-body" *ngFor="let light of lights">
-            <p>Choose A Scene for {{light.name}}</p>
+        <div class="panel-body form-group" *ngFor="let light of lights">
+            <label for="light-scene-{{light.name}}">Choose A Scene for {{light.displayName}}</label> 
             
-            <select id="light-scene-{{light.name}}" style="width: 250px;" (change)="sceneChanged(light, $event)">
+            <select id="light-scene-{{light.name}}" (change)="sceneChanged(light, $event)" class="form-control">
                 <option value="-">-</option>>
                 <option value="off">Off</option>>
                 <option *ngFor="let scene of light.lightScenes" [value]="scene.name">{{scene.name}} - {{scene.description}}</option>
