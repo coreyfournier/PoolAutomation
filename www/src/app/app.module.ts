@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { TemperatureComponent } from './temperature/temperature.component';
 import { HttpClientModule } from '@angular/common/http';
 import { SchedulesComponent } from './schedules/schedules.component';
+import { ScheduleEditComponent } from './schedules/edit/edit.component';
 import { VariableGroupsComponent } from './variable-groups/variable-groups.component';
 import { LightsComponent } from './lights/lights.component';
 import { PumpsComponent } from './pumps/pumps.component';
@@ -27,7 +28,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     LightsComponent,
     PumpsComponent,
     ValvesComponent,
-    StatsComponent
+    StatsComponent,
+    ScheduleEditComponent
   ],
   imports: [
     HttpClientModule,

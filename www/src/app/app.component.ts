@@ -14,6 +14,7 @@ import { EventInfo } from './app.events';
 export class AppComponent {
   title = 'Pool Automation';
   eventsSubject: Subject<EventInfo> = new Subject<EventInfo>();
+  editSchedule: boolean = true;
   
 
   constructor(private _zone: NgZone, private http: HttpClient) {
