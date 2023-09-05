@@ -1,0 +1,35 @@
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6">
+            <app-schedules [events]="eventsSubject.asObservable()"></app-schedules>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <app-stats [events]="eventsSubject.asObservable()"></app-stats>
+        </div>
+    </div>
+    <div class="row">
+        <app-temperature [events]="eventsSubject.asObservable()"></app-temperature>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <app-variable-groups [events]="eventsSubject.asObservable()"></app-variable-groups>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <app-lights [events]="eventsSubject.asObservable()"></app-lights>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <app-pumps [events]="eventsSubject.asObservable()"></app-pumps>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <app-valves [events]="eventsSubject.asObservable()"></app-valves>
+        </div>
+    </div>
+</div>

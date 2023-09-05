@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ScheduleInfo } from './schedule';
 import { DatePipe } from '@angular/common';
 import { EventInfo, ScheduleChangeEvent } from '../app.events';
+import { ScheduleEditComponent } from './edit/edit.component';
 
 @Component({
   selector: 'app-schedules',
@@ -15,6 +16,7 @@ import { EventInfo, ScheduleChangeEvent } from '../app.events';
 export class SchedulesComponent {
   private eventsSubscription!: Subscription;
   @Input() events!: Observable<EventInfo>;
+  editSchedules:boolean = false
   
   scheduleInfo:ScheduleInfo = {
     schedules:[],
@@ -78,5 +80,10 @@ export class SchedulesComponent {
 
   getSchedules():Observable<ScheduleInfo>{
     return this.http.get<ScheduleInfo>(this.scheduleUrl);
+  }
+
+  showEditSchedules():void
+  {
+      this.editSchedules = true;
   }
 }

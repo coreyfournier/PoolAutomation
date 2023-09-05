@@ -106,3 +106,13 @@ label
   border: 0px;
   box-shadow:none;
 }
+
+.panel-title{
+  display: inline;
+
+}
+/*Moves the edit button to the right of the header*/
+.panel-heading input{
+  float:right;
+  margin-top: -7px;
+}

@@ -17,7 +17,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-
+import { AppRoutingModule } from './app-routing.module';
+import { IndexComponent } from './index/index.component'
 
 @NgModule({
   declarations: [
@@ -29,11 +30,13 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     PumpsComponent,
     ValvesComponent,
     StatsComponent,
-    ScheduleEditComponent
+    ScheduleEditComponent,
+    IndexComponent
   ],
   imports: [
     HttpClientModule,
     BrowserModule,
+    AppRoutingModule ,
     FormsModule,
     NgApexchartsModule,
     BrowserAnimationsModule,
