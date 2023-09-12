@@ -2,15 +2,14 @@
 <div class="add-lessons-form" [formGroup]="form">
     <ng-container formArrayName="lessons">
         <ng-container *ngFor="let lessonForm of lessons.controls; let i = index">
-            <div class="lesson-form-row" [formGroup]="lessonForm">
+            <div class="lesson-form-row">
                 <mat-form-field appearance="fill">
                     <input matInput
                            formControlName="title"
                            placeholder="Lesson title">
                 </mat-form-field>
                 <mat-form-field appearance="fill">
-                    <mat-select formControlName="level"
-                            placeholder="Lesson level">
+                    <mat-select formControlName="level" placeholder="Lesson level">
                         <mat-option value="beginner">Beginner</mat-option>
                         <mat-option value="intermediate">Intermediate</mat-option>
                         <mat-option value="advanced">Advanced</mat-option>
