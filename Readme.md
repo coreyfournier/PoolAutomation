@@ -1,15 +1,18 @@
 # Pool Automation
+UI is mobile first and API first implementation. The backend communicates via JSON services to the UI written in Angular.
 
-Custom schedules can be configured. You get feed back in which schedule is running and for how long. Actions can override the schedule at any time to prevent the pump or anything else from making changes.
+Custom schedules can be configured. You get feed back of which schedule is running and for how long. Actions can override the schedule at any time to prevent the pump or anything else from making changes.
 
 ![Alt text](assets/pool-automation-schedules.PNG "Pump Schedule")
+
+Temperature information is updated live using server sent events from the backend. If you implement logging of the temperature you can display the information over time from all of the sensors. 
+![Alt text](assets/pool-automation-stats.PNG "Stats")
 
 You can configure custom actions that listen for events to make decisions. Each UI component is a variable and built dynamically. Changing any value fires an event and any component can listen to the events to change the application flow.
 
 ![Alt text](assets/pool-automation-actions.PNG "Custom actions")
 
-If you need to override anything at any time you get access to the individual devices.
-
+If you need to override anything at any time you get access to the individual devices. This is helpful when backwashing or emptying the pump basket.
 ![Alt text](assets/pool-automation-device-control.PNG "Device Control")
 
 
