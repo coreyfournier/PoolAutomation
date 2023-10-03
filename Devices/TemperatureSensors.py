@@ -1,5 +1,5 @@
 from IO.TemperatureRepo import TemperatureRepo
-from Devices.Temperature import Temperature,TemperatureChangeEvent
+from Devices.Temperature import Temperature,TemperatureChangeEvent, TemperatureDevice
 import DependencyContainer
 
 class TemperatureSensors:
@@ -31,7 +31,7 @@ class TemperatureSensors:
     def getById(self, id:int) -> Temperature:
         return self._byId[id]
     
-    def getAll(self) -> "list[Temperature]":
+    def getAll(self) -> "list[TemperatureDevice]":
         """Gets all devices
 
         Returns:
