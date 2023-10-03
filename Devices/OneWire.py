@@ -68,11 +68,12 @@ class OneWire(Temperature):
         else:
             tempC = self.__read_temp(self.deviceId)
             self._tracked[self.deviceId] = tempC
-        
-        if(DependencyContainer.temperatureUnit == "c"):
-            return round(tempC, self._maxDigits)
-        else:
-            return self._celsiusToFahrenheit(tempC)
+            
+        return Temperature.getTemperatureToLocal(
+            tempC,
+            DependencyContainer.temperatureUnit,
+            self._maxDigits
+        )
     
     def __str__(self) -> str:
         return f"{self.name} - {self.get()}"

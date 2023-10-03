@@ -13,10 +13,11 @@ class TempStub(Temperature):
 
         self._tracked[self.deviceId] = temp
 
-        if(DependencyContainer.temperatureUnit == "c"):
-            return temp
-        else:
-            return self._celsiusToFahrenheit(temp)
+        return Temperature.getTemperatureToLocal(
+            temp,
+            DependencyContainer.temperatureUnit,
+            self._maxDigits
+        )
     
     def getAllDevices(self)-> "list[str]":
         """Gets all one wire temp devices

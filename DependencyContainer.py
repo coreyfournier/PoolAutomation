@@ -86,6 +86,7 @@ from Devices.Lights import Lights
 from Devices.TemperatureSensors import TemperatureSensors
 from IO.StateLoggerDuckDbRepo import StateLoggerDuckDbRepo
 from IO.SeverSentEvents import *
+from Devices.AtlasScientific import *
 
 
 
@@ -110,3 +111,5 @@ variables:Variables = None
 valves:Valves = None
 
 stateLogger:StateLoggerDuckDbRepo = None
+
+enviromentalSensor:AtlasScientific = None

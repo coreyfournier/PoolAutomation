@@ -24,6 +24,8 @@ from Devices.Temperature import *
 from datetime import timedelta
 from IO.GpioStub import GpioStub
 from Devices.Display import Display
+from Devices.AtlasScientific import *
+from IO.AtlasScientificStub import *
 
 logger = DependencyContainer.get_logger(__name__)
 display:Display = None
@@ -42,6 +44,11 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
         #GloBrite("main","Light", I2cController(7, relayAddress, i2cBus))
         GloBrite("main","Light", GpioController(GPIO,6, False))
     ])
+
+    if("ATLAS_SCIENTIFIC" not in os.environ or os.environ["ATLAS_SCIENTIFIC"] is None):
+        DependencyContainer.enviromentalSensor = AtlasScientificStub()
+    else:
+        DependencyContainer.enviromentalSensor = AtlasScientific(os.environ["ATLAS_SCIENTIFIC"])    
 
     logger.debug("Loading variables")
     DependencyContainer.variables = Variables(
@@ -141,6 +148,8 @@ def allChangeNotification(event:Event):
     #log once every 5 minutes or when something changes that is not time and temp
     if((isinstance(event, TimerEvent) and event.secondsPassedTheHour % 300 == 0) or (not isinstance(event, TimerEvent) and not isinstance(event, TemperatureChangeEvent))):
         if(DependencyContainer.stateLogger != None):
+            sensor = DependencyContainer.enviromentalSensor.getData()
+
             #Using the nameing convention where the Id number matches the number of the column. Temp sensor 1 matches temperature1
             DependencyContainer.stateLogger.add(
                 temperature1 = DependencyContainer.temperatureDevices.getById(1).getLast(),
@@ -154,7 +163,10 @@ def allChangeNotification(event:Event):
                 ActionActive1 = DependencyContainer.actions.get()[0].overrideSchedule,
                 ActionActive2 = DependencyContainer.actions.get()[1].overrideSchedule,
                 ActionActive3 = DependencyContainer.actions.get()[2].overrideSchedule,
-                ActionActive4 = DependencyContainer.actions.get()[3].overrideSchedule
+                ActionActive4 = DependencyContainer.actions.get()[3].overrideSchedule,
+                Orp1 = sensor["ORP"],
+                PH1 = sensor["PH"],
+                temperature5 =  sensor["RTD"]
             )
     #update the display every 5 seconds
     if(isinstance(event, TimerEvent) and display != None):

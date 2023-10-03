@@ -28,11 +28,8 @@ class Temperature(TemperatureDevice):
         Returns:
             float: temp in fahrenheit or celsius. This is set in the Dependency container.
         """
-        pass
-    
-    def _celsiusToFahrenheit(self, celsius:float) -> float:
-        return round(celsius * 9.0 / 5.0 + 32.0, self._maxDigits)
-    
+        pass    
+
     def getAllDevices(self)-> "list[str]":
         """Gets all devices for this type of temp sensor
 
@@ -47,13 +44,24 @@ class Temperature(TemperatureDevice):
         Returns:
             float: _description_
         """
-        if(self.deviceId in self._tracked):            
-            if(DependencyContainer.temperatureUnit == "c"):
-                return self._tracked[self.deviceId]
-            else:
-                return self._celsiusToFahrenheit(self._tracked[self.deviceId])
+        if(self.deviceId in self._tracked):   
+            return Temperature.getTemperatureToLocal(
+                self._tracked[self.deviceId],
+                DependencyContainer.temperatureUnit,
+                self._maxDigits
+            )                    
         else:
             return None
+    
+    @staticmethod
+    def getTemperatureToLocal(celsius:float, unit:str, maxDigits:int) -> float:
+        if(celsius == None):
+            return None        
+        if(unit == "c"):
+           return round(celsius, maxDigits)           
+        else:
+            return round(celsius * 9.0 / 5.0 + 32.0, maxDigits)           
+        
         
     def __str__(self) -> str:
         return f"{self.name} - {self.get()}"

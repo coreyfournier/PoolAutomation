@@ -95,10 +95,10 @@ class StateLoggerMsSqlRepo():
                         Orp2 decimal(6,2) NULL,
                         PH1 decimal(6,2) NULL,
                         PH2 decimal(6,2) NULL,
-                        Pressure1 decimal(4,2) NULL,
-                        Pressure2 decimal(4,2) NULL,
-                        Pressure3 decimal(4,2) NULL,
-                        Pressure4 decimal(4,2) NULL,
+                        Pressure1 decimal(6,2) NULL,
+                        Pressure2 decimal(6,2) NULL,
+                        Pressure3 decimal(6,2) NULL,
+                        Pressure4 decimal(6,2) NULL,
                         CreatedDate datetime2 
                         )
                         CREATE CLUSTERED COLUMNSTORE INDEX [CCI-StateLogs] ON StateLogs

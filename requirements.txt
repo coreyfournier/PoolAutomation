@@ -12,3 +12,4 @@ odata-query==0.8.0
 smbus2==0.4.2 ; sys_platform == "linux" and platform_machine == "armv7l"
 adafruit-circuitpython-ssd1306==2.12.12 ; sys_platform == "linux" and platform_machine == "armv7l"
 RPi.GPIO==0.7.1 ; sys_platform == "linux" and platform_machine == "armv7l"
+requests==2.28.1
