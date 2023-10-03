@@ -8,6 +8,7 @@ from IO.GpioController import GpioController
 from IO.I2cController import I2cController
 from cherrypy.process.plugins import Daemonizer
 from Services.LightService import LightService
+from Services.PoolChemistry import PoolChemistryService
 from Services.PumpService import PumpService
 from Services.ScheduleService import ScheduleService
 from Services.TemperatureService import TemperatureService
@@ -154,6 +155,7 @@ if __name__ == '__main__':
     cherrypy.tree.mount(VariableService(), "/variable", config=app_conf)
     cherrypy.tree.mount(ValveService(), "/valve", config=app_conf)
     cherrypy.tree.mount(DataService(), "/data", config=app_conf)
+    cherrypy.tree.mount(PoolChemistryService(), "/poolChemistry", config=app_conf)
     cherrypy.engine.start()
     logger.info(f"Browse to http://localhost:{server_config['server.socket_port']}")
     cherrypy.engine.block()
