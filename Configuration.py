@@ -148,7 +148,10 @@ def allChangeNotification(event:Event):
     #log once every 5 minutes or when something changes that is not time and temp
     if((isinstance(event, TimerEvent) and event.secondsPassedTheHour % 300 == 0) or (not isinstance(event, TimerEvent) and not isinstance(event, TemperatureChangeEvent))):
         if(DependencyContainer.stateLogger != None):
-            sensor = DependencyContainer.enviromentalSensor.getData()
+            if(DependencyContainer.enviromentalSensor == None):
+                sensor = None
+            else:
+                sensor = DependencyContainer.enviromentalSensor.get()
 
             #Using the nameing convention where the Id number matches the number of the column. Temp sensor 1 matches temperature1
             DependencyContainer.stateLogger.add(
@@ -164,9 +167,9 @@ def allChangeNotification(event:Event):
                 ActionActive2 = DependencyContainer.actions.get()[1].overrideSchedule,
                 ActionActive3 = DependencyContainer.actions.get()[2].overrideSchedule,
                 ActionActive4 = DependencyContainer.actions.get()[3].overrideSchedule,
-                Orp1 = sensor["ORP"],
-                PH1 = sensor["PH"],
-                temperature5 =  sensor["RTD"]
+                Orp1 = None if sensor == None else sensor.orp,
+                PH1 = None if sensor == None else sensor.ph,
+                temperature5 = None if sensor == None else sensor.temperature
             )
     #update the display every 5 seconds
     if(isinstance(event, TimerEvent) and display != None):

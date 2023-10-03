@@ -85,7 +85,13 @@ class WorkerPlugin(SimplePlugin):
                     if(DependencyContainer.variables != None)                :
                         DependencyContainer.variables.checkForExpiredVariables()
                 except Exception  as err:
-                    logger.error(f"Failed when checkForExpiredVariables. Error:{err}")                
+                    logger.error(f"Failed when checkForExpiredVariables. Error:{err}")   
+
+                try:
+                    if(DependencyContainer.enviromentalSensor != None):
+                        DependencyContainer.enviromentalSensor.get(False)
+                except Exception  as err:
+                    logger.error(f"Failed when enviromental sensors. Error:{err}")   
 
             #I want this to fire more often
             try:
