@@ -18,7 +18,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { AppRoutingModule } from './app-routing.module';
-import { IndexComponent } from './index/index.component'
+import { IndexComponent } from './index/index.component';
+import { PoolChemistryComponent } from './poolChemistry/poolChemistry.component'
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { IndexComponent } from './index/index.component'
     ValvesComponent,
     StatsComponent,
     ScheduleEditComponent,
-    IndexComponent
+    IndexComponent,
+    PoolChemistryComponent
   ],
   imports: [
     HttpClientModule,

@@ -1,0 +1,14 @@
+<ng-template [ngIf]="chemistry != undefined">
+    
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Chemistry</h3>
+        </div>
+        <div class="panel-body" id="chemistry">
+            <div class="panel-body form-group" >
+                <span id="ph" style="padding-right: 20px;">PH {{chemistry.ph}}</span>
+                <span id="orp">ORP {{chemistry.orp}}</span>
+            </div>
+        </div>
+    </div>
+</ng-template>

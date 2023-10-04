@@ -19,6 +19,7 @@ class PoolChemistryService:
         if(DependencyContainer.enviromentalSensor == None):
             return None
         else:
-            return DependencyContainer.enviromentalSensor.get()
+            return dataclasses.asdict(
+                DependencyContainer.enviromentalSensor.get())
                        
     
