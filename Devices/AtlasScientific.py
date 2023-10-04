@@ -14,6 +14,7 @@ class AtlasScientific:
         self.__url = url
         self.__timeout = timeout
         self.__maxDigits = maxDigits
+        self.__lastValue = None
 
     def get(self, allowCached:bool = True) -> PoolChemistry:
         response = requests.get(self.__url, timeout = self.__timeout)
