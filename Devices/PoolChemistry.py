@@ -7,6 +7,13 @@ class PoolChemistry:
     orp:float
     ph:float
 
+    def to_dict(self):
+        return {
+            "temperature": self.temperature,
+            "orp": self.orp,
+            "ph": self.ph
+        }
+
 @dataclass
 class PhChangeEvent(Event):
     data:PoolChemistry = None

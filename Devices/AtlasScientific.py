@@ -10,11 +10,14 @@ This is the kit https://atlas-scientific.com/kits/wi-fi-pool-kit/
 
 """
 class AtlasScientific:
-    def __init__(self, url:str, timeout = 3, maxDigits = 2) -> None:
+    def __init__(self, url:str, timeout = 3, maxDigits = 2, orpDigitsForChange = 0, phDigitsForChange = 1) -> None:
         self.__url = url
         self.__timeout = timeout
         self.__maxDigits = maxDigits
         self.__lastValue = None
+        
+        self.__phDigitsForChange = phDigitsForChange
+        self.__orpDigitsForChange = orpDigitsForChange
 
     def get(self, allowCached:bool = True) -> PoolChemistry:
         response = requests.get(self.__url, timeout = self.__timeout)
@@ -40,9 +43,9 @@ class AtlasScientific:
             self.__lastValue = tempPc
 
             if(DependencyContainer.actions != None and self.__lastValue != None):
-                if(tempLast.orp != tempPc.orp):
+                if(round(tempLast.orp, self.__orpDigitsForChange) != round(tempPc.orp, self.__orpDigitsForChange)):
                     DependencyContainer.actions.nofityListners(OrpChangeEvent(None, tempPc))
-                if(tempLast.ph != tempPc.ph):
+                if(round(tempLast.ph, self.__phDigitsForChange) != round(tempPc.ph, self.__phDigitsForChange)):
                     DependencyContainer.actions.nofityListners(OrpChangeEvent(None, tempPc))            
 
             return self.__lastValue
