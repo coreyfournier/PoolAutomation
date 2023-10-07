@@ -135,6 +135,7 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
 
 def allChangeNotification(event:Event):
     global displayRotation    
+    isFrequentEventType:bool = isinstance(event, TemperatureChangeEvent) or isinstance(event, PhChangeEvent) or isinstance(event, OrpChangeEvent)
 
     logger.debug(f"Change detected ---- {event}")           
 
@@ -146,7 +147,7 @@ def allChangeNotification(event:Event):
         DependencyContainer.schedules.checkSchedule()
 
     #log once every 5 minutes or when something changes that is not time and temp
-    if((isinstance(event, TimerEvent) and event.secondsPassedTheHour % 300 == 0) or (not isinstance(event, TimerEvent) and not isinstance(event, TemperatureChangeEvent))):
+    if((isinstance(event, TimerEvent) and event.secondsPassedTheHour % 300 == 0) or (not isinstance(event, TimerEvent) and not isFrequentEventType)):
         if(DependencyContainer.stateLogger != None):
             if(DependencyContainer.enviromentalSensor == None):
                 sensor = None
