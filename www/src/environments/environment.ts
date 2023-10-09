@@ -1,4 +1,6 @@
 export const environment = {
     production: true,
-    apiUrl: '/'
+    apiUrl: '/',
+    timeFormat: 'hh:mm a',
+    locale:'en-US'
 };

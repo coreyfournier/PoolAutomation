@@ -5,7 +5,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ScheduleInfo } from './schedule';
 import { DatePipe } from '@angular/common';
 import { EventInfo, ScheduleChangeEvent } from '../app.events';
-import { ScheduleEditComponent } from './edit/edit.component';
 
 @Component({
   selector: 'app-schedules',
@@ -24,8 +23,8 @@ export class SchedulesComponent {
   };
 
   private scheduleUrl = environment.apiUrl + 'schedule/schedules';  // URL to web api
-  datepipe: DatePipe = new DatePipe('en-US');
-  timeFormat:string = 'hh:mm a';
+  datepipe: DatePipe = new DatePipe(environment.locale);
+  timeFormat:string = environment.timeFormat;
 
   constructor(private http: HttpClient, public zone: NgZone) { 
 

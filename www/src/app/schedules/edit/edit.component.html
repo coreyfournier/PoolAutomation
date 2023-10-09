@@ -1,28 +1,41 @@
 <h3>Add Course Lessons:</h3>
-<div class="add-lessons-form" [formGroup]="form">
-    <ng-container formArrayName="lessons">
-        <ng-container *ngFor="let lessonForm of lessons.controls; let i = index">
-            <div class="lesson-form-row">
-                <mat-form-field appearance="fill">
-                    <input matInput
-                           formControlName="title"
-                           placeholder="Lesson title">
-                </mat-form-field>
-                <mat-form-field appearance="fill">
-                    <mat-select formControlName="level" placeholder="Lesson level">
-                        <mat-option value="beginner">Beginner</mat-option>
-                        <mat-option value="intermediate">Intermediate</mat-option>
-                        <mat-option value="advanced">Advanced</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-icon class="delete-btn" (click)="deleteLesson(i)">
-                    delete_forever</mat-icon>
-            </div>
-        </ng-container>
-    </ng-container>
-  
-    <button mat-mini-fab (click)="addLesson()">
-        <mat-icon class="add-course-btn">add</mat-icon>
-    </button>
-
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Schedules</h3>
+    </div>
+    <div class="panel-body" [formGroup]="form">
+        <div id="schedule">            
+        <table class="table">
+            <tr><th>Name</th><th></th><th></th></tr>
+            <ng-container formArrayName="schedules">
+                <ng-container *ngFor="let row of schedules.controls; let i = index">
+                <tr [formGroupName]="i">
+                    <td class="">
+                        <mat-form-field appearance="fill">
+                            <input matInput
+                                   formControlName="name"
+                                   placeholder="Schedule Name">
+                        </mat-form-field>
+                    </td> 
+                    <td class="">
+                        <mat-form-field appearance="fill">
+                            <input matInput
+                                   formControlName="scheduleStart"
+                                   placeholder="Start">
+                        </mat-form-field>
+                    </td> 
+                    <td class="">
+                        <mat-form-field appearance="fill">
+                            <input matInput
+                                   formControlName="scheduleEnd"
+                                   placeholder="End">
+                        </mat-form-field>
+                    </td>                    
+                </tr>
+            </ng-container>
+            </ng-container>
+        </table>
+    </div>
+    </div>
 </div>
+
