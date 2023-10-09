@@ -6,11 +6,24 @@ import { ScheduleInfo } from '../schedule';
 import { DatePipe } from '@angular/common';
 import { EventInfo, ScheduleChangeEvent } from '../../app.events';
 import { FormBuilder, FormGroup, Validators,FormArray, FormControl } from '@angular/forms';
+import { MatDateFormats, MAT_NATIVE_DATE_FORMATS, DateAdapter } from '@angular/material/core';
+
+export const GRI_DATE_FORMATS: MatDateFormats = {
+  ...MAT_NATIVE_DATE_FORMATS,
+  display: {
+    ...MAT_NATIVE_DATE_FORMATS.display,
+    dateInput: {
+      hour12:true,
+      minute:'numeric'
+    } as Intl.DateTimeFormatOptions,
+  }
+}
 
 @Component({
   selector: 'app-schedules-edit',
   templateUrl: './edit.component.html',
-  styleUrls: ['../schedules.component.css']
+  styleUrls: ['../schedules.component.css'],
+ 
 })
 
 export class ScheduleEditComponent {
@@ -33,8 +46,8 @@ export class ScheduleEditComponent {
   datepipe: DatePipe = new DatePipe(environment.locale);
   timeFormat:string = environment.timeFormat;
 
-  constructor(private http: HttpClient, public zone: NgZone, private formBuilder: FormBuilder) { 
-
+  constructor(private http: HttpClient, public zone: NgZone, private formBuilder: FormBuilder, private readonly adapter: DateAdapter<Date>) { 
+    this.adapter.setLocale("en-EN");
   }     
 
   ngOnInit(): void {    

@@ -1,8 +1,10 @@
-<h3>Add Course Lessons:</h3>
+<form  (ngSubmit)="onSubmit()">
+<h3>Edit schedule</h3>
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Schedules</h3>
     </div>
+    
     <div class="panel-body" [formGroup]="form">
         <div id="schedule">            
         <table class="table">
@@ -20,22 +22,26 @@
                     <td class="">
                         <mat-form-field appearance="fill">
                             <input matInput
-                                   formControlName="scheduleStart"
-                                   placeholder="Start">
+                                type="datetime-local"
+                                formControlName="scheduleStart"
+                                placeholder="Start">
                         </mat-form-field>
                     </td> 
                     <td class="">
                         <mat-form-field appearance="fill">
                             <input matInput
-                                   formControlName="scheduleEnd"
-                                   placeholder="End">
+                                type="datetime-local"
+                                formControlName="scheduleEnd"
+                                placeholder="End">
                         </mat-form-field>
                     </td>                    
                 </tr>
             </ng-container>
             </ng-container>
         </table>
+        <button mat-button type="submit">Save</button>
     </div>
     </div>
 </div>
 
+</form>
