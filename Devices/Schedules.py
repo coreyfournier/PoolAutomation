@@ -23,6 +23,9 @@ class Schedules:
         for item in self._scheduleData:
             self._byId[item.id] = item
 
+    def save(self, schedules:"list[PumpSchedule]"):
+        self.__repo.saveSchedules(schedules)
+
     def get(self) -> "list[PumpSchedule]":
         return self._scheduleData
     
