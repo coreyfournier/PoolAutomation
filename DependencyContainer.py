@@ -16,6 +16,8 @@ temperatureUnit = "f"
 short_time_format = "%I:%M%p"
 #format to show for just an hour
 hour_format = "%I %p"
+dateFormat = "%m/%d/%Y"
+timeFormat = "%H:%M"
 
 _nameToLevel = {
     'CRITICAL': logging.CRITICAL,

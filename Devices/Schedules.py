@@ -1,6 +1,6 @@
 import threading
 import time
-import datetime
+from datetime import datetime
 import logging
 from Devices.Schedule import *
 import DependencyContainer
@@ -44,7 +44,7 @@ class Schedules:
     def checkSchedule(self):
         #Make sure no one else tries to modify anything
         with self.lock:
-            now = datetime.datetime.now()
+            now = datetime.now()
             if(DependencyContainer.actions == None):
                 hasOverride = False
             else:        

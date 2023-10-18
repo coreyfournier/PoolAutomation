@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 import datetime
+
+from dataclass_wizard.type_def import JSONObject
 from Devices import Pump
 import dataclasses
 from dataclasses_json import dataclass_json, LetterCase, config
@@ -7,16 +9,19 @@ from typing import List as PyList
 from dataclass_wizard import JSONWizard
 from marshmallow import Schema, fields
 from lib.Actions import Event
+import DependencyContainer
 
+@dataclass_json
 @dataclass
-class PumpControl:
+class PumpControl(JSONWizard):
     id:int
     name:str
     #Name value of Pump.Speed
     speedName:str
 
+@dataclass_json
 @dataclass
-class ValveControl:
+class ValveControl(JSONWizard):
     id:int
     name:str
     #need to figure out how this will work for the three state valve. maybe bitwise????
@@ -39,15 +44,14 @@ class Control(JSONWizard):
     #Set by the worker to indicate if it's running
     isRunning:bool = None
 
-timeFormat = "%H:%M"
-dateFormat = "%m/%d/%Y"
-dateTimeFormat = dateFormat + " " + timeFormat
+
+dateTimeFormat = DependencyContainer.dateFormat + " " + DependencyContainer.timeFormat
 
 def toLocalTime(time)->str:
-    return time.strftime(dateFormat + " " + timeFormat)
+    return time.strftime(dateTimeFormat)
 
 def fromLocalTime(input)->datetime:
-    return datetime.datetime.strptime(input, dateFormat + " " + timeFormat)
+    return datetime.datetime.strptime(input, dateTimeFormat)
 
 @dataclass_json
 @dataclass
@@ -111,6 +115,24 @@ class PumpSchedule(Control):
             return self.endTime.replace(year=now.year, month=now.month, day=now.day, second = 59)
         else:
             return self.endTime
+        
+    
+    def toDictionary(self) -> "dict":
+        """ Converts the object a dictionary to be seralized.
+        I really wanted to do a to_dict, but it was already taken :(
+
+        Returns:
+            dict: Dictory of the oejct and children.
+        """
+        return {
+            "id":self.id,
+            "startTime": toLocalTime(self.startTime),
+            "endTime": toLocalTime(self.endTime),
+            "name":self.name,
+            "pumps": [] if self.pumps == None else [p.to_dict() for p in self.pumps] ,
+            "valves": [] if self.valves == None else [v.to_dict() for v in self.valves]
+        }
+        
 
 @dataclass
 class ScheduleChangeEvent(Event):

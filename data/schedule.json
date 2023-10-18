@@ -1,41 +1,44 @@
 [
     {
-        "startTime":"01/01/0001 07:00",
-        "endTime":"01/01/9999 10:59",
-        "id":1,
-        "name":"Morning",
-        "isActive":true,
-        "pumps":[{
-            "id":1,
-            "name":"main",
-            "speedName":"SPEED_1"
-        }],
-        "valves":null
+        "id": 1,
+        "startTime": "01/01/0001 07:00",
+        "endTime": "01/01/9999 10:59",
+        "name": "Morning",
+        "pumps": [
+            {
+                "id": 1,
+                "name": "main",
+                "speedName": "SPEED_1"
+            }
+        ],
+        "valves": []
     },
     {
-        "startTime":"01/01/0001 11:00",
-        "endTime":"01/01/9999 13:59",
-        "id":2,
-        "name":"Afternoon",
-        "isActive":true,
-        "pumps":[{
-            "id":1,
-            "name":"main",
-            "speedName":"SPEED_2"
-        }],
-        "valves":null
+        "id": 2,
+        "startTime": "01/01/0001 11:00",
+        "endTime": "01/01/9999 13:59",
+        "name": "Afternoon",
+        "pumps": [
+            {
+                "id": 1,
+                "name": "main",
+                "speedName": "SPEED_2"
+            }
+        ],
+        "valves": []
     },
     {
-        "startTime":"01/01/0001 14:00",
-        "endTime":"01/01/9999 18:59",
-        "id":3,
-        "name":"Evening",
-        "isActive":true,
-        "pumps":[{
-            "id":1,
-            "name":"main",
-            "speedName":"SPEED_4"
-        }],
-        "valves":null
+        "id": 3,
+        "startTime": "01/01/0001 14:00",
+        "endTime": "01/01/9999 18:59",
+        "name": "Evening",
+        "pumps": [
+            {
+                "id": 1,
+                "name": "main",
+                "speedName": "SPEED_4"
+            }
+        ],
+        "valves": []
     }
 ]

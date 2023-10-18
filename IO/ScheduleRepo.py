@@ -1,8 +1,12 @@
 from Devices.Schedule import *
 import json
 import DependencyContainer
+from datetime import datetime
 
 class ScheduleRepo:
+    minDate:datetime = datetime(1,1,1)
+    maxDate:datetime = datetime(9999, 1,1)
+
     def __init__(self, file:str) -> None:
         self.__scheduleFile:str = file
         #Loads the schedules on startup
@@ -20,7 +24,7 @@ class ScheduleRepo:
         uniqueIds = set()
         uniqueNames = set()        
 
-        for i, schedule in schedules:
+        for i, schedule in enumerate(schedules):
             if(schedule.id in uniqueIds):
                 raise Exception(f"The id {schedule.id} already exists")
             
@@ -44,12 +48,7 @@ class ScheduleRepo:
             if(nextSchedule != None and nextSchedule.startTime < schedule.endTime):
                 raise Exception(f"{nextSchedule.startTime} is before {schedule.endTime} on {nextSchedule.name}")
             
-            totalTime = schedule.endTime - schedule.startTime
-
-            if(totalTime.total_hours > 24):
-                raise Exception(f"The schedule {schedule.name} must be less than 24 hours")
-            
-            if(schedule.pumps == None or len(schedule.pumps)):
+            if(schedule.pumps == None or len(schedule.pumps) == 0):
                 raise Exception(f"No pumps were found on schedule {schedule.name}")
             
             for pump in schedule.pumps:
@@ -62,9 +61,10 @@ class ScheduleRepo:
                 foundPump = DependencyContainer.pumps.getById(pump.id)
                 if(foundPump == None):
                     raise Exception(f"Pump {pump.id} was not found on schedule {schedule.name}")
-                
-                
-            
 
-        with open(self.__scheduleFile, mode = "w") as f:                        
-            f.write(json.dumps(schedules.to_dict()))
+        dictList = [s.toDictionary() for s in schedules]
+
+        data = json.dumps(dictList)
+
+        with open(self.__scheduleFile, mode = "w") as f:
+            f.write(data)

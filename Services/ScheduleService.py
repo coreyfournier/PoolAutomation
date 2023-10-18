@@ -39,7 +39,8 @@ class ScheduleService:
             cl = cherrypy.request.headers['Content-Length']
             rawbody = cherrypy.request.body.read(int(cl))
             data = PumpSchedule.schema().loads(rawbody, many=True) 
-            try:
+
+            try:    
                 DependencyContainer.schedules.save(data)
 
                 return {
