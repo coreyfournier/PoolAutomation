@@ -22,7 +22,7 @@
                     <td class="">
                         <mat-form-field appearance="fill">
                             <input matInput
-                                type="datetime-local"
+                                type="time"
                                 formControlName="scheduleStart"
                                 placeholder="Start">
                         </mat-form-field>
@@ -30,7 +30,7 @@
                     <td class="">
                         <mat-form-field appearance="fill">
                             <input matInput
-                                type="datetime-local"
+                                type="time"
                                 formControlName="scheduleEnd"
                                 placeholder="End">
                         </mat-form-field>
@@ -39,9 +39,10 @@
             </ng-container>
             </ng-container>
         </table>
-        <button mat-button type="submit">Save</button>
+        <button mat-button type="button" (click)="addItem()">Add</button>
+        
     </div>
     </div>
 </div>
-
+    <button mat-button type="submit">Save</button>
 </form>

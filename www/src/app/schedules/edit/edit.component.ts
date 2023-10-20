@@ -26,6 +26,12 @@ export const GRI_DATE_FORMATS: MatDateFormats = {
  
 })
 
+export class SaveResponse
+{
+  success:boolean = false;
+  error:string = '';
+}
+
 export class ScheduleEditComponent {
 
   form = this.formBuilder.group({
@@ -57,12 +63,10 @@ export class ScheduleEditComponent {
         s.schedules.forEach(sch=>{
           const scheduleForm = this.formBuilder.group({
             name:[sch.name, Validators.required],
-            scheduleStart:[sch.scheduleStart, Validators.required],
-            scheduleEnd:[sch.scheduleEnd, Validators.required],
+            scheduleStart:[this.datepipe.transform(sch.scheduleStart, "HH:mm"), Validators.required],
+            scheduleEnd:[this.datepipe.transform(sch.scheduleEnd, "HH:mm"), Validators.required],
             id:[sch.id, Validators.required]
           });
-
-          //this.form.controls["schedules"].push();
 
           this.schedules.push(scheduleForm);
         });        
@@ -73,16 +77,36 @@ export class ScheduleEditComponent {
     return this.http.get<ScheduleInfo>(this.scheduleUrl);
   }
 
-  onSubmit() {    
+  onSubmit():void 
+  {    
     console.log("Submitted form");
+
+    this.http.post<SaveResponse>(this.scheduleUrl,this.scheduleInfo).subscribe(s=>{
+      if(s.success)
+        console.log("Saved!!!");
+      else
+        console.log(`Failed to save: ${s.error}`);
+    });
   }
 
-  addLesson():void  {
-    // const lessonForm = this.formBuilder.group({
-    //   title: ['', Validators.required],
-    //   level: ['beginner', Validators.required]
-    // });
-    // this.schedules.push(lessonForm);
+  addItem():void
+  {
+    let nextId = 0;
+    this.scheduleInfo.schedules.forEach(element => {
+      if(element.id > nextId)
+        nextId = element.id;
+    });
+
+    nextId ++;
+
+    const newItem = this.formBuilder.group({
+        name:['', Validators.required],
+        scheduleStart:['', Validators.required],
+        scheduleEnd:['', Validators.required],
+        id:[nextId, Validators.required]
+      });
+
+      this.schedules.push(newItem);
   }
 
   deleteLesson(lessonIndex: number):void {
