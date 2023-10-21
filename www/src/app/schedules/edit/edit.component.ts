@@ -7,6 +7,7 @@ import { DatePipe } from '@angular/common';
 import { EventInfo, ScheduleChangeEvent } from '../../app.events';
 import { FormBuilder, FormGroup, Validators,FormArray, FormControl } from '@angular/forms';
 import { MatDateFormats, MAT_NATIVE_DATE_FORMATS, DateAdapter } from '@angular/material/core';
+import { SaveResponse } from '../SaveResponse';
 
 export const GRI_DATE_FORMATS: MatDateFormats = {
   ...MAT_NATIVE_DATE_FORMATS,
@@ -25,13 +26,6 @@ export const GRI_DATE_FORMATS: MatDateFormats = {
   styleUrls: ['../schedules.component.css'],
  
 })
-
-export class SaveResponse
-{
-  success:boolean = false;
-  error:string = '';
-}
-
 export class ScheduleEditComponent {
 
   form = this.formBuilder.group({
@@ -81,7 +75,8 @@ export class ScheduleEditComponent {
   {    
     console.log("Submitted form");
 
-    this.http.post<SaveResponse>(this.scheduleUrl,this.scheduleInfo).subscribe(s=>{
+    this.http.post<SaveResponse>(this.scheduleUrl, this.scheduleInfo.schedules)
+    .subscribe(s=>{
       if(s.success)
         console.log("Saved!!!");
       else

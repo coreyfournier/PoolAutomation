@@ -20,7 +20,7 @@ class ScheduleService:
             Schedule: All schedule information
         """
         if(cherrypy.request.method == 'GET'):
-            schedules = [dataclasses.asdict(item) for item in DependencyContainer.schedules.get()]
+            schedules = [item.to_dict() for item in DependencyContainer.schedules.get()]
 
             if(DependencyContainer.pumps != None):
                 for schedule in schedules:
@@ -37,7 +37,7 @@ class ScheduleService:
             }
         elif(cherrypy.request.method == 'POST'):
             cl = cherrypy.request.headers['Content-Length']
-            rawbody = cherrypy.request.body.read(int(cl))
+            rawbody = cherrypy.request.body.read(int(cl)).decode('ascii')
             data = PumpSchedule.schema().loads(rawbody, many=True) 
 
             try:    

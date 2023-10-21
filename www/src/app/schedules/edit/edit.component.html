@@ -8,7 +8,7 @@
     <div class="panel-body" [formGroup]="form">
         <div id="schedule">            
         <table class="table">
-            <tr><th>Name</th><th></th><th></th></tr>
+            <tr><th>Name</th><th></th><th></th><th></th></tr>
             <ng-container formArrayName="schedules">
                 <ng-container *ngFor="let row of schedules.controls; let i = index">
                 <tr [formGroupName]="i">
@@ -34,7 +34,11 @@
                                 formControlName="scheduleEnd"
                                 placeholder="End">
                         </mat-form-field>
-                    </td>                    
+                    </td>  
+                    <td>
+                        <table>
+                        </table>
+                    </td>                 
                 </tr>
             </ng-container>
             </ng-container>
