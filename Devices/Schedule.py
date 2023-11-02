@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 import datetime
-
 from dataclass_wizard.type_def import JSONObject
 from Devices import Pump
 import dataclasses
@@ -45,7 +44,7 @@ class Control(JSONWizard):
     isRunning:bool = None
 
 
-dateTimeFormat = DependencyContainer.dateFormat + " " + DependencyContainer.timeFormat
+dateTimeFormat = "%Y-%m-%dT%H:%M:%S"
 
 def toLocalTime(time)->str:
     return time.strftime(dateTimeFormat)
@@ -53,18 +52,35 @@ def toLocalTime(time)->str:
 def fromLocalTime(input)->datetime:
     return datetime.datetime.strptime(input, dateTimeFormat)
 
+def fromIsoFormat(input):
+    if(type(input) is datetime.datetime):
+        return input
+    else:
+        return datetime.datetime.strptime(input, dateTimeFormat)
+
+def toIsoFormat(time:datetime):
+    return time.strftime(dateTimeFormat)
+
 @dataclass_json
 @dataclass
 class PumpSchedule(Control):
     #Seperate time and date, so the schedule can support specific dates and times, or just time with no date specified.
-    startTime:str = field(
-        metadata= {'dataclasses_json': {
-            'mm_field': fields.DateTime(format=dateTimeFormat)
-        }}, default= None)
-    endTime:str = field(
-        metadata= {'dataclasses_json': {
-            'mm_field': fields.DateTime(format=dateTimeFormat)
-        }}, default= None)
+    startTime:datetime = field(
+        metadata=config(
+            encoder=toIsoFormat,
+            decoder=fromIsoFormat,
+            mm_field=fields.DateTime(format='iso')
+        ),
+        default= None
+    )
+    endTime:datetime = field(
+        metadata=config(
+            encoder=toIsoFormat,
+            decoder=fromIsoFormat,
+            mm_field=fields.DateTime(format='iso')
+        ),
+        default= None
+    )
     
     duration:float = None
 

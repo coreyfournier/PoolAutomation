@@ -75,12 +75,19 @@ export class ScheduleEditComponent {
   {    
     console.log("Submitted form");
 
-    this.http.post<SaveResponse>(this.scheduleUrl, this.scheduleInfo.schedules)
+    
+
+    this.http.post<SaveResponse>(
+      this.scheduleUrl, 
+      this.form.value.schedules)
     .subscribe(s=>{
       if(s.success)
         console.log("Saved!!!");
       else
+      {
         console.log(`Failed to save: ${s.error}`);
+        alert(s.error);
+      }
     });
   }
 
