@@ -146,7 +146,8 @@ class PumpSchedule(Control):
             "endTime": toLocalTime(self.endTime),
             "name":self.name,
             "pumps": [] if self.pumps == None else [p.to_dict() for p in self.pumps] ,
-            "valves": [] if self.valves == None else [v.to_dict() for v in self.valves]
+            "valves": [] if self.valves == None else [v.to_dict() for v in self.valves],
+            "isActive": self.isActive
         }
         
 

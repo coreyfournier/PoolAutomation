@@ -59,7 +59,8 @@ class Schedules:
                     #If it is running, indicate that it's off
                     if(item.isRunning):
                         item.isRunning = False
-                else:
+                #Only run a schedule that is marked active
+                elif(item.isActive):
                     #run the schedule
                     if(now >= startTime and now <= endTime):
                         if(not item.isRunning):
@@ -74,7 +75,8 @@ class Schedules:
                         item.isRunning = False
                     else:
                         item.isRunning = False
-                        #self.bus.log(f"Schedule {item.name} not ready - {now}")
+                        #self.bus.log(f"Schedule {item.name} not ready - {now}")                
+
     
     def _setPumpSpeed(self, schedule:PumpSchedule, pumps:"list[Pump]", allOff:bool):
         if(pumps != None):

@@ -2,6 +2,7 @@ export interface ScheduleInfo {
     schedules:Schedule[];
     overrides:Override[];
   }
+
   export interface Override{
     displayName:string;
     name: string;
@@ -22,8 +23,11 @@ export interface ScheduleInfo {
   {
     id: number;
     name: string;
+    //Current speed
     speedName:string;
-    displayName:string;
+    displayName:string;    
+
+    speeds:Speed[] = [];
 
     constructor(jsonParsed:any){
       this.id = jsonParsed.id;
@@ -31,4 +35,9 @@ export interface ScheduleInfo {
       this.speedName = jsonParsed.speedName;
       this.displayName = jsonParsed.displayName;
     }
+  }
+
+  export class Speed{
+    name:string = '';
+    isActive:boolean = true;
   }

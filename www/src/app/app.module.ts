@@ -20,6 +20,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { AppRoutingModule } from './app-routing.module';
 import { IndexComponent } from './index/index.component';
 import { PoolChemistryComponent } from './poolChemistry/poolChemistry.component'
+import {MatSelectModule} from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { PoolChemistryComponent } from './poolChemistry/poolChemistry.component'
     MatNativeDateModule,
     FormsModule,
     ReactiveFormsModule,
-    MatSlideToggleModule 
+    MatSlideToggleModule,
+    MatSelectModule 
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA],
   providers: [],
