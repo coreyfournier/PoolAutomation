@@ -36,7 +36,38 @@
                         </mat-form-field>
                     </td>  
                     <td>
-                        
+                        <table>
+                            <ng-container formArrayName="pumps">
+                                <tbody *ngFor="let row of schedulePumps(s, schedule).controls; let p = index">
+                                    <tr [formGroupName]="p" >
+                                        <td>                                            
+                                            <mat-form-field appearance="fill">
+                                                <input matInput
+                                                    formControlName="name"
+                                                    placeholder="Pump Name">
+                                            </mat-form-field>
+                                            <mat-select>
+                                                <mat-option *ngFor="let pump of avaliablePumps">  
+                                                    {{pump.name}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </td>
+                                        <td>
+                                            <div>Pumps</div>
+                                            <div *ngFor="let pump of avaliablePumps">
+                                                <span>{{pump.name}}</span>
+                                                <mat-select>
+                                                    <mat-option *ngFor="let speed of pump.speeds">  
+                                                        {{speed.name}}
+                                                    </mat-option>
+                                                </mat-select>
+                                            </div>
+                                            
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </ng-container>                        
+                        </table>
                     </td>                 
                 </tr>
             </ng-container>

@@ -2,7 +2,7 @@ import { Observable, Subscription } from 'rxjs';
 import { Component, ChangeDetectorRef,Input, NgZone } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Pump, ScheduleInfo } from '../schedule';
+import { Pump, Schedule, ScheduleInfo } from '../schedule';
 import { DatePipe } from '@angular/common';
 import { EventInfo, ScheduleChangeEvent } from '../../app.events';
 import { FormBuilder, FormGroup, Validators,FormArray, FormControl } from '@angular/forms';
@@ -28,10 +28,7 @@ export const GRI_DATE_FORMATS: MatDateFormats = {
 })
 export class ScheduleEditComponent {
 
-  scheduleForm = this.formBuilder.group({
-    
-    schedules: this.formBuilder.array([])
-  });
+  scheduleForm: FormGroup = this.formBuilder.group({});
 
   pumpForm = this.formBuilder.group({
     pumps:this.formBuilder.array([])
@@ -46,6 +43,26 @@ export class ScheduleEditComponent {
 
   get schedules():FormArray {
     return this.scheduleForm.controls["schedules"] as FormArray;
+  }
+
+  schedulePumps(index:number, control:any):FormArray
+  {
+
+    //let schedule = this.scheduleInfo.schedules[0];
+
+    return control.controls.pumps;
+    
+    /*
+    //var  = this.scheduleInfo.schedules.find(x=> x.id == schedule.id);
+    return this.formBuilder.array(schedule.pumps.map(p=>{
+      return this.formBuilder.group({
+        name:[p.name, Validators.required],
+        speed:[p.speedName, Validators.required],
+        id:[p.id, Validators.required],
+        displayName:[p.displayName, Validators.required]
+      })
+    }));
+    */
   }
 
   private scheduleUrl = environment.apiUrl + 'schedule/schedules';  // URL to web api
@@ -66,24 +83,27 @@ export class ScheduleEditComponent {
     {
         this.scheduleInfo = s;
 
-        s.schedules.forEach(sch=>{
-          const scheduleForm = this.formBuilder.group({
-            name:[sch.name, Validators.required],
-            scheduleStart:[this.datepipe.transform(sch.scheduleStart, "HH:mm"), Validators.required],
-            scheduleEnd:[this.datepipe.transform(sch.scheduleEnd, "HH:mm"), Validators.required],
-            id:[sch.id, Validators.required],
-            pumps:this.formBuilder.array(sch.pumps.map(p=>{
-              return this.formBuilder.group({
-                name:[p.name, Validators.required],
-                speed:[p.speedName, Validators.required],
-                id:[p.id, Validators.required],
-                displayName:[p.displayName, Validators.required]
-              })
-            }))
-          });
+        this.scheduleForm = this.formBuilder.group({
+          schedules : this.formBuilder.array(s.schedules.map(sch=>{
 
-          this.schedules.push(scheduleForm);
-        });        
+            return  this.formBuilder.group({
+              name:[sch.name, Validators.required],
+              scheduleStart:[this.datepipe.transform(sch.scheduleStart, "HH:mm"), Validators.required],
+              scheduleEnd:[this.datepipe.transform(sch.scheduleEnd, "HH:mm"), Validators.required],
+              id:[sch.id, Validators.required],
+              pumps:this.formBuilder.array(sch.pumps.map(p=>{
+
+                return this.formBuilder.group({
+                  name:[p.name, Validators.required],
+                  speed:[p.speedName, Validators.required],
+                  id:[p.id, Validators.required],
+                  displayName:[p.displayName, Validators.required]
+                })
+              }))
+            });
+          }))
+
+        });              
       });   
   }
 
@@ -101,7 +121,7 @@ export class ScheduleEditComponent {
 
     this.http.post<SaveResponse>(
       this.scheduleUrl, 
-      this.scheduleForm.value.schedules)
+      this.scheduleForm?.value.schedules)
     .subscribe(s=>{
       if(s.success)
         console.log("Saved!!!");
