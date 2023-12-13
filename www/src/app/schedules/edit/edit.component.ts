@@ -28,7 +28,10 @@ export const GRI_DATE_FORMATS: MatDateFormats = {
 })
 export class ScheduleEditComponent {
 
-  scheduleForm: FormGroup = this.formBuilder.group({});
+  scheduleForm: FormGroup = this.formBuilder.group(
+    {
+      schedules : this.formBuilder.array([])
+    });
 
   pumpForm = this.formBuilder.group({
     pumps:this.formBuilder.array([])

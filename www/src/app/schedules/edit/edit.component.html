@@ -37,15 +37,17 @@
                     </td>  
                     <td>
                         <table>
+                            <tr><th>Pump Name</th><th>Pumps</th></tr>
                             <ng-container formArrayName="pumps">
                                 <tbody *ngFor="let row of schedulePumps(s, schedule).controls; let p = index">
                                     <tr [formGroupName]="p" >
-                                        <td>                                            
+                                        <td>                                        
                                             <mat-form-field appearance="fill">
                                                 <input matInput
                                                     formControlName="name"
                                                     placeholder="Pump Name">
                                             </mat-form-field>
+
                                             <mat-select>
                                                 <mat-option *ngFor="let pump of avaliablePumps">  
                                                     {{pump.name}}
@@ -53,7 +55,6 @@
                                             </mat-select>
                                         </td>
                                         <td>
-                                            <div>Pumps</div>
                                             <div *ngFor="let pump of avaliablePumps">
                                                 <span>{{pump.name}}</span>
                                                 <mat-select>
