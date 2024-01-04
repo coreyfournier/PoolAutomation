@@ -48,20 +48,25 @@
                                                     placeholder="Pump Name">
                                             </mat-form-field>
 
-                                            <mat-select>
-                                                <mat-option *ngFor="let pump of avaliablePumps">  
-                                                    {{pump.name}}
-                                                </mat-option>
-                                            </mat-select>
-                                        </td>
-                                        <td>
-                                            <div *ngFor="let pump of avaliablePumps">
-                                                <span>{{pump.name}}</span>
+                                            <mat-form-field>
                                                 <mat-select>
-                                                    <mat-option *ngFor="let speed of pump.speeds">  
-                                                        {{speed.name}}
+                                                    <mat-option *ngFor="let pump of avaliablePumps">  
+                                                        {{pump.name}}
                                                     </mat-option>
                                                 </mat-select>
+                                            </mat-form-field>
+                                        </td>
+                                        <td>
+                                            <div>Available pumps</div>
+                                            <div *ngFor="let pump of avaliablePumps">
+                                                <span>Select {{pump.name}} speed</span>
+                                                <mat-form-field>
+                                                    <mat-select matNativeControl>
+                                                        <mat-option *ngFor="let speed of pump.speeds">  
+                                                            {{speed.name}}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
                                             </div>
                                             
                                         </td>
