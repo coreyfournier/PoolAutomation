@@ -49,7 +49,7 @@
                                             </mat-form-field>
 
                                             <mat-form-field>
-                                                <mat-select>
+                                                <mat-select [(value)]="row.value.name">
                                                     <mat-option *ngFor="let pump of avaliablePumps">  
                                                         {{pump.name}}
                                                     </mat-option>
@@ -61,7 +61,7 @@
                                             <div *ngFor="let pump of avaliablePumps">
                                                 <span>Select {{pump.name}} speed</span>
                                                 <mat-form-field>
-                                                    <mat-select matNativeControl>
+                                                    <mat-select  [(value)]="row.value.speed">
                                                         <mat-option *ngFor="let speed of pump.speeds">  
                                                             {{speed.name}}
                                                         </mat-option>
