@@ -241,10 +241,12 @@ def evaluateFreezePrevention(event:Event):
         if("ambient" in event.data.name.lower() and event.data.getLast() <= freezePreventionTemp):        
             isFreezePreventionEnabled = DependencyContainer.variables.get("freeze-prevention-enabled").value
             if(isFreezePreventionEnabled):
-                logger.info(f"Temp has reached freezing... Need to turn on pump to prevent freezing")
-                DependencyContainer.pumps.get("main").on(Speed.SPEED_1)
-                action.overrideSchedule = True
-                DependencyContainer.variables.get("freeze-prevention-on").value =  True
+                #If it's not already on, then turn it on
+                if(not DependencyContainer.variables.get("freeze-prevention-on").value):
+                    logger.info(f"Temp has reached freezing... Need to turn on pump to prevent freezing")
+                    DependencyContainer.pumps.get("main").on(Speed.SPEED_2)
+                    action.overrideSchedule = True
+                    DependencyContainer.variables.get("freeze-prevention-on").value =  True
             else:
                 logger.debug("Freezing, but freeze prevention disabled")
         #If it's on, but no longer freezing turn it off
