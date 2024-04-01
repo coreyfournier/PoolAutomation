@@ -32,7 +32,7 @@ class VariableRepo:
                 self._container.groups.append(variable)
                 refresh = True
         else:
-            if(variable.name not in self._variables):    
+            if(variable.name in self._variables):    
                 self._container.variables.append(variable)
                 refresh = True
         
