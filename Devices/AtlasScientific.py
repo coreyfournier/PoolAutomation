@@ -3,6 +3,8 @@ from Devices.Temperature import Temperature
 import DependencyContainer
 from Devices.PoolChemistry import *
 
+logger = DependencyContainer.get_logger(__name__)
+
 """
 Expects to use the wifi pool monitor software i adapted 
 https://github.com/coreyfournier/PoolChemistry
@@ -20,35 +22,42 @@ class AtlasScientific:
         self.__orpDigitsForChange = orpDigitsForChange
 
     def get(self, allowCached:bool = True) -> PoolChemistry:
-        response = requests.get(self.__url, timeout = self.__timeout)
+        try:
+            response = requests.get(self.__url, timeout = self.__timeout)
 
-        if(allowCached and self.__lastValue != None):
-            return self.__lastValue
-        
-        if(response.status_code == 200):
-            data = response.json()
-
-            tempPc = PoolChemistry(
-                #Change the temperature to the local units
-                Temperature.getTemperatureToLocal(
-                    data["RTD"],
-                    DependencyContainer.temperatureUnit,
-                    self.__maxDigits
-                ), 
-                round(data["ORP"], self.__maxDigits), 
-                round(data["PH"], self.__maxDigits))
+            if(allowCached and self.__lastValue != None):
+                return self.__lastValue
             
-            tempLast = self.__lastValue
-            # set the last value now incase a reader of the event reads from the model and not the event.
-            self.__lastValue = tempPc
+            if(response.status_code == 200):
+                data = response.json()
 
-            if(DependencyContainer.actions != None and self.__lastValue != None):
-                if(round(tempLast.orp, self.__orpDigitsForChange) != round(tempPc.orp, self.__orpDigitsForChange)):
-                    DependencyContainer.actions.nofityListners(OrpChangeEvent(None, tempPc))
-                if(round(tempLast.ph, self.__phDigitsForChange) != round(tempPc.ph, self.__phDigitsForChange)):
-                    DependencyContainer.actions.nofityListners(OrpChangeEvent(None, tempPc))            
+                tempPc = PoolChemistry(
+                    #Change the temperature to the local units
+                    Temperature.getTemperatureToLocal(
+                        data["RTD"],
+                        DependencyContainer.temperatureUnit,
+                        self.__maxDigits
+                    ), 
+                    round(data["ORP"], self.__maxDigits), 
+                    round(data["PH"], self.__maxDigits))
+                
+                tempLast = self.__lastValue
+                # set the last value now incase a reader of the event reads from the model and not the event.
+                self.__lastValue = tempPc
 
-            return self.__lastValue
-        else:
-            return PoolChemistry(0, 0, 0)
+                if(DependencyContainer.actions != None and self.__lastValue != None):
+                    if(round(tempLast.orp, self.__orpDigitsForChange) != round(tempPc.orp, self.__orpDigitsForChange)):
+                        DependencyContainer.actions.nofityListners(OrpChangeEvent(None, tempPc))
+                    if(round(tempLast.ph, self.__phDigitsForChange) != round(tempPc.ph, self.__phDigitsForChange)):
+                        DependencyContainer.actions.nofityListners(OrpChangeEvent(None, tempPc))            
+
+                return self.__lastValue
+            else:
+                logger.error(f"Server responed with code {response.status_code}")
+                
+        except requests.exceptions.Timeout:
+            logger.error(f"Took too long to receive data from the sensor. Continuing.")
+        
+        return None
+        
 
