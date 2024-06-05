@@ -234,9 +234,9 @@ def allChangeNotification(event:Event):
             )
 
          #If the generator is activated, then poll the state to see if we can disable it
-        if(DependencyContainer.generator != None and DependencyContainer.variables.get("generator-lockout-activated").value):
+        if(isinstance(event, TimerEvent) and DependencyContainer.generator != None and DependencyContainer.variables.get("generator-lockout-activated").value):
             if(not DependencyContainer.generator.isOn()):
-                logger.debug("Disabling generator lockout")      
+                logger.debug("Disabling generator lockout, generator is now off.")      
                 DependencyContainer.variables.get("generator-lockout-activated").value = False
 
     #update the display every 5 seconds
