@@ -1,5 +1,9 @@
 import logging
 import os
+import logging.handlers
+import socket
+import logging, platform
+from syslog_rfc5424_formatter import RFC5424Formatter
 
 #defaults to DEBUG in the get_logger
 #This must be set BEFORE any imports of custom code because it calls get_logger
@@ -18,6 +22,9 @@ short_time_format = "%I:%M%p"
 hour_format = "%I %p"
 dateFormat = "%m/%d/%Y"
 timeFormat = "%H:%M"
+
+logServerName = 'ENV_LOG_SERVER_NAME'
+logServerPort = 'ENV_LOG_SERVER_PORT'
 
 _nameToLevel = {
     'CRITICAL': logging.CRITICAL,
@@ -54,6 +61,7 @@ for logger_name in _loggersToWarn:
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.WARN)
 
+
 def get_logger(logger_name:str) -> logging.Logger:
     """Gets a universal logger specific to the caller
         Defaults the log level to DEBUG, if not environment variable is found for LOG_LEVEL
@@ -73,7 +81,13 @@ def get_logger(logger_name:str) -> logging.Logger:
    
     logger = logging.getLogger(f'PoolAutomation.{logger_name}')    
     logger.setLevel(log_level)
-   
+
+    #Log to a syslog if it is specified in the environment    
+    if (logServerName in os.environ and logServerPort in os.environ):        
+        syslogHandler = logging.handlers.SysLogHandler(address=(os.environ[logServerName], int(os.environ[logServerPort])))        
+        syslogHandler.setFormatter(RFC5424Formatter())
+        logger.addHandler(syslogHandler)
+    
     return logger
 
 #from Lights.GloBrite import GloBrite 

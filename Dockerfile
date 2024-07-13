@@ -21,10 +21,12 @@ RUN rm -r /app/node_modules
 FROM arm32v7/python:3.10.10-slim AS PYTHON_BASE
 WORKDIR /app/
 RUN pip install --upgrade pip setuptools wheel
+
+RUN apt update
+RUN apt-get -y install cmake
 ##############################################################
 #Necessary for pillow (images for display)
 ##############################################################
-RUN apt update
 RUN apt -y install build-essential libwrap0-dev libssl-dev libc-ares-dev uuid-dev xsltproc
 RUN apt-get update -qq \
     && apt-get install --no-install-recommends --yes \
@@ -39,6 +41,8 @@ RUN apt-get install libfreetype6-dev -y
 RUN apt-get install libopenjp2-7 -y
 RUN apt-get install libtiff5 -y
 RUN apt-get install unzip
+
+RUN pip install --upgrade pip
 
 COPY requirements.txt /app/
 RUN pip install -r /app/requirements.txt

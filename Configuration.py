@@ -309,7 +309,7 @@ def evaluateSolarStatus(event):
                     logger.debug(f"It's NOT hot enough, going to turn off Diff={solarVsPoolDifference}")
                     solarShouldBeOn = False
             #See if it should be turned on
-            elif(roofTemp >= needRoofTemp and poolTemp <= solarSetTemp):
+            elif(roofTemp >= needRoofTemp and (poolTemp <= solarSetTemp and solarVsPoolDifference > .5)):
                     logger.debug(f"Heater staying on. Pool still not warm enough {poolTemp} < {solarSetTemp}. Roof:{roofTemp} Roof temp until off:{poolTemp-needRoofTemp}")
                     solarShouldBeOn = True                        
             else: 
