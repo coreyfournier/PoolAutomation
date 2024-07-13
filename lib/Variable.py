@@ -56,8 +56,6 @@ class Variable(JSONWizard):
         }})
 
     value:any = field(
-        init=False, 
-        repr=False,
         metadata={'dataclasses_json': {
             'encoder': valueToJson,
             'decoder': JsonToValue
@@ -104,6 +102,12 @@ class Variable(JSONWizard):
                 DependencyContainer.actions.nofityListners(VariableChangeEvent(None, self))
             if(DependencyContainer.variables != None):
                 DependencyContainer.variables.save() 
+    
+    #Allows you to set the value, but not send out any notification.
+    #This is necessary on operations that startup and need to always set an initial state.
+    def setValueNoNotify(self, v:any):
+        if(v != self._value):
+            self._value = v
 
     @property
     def hasExpired(self) -> bool:

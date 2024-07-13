@@ -26,6 +26,8 @@ from IO.GpioStub import GpioStub
 from Devices.Display import Display
 from Devices.AtlasScientific import *
 from IO.AtlasScientificStub import *
+from IO.GeneratorRepo import *
+import requests
 
 logger = DependencyContainer.get_logger(__name__)
 display:Display = None
@@ -50,22 +52,36 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
     else:
         DependencyContainer.enviromentalSensor = AtlasScientific(os.environ["ATLAS_SCIENTIFIC"])    
 
+    #Only set the generator object if the values are set
+    if("GENERATOR_DATA_URL" in os.environ and "GENERATOR_GPIO" in os.environ):
+        DependencyContainer.generator = HttpGenerator(os.environ["GENERATOR_DATA_URL"], int(os.environ["GENERATOR_GPIO"]))
+
+    #Initalize it's state on startup to lock out the pump from turning on when the power is restored.
+    #expectation is that the power goes out, pi is off, generator starts up, transfers power, then the pi starts up. 
+    generatorLockoutDefaultState = False
+    if(DependencyContainer.generator != None):
+        logger.debug(f"Checking the generator state")
+        generatorLockoutDefaultState = DependencyContainer.generator.isOn()
+
     logger.debug("Loading variables")
     DependencyContainer.variables = Variables(
             #default variables
             [
+                # Quck clean
                 VariableGroup("Quick Clean",[
                     Variable("quick-clean-expires-in-hours","Expires in (hours)", float,0)                        
                     ],
                     isOnVariable="quick-clean-on"),
                 Variable("quick-clean-expires-on","Expires on", datetime, value=None, expires=True),
                 Variable("quick-clean-on",None, bool, value=False),
+
                 #Denotes if the slide is on or off. This will be a button
                 VariableGroup("Slide", [
                     Variable("slide-on", None, bool,value=False)
                 ], 
                 True,
-                "slide-on"),      
+                "slide-on"),
+                # Solar Heat      
                 Variable("solar-heat-on",None, bool, value=False),          
                 VariableGroup("Solar Heater", [                
                     Variable("solar-heat-temperature","Heater temp", float,value=90.0),                                    
@@ -74,7 +90,8 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
                     Variable("solar-heat-enabled","Enabled", bool, value=False)
                 ], 
                 True, 
-                "solar-heat-on"),                                
+                "solar-heat-on"),
+                # Freeze prevention                                
                 VariableGroup("Freeze Prevention", [
                     Variable("freeze-prevention-enabled","Enabled", bool, value=False)    
                 ],
@@ -82,10 +99,17 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
                 "freeze-prevention-on"),
                 #Indicates if the freeze prevention is currently running/on
                 Variable("freeze-prevention-on","Freeze prevention activated", bool, value=False),
-                Variable("freeze-prevention-temperature","Temperature to activate prevention", float, value=33)
+                Variable("freeze-prevention-temperature","Temperature to activate prevention", float, value=33),
+                VariableGroup("Generator Lockout", [
+                    Variable("generator-lockout-activated","Pump disabled while generator is on", bool, value = False)
+                ],
+                True, 
+                "generator-lockout-activated")        
             ],
             variableRepo)
     
+    DependencyContainer.variables.get("generator-lockout-activated").setValueNoNotify(generatorLockoutDefaultState)
+
     global display
     global displayRotation
 
@@ -108,6 +132,12 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
 
     logger.debug("Loading actions")
     DependencyContainer.actions = Actions([
+        Action("generator-lockout",
+            "Generator lockout", 
+            generatorLockoutChanged,
+            #Don't let the schedule run if the generator is on
+            DependencyContainer.variables.get("generator-lockout-activated").value
+        ),
         Action("quick-clean",
             "Quick Clean", 
             quickClean
@@ -132,6 +162,36 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus):
     #When schedule override is is turned off, check to see if the schedule should be resumed
     allChangeNotification
         )
+    
+    
+
+#Checks the generator activiation state.
+class HttpGenerator(GeneratorRepo):
+    def __init__(self, url:str, gpioPin:int) -> None:
+        super().__init__()
+        self._url = url
+        self._gpioPin = gpioPin
+
+    def isOn(self):
+        
+        try:
+            resp = requests.get(url=self._url, timeout = 5)
+            if(resp.status_code == 200):
+                data = resp.json() 
+                #find the pin and see if the generator is on
+                generatorPin = [x for x in data['pins'] if x['gpio'] == self._gpioPin]
+                
+                if(len(generatorPin) > 0):
+                    return generatorPin[0]['state']
+
+            else:
+                logger.error(f"Failed getting generator info, code {resp.status_code}")
+        except requests.exceptions.Timeout:
+            logger.error(f"Took too long to receive data from generator. Continuing.")
+        except:
+            logger.error(f"Unable to get generator status")
+        
+        return False
 
 def allChangeNotification(event:Event):
     global displayRotation    
@@ -172,6 +232,13 @@ def allChangeNotification(event:Event):
                 PH1 = None if sensor == None else sensor.ph,
                 temperature5 = None if sensor == None else sensor.temperature
             )
+
+         #If the generator is activated, then poll the state to see if we can disable it
+        if(isinstance(event, TimerEvent) and DependencyContainer.generator != None and DependencyContainer.variables.get("generator-lockout-activated").value):
+            if(not DependencyContainer.generator.isOn()):
+                logger.debug("Disabling generator lockout, generator is now off.")      
+                DependencyContainer.variables.get("generator-lockout-activated").value = False
+
     #update the display every 5 seconds
     if(isinstance(event, TimerEvent) and display != None):
         displayRotation = 1 + displayRotation
@@ -207,6 +274,18 @@ def allChangeNotification(event:Event):
             for valve in DependencyContainer.valves.getAll():
                 toDisplay.append(f"{valve.name}: {'On' if valve.isOn else 'Off'}")
             display.write(toDisplay)
+
+   
+    
+
+def generatorLockoutChanged(event:Event):
+    if(isinstance(event, VariableChangeEvent) and event.data.name in ["generator-lockout-activated"]):
+        if(event.data.value):
+            event.action.overrideSchedule = True
+            DependencyContainer.pumps.get("main").on(Speed.OFF)
+        else:
+            event.action.overrideSchedule = False
+        
 
 def quickClean(event:Event):
     

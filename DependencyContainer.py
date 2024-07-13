@@ -103,6 +103,7 @@ from Devices.TemperatureSensors import TemperatureSensors
 from IO.StateLoggerDuckDbRepo import StateLoggerDuckDbRepo
 from IO.SeverSentEvents import *
 from Devices.AtlasScientific import *
+from IO.GeneratorRepo import *
 
 
 
@@ -129,3 +130,5 @@ valves:Valves = None
 stateLogger:StateLoggerDuckDbRepo = None
 
 enviromentalSensor:AtlasScientific = None
+
+generator:GeneratorRepo = None
