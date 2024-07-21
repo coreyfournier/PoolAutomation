@@ -45,11 +45,13 @@ class AtlasScientific:
                 # set the last value now incase a reader of the event reads from the model and not the event.
                 self.__lastValue = tempPc
 
-                if(DependencyContainer.actions != None and self.__lastValue != None):
-                    if(round(tempLast.orp, self.__orpDigitsForChange) != round(tempPc.orp, self.__orpDigitsForChange)):
-                        DependencyContainer.actions.nofityListners(OrpChangeEvent(None,True, tempPc))
-                    if(round(tempLast.ph, self.__phDigitsForChange) != round(tempPc.ph, self.__phDigitsForChange)):
-                        DependencyContainer.actions.nofityListners(OrpChangeEvent(None,True, tempPc))            
+                if(tempLast != None):
+                    if(DependencyContainer.actions != None and self.__lastValue != None):
+                        if(round(tempLast.orp, self.__orpDigitsForChange) != round(tempPc.orp, self.__orpDigitsForChange)):
+                            DependencyContainer.actions.nofityListners(OrpChangeEvent(None,True, tempPc))
+
+                        if(round(tempLast.ph, self.__phDigitsForChange) != round(tempPc.ph, self.__phDigitsForChange)):
+                            DependencyContainer.actions.nofityListners(PhChangeEvent(None,True, tempPc))            
 
                 return self.__lastValue
             else:

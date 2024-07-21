@@ -52,7 +52,6 @@ class WorkerPlugin(SimplePlugin):
 
     def stop(self):
         '''Called when the engine stops'''
-        #self.bus.unsubscribe('do-something', self._do)
 
         self._running = False
 

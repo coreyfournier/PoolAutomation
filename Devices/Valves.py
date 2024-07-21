@@ -48,7 +48,7 @@ class Valves:
         self._valves[name].isOn = True
         
         if(DependencyContainer.actions != None):
-            DependencyContainer.actions.nofityListners(ValveChangeEvent(None,self._valves[name]))
+            DependencyContainer.actions.nofityListners(ValveChangeEvent(None, False, self._valves[name]))
 
     def off(self, name:"str|int"):
         #Allow a lookup by id
@@ -59,6 +59,6 @@ class Valves:
         self._valves[name].isOn = False
 
         if(DependencyContainer.actions != None):
-            DependencyContainer.actions.nofityListners(ValveChangeEvent(None,self._valves[name]))
+            DependencyContainer.actions.nofityListners(ValveChangeEvent(None, False, self._valves[name]))
 
         
