@@ -47,9 +47,9 @@ class AtlasScientific:
 
                 if(DependencyContainer.actions != None and self.__lastValue != None):
                     if(round(tempLast.orp, self.__orpDigitsForChange) != round(tempPc.orp, self.__orpDigitsForChange)):
-                        DependencyContainer.actions.nofityListners(OrpChangeEvent(None, tempPc))
+                        DependencyContainer.actions.nofityListners(OrpChangeEvent(None,True, tempPc))
                     if(round(tempLast.ph, self.__phDigitsForChange) != round(tempPc.ph, self.__phDigitsForChange)):
-                        DependencyContainer.actions.nofityListners(OrpChangeEvent(None, tempPc))            
+                        DependencyContainer.actions.nofityListners(OrpChangeEvent(None,True, tempPc))            
 
                 return self.__lastValue
             else:

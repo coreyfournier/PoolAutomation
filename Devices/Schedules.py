@@ -68,6 +68,7 @@ class Schedules:
                             #run the set speed for each pump listed
                             self._setPumpSpeed(item, item.pumps, False)
                             item.isRunning = True
+                            DependencyContainer.actions.nofityListners(ScheduleChangeEvent(None, False, item))
                         
                     elif(item.isRunning):
                         #Turn all the pumps off

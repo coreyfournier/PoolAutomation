@@ -157,7 +157,7 @@ class ScheduleChangeEvent(Event):
 
     def to_dict(self):
         return {
-            "data":  dataclasses.asdict(self.data),
+            "data":  self.data.toDictionary(),
             "dataType": self.dataType
         }
    

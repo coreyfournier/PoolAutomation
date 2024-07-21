@@ -53,4 +53,4 @@ class TemperatureSensors:
 
                 if(totalChange > 0.0):
                     if(DependencyContainer.actions != None):
-                        DependencyContainer.actions.nofityListners(TemperatureChangeEvent(None, device))
+                        DependencyContainer.actions.nofityListners(TemperatureChangeEvent(None, True, device))

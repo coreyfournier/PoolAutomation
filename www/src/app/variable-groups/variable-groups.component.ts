@@ -24,7 +24,15 @@ export class VariableGroupsComponent {
   }   
 
   ngOnInit(): void {
-    this.getVariableGroups().subscribe(vg=> this.variableGroups = vg);
+    this.getVariableGroups().subscribe((vg)=> {
+      //Sort the list by how the server is telling you the order of them.
+      this.variableGroups = vg.sort((l, r) => {
+        if (l.order > r.order) return 1;  
+        if (l.order < r.order) return -1;
+
+        return 0;
+      });
+  });
 
     this.eventsSubscription = this.events.subscribe((d) => {
       if(d.dataType == "VariableChangeEvent")

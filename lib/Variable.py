@@ -11,6 +11,7 @@ import datetime
 import DependencyContainer
 from dataclass_wizard import property_wizard
 from typing_extensions import Annotated
+import sys
 
 def dataTypeToString(dataType:type):
     return dataType.__name__
@@ -32,8 +33,10 @@ class VariableGroup(JSONWizard):
     title:str
     variables:"PyList[Variable]"
     showInUi:bool = True
-    #If there is a variable that holds the on status. This must be a boolean
+    #If there is a variable that holds the on status. The variable name must be a boolean
     isOnVariable:str = None
+    #What order the variable group will appear on the UI. It defaults to the order in which it was 
+    order:int = sys.maxsize
 
 def valueToJson(input):
     return input
@@ -99,7 +102,7 @@ class Variable(JSONWizard):
             self._value = v
             #It changed so notify everyone
             if(DependencyContainer.actions != None):
-                DependencyContainer.actions.nofityListners(VariableChangeEvent(None, self))
+                DependencyContainer.actions.nofityListners(VariableChangeEvent(None, False, self))
             if(DependencyContainer.variables != None):
                 DependencyContainer.variables.save() 
     
@@ -129,7 +132,7 @@ class Variable(JSONWizard):
             self._hasExpired = v
             #It changed so notify everyone
             if(DependencyContainer.actions != None):
-                DependencyContainer.actions.nofityListners(VariableChangeEvent(None, self))    
+                DependencyContainer.actions.nofityListners(VariableChangeEvent(None, False, self))    
             if(DependencyContainer.variables != None):
                 DependencyContainer.variables.save()
 

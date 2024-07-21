@@ -77,7 +77,7 @@ class Temperature(TemperatureDevice):
     
 @dataclass
 class TemperatureChangeEvent(Event):
-    data:Temperature = None
+    data:TemperatureDevice = None
     
     def __str__(self) -> str:
         return f"{self.data.name} - {self.data.get()}{DependencyContainer.temperatureUnit}"

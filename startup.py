@@ -105,11 +105,11 @@ if __name__ == '__main__':
     from IO.ValveRepo import ValveRepo
     from IO.StateLoggerMsSqlRepo import StateLoggerMsSqlRepo
 
-    if("PoolAutomationSqlConnection" in os.environ):
-        logger.debug(f'PoolAutomationSqlConnection={os.environ["PoolAutomationSqlConnection"]}')
-        DependencyContainer.stateLogger = StateLoggerMsSqlRepo(os.environ["PoolAutomationSqlConnection"])
-    else:
-        logger.warn(f"Missing environment variable for sql connection (PoolAutomationSqlConnection)")
+    # if("PoolAutomationSqlConnection" in os.environ):
+    #     logger.debug(f'PoolAutomationSqlConnection={os.environ["PoolAutomationSqlConnection"]}')
+    #     DependencyContainer.stateLogger = StateLoggerMsSqlRepo(os.environ["PoolAutomationSqlConnection"])
+    # else:
+    #     logger.warn(f"Missing environment variable for sql connection (PoolAutomationSqlConnection)")
 
     logger.debug("Loading valves")
     DependencyContainer.valves = Valves(ValveRepo(os.path.join(dataPath, "valves.json"),GPIO, i2cBus))
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     variableRepo = VariableRepo(os.path.join(dataPath, "variables.json"))
     
     #All custom changes are here
-    Configuration.configure(variableRepo, GPIO, i2cBus)    
+    Configuration.configure(variableRepo, GPIO, i2cBus, rootFolder)    
 
     # #Check the schedule as soon as the system starts up. something may need to be turned on or off.
     if(DependencyContainer.schedules != None):
