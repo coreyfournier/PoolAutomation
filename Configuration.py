@@ -24,6 +24,7 @@ from Plugins.IPlugin import IPlugin
 
 logger = DependencyContainer.get_logger(__name__)
 
+pluginList: "list[IPlugin]" = []
 
 def configure(variableRepo:VariableRepo, GPIO, i2cBus, rootFolder:str):
 
@@ -38,16 +39,18 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus, rootFolder:str):
         DependencyContainer.enviromentalSensor = AtlasScientificStub()
     else:
         DependencyContainer.enviromentalSensor = AtlasScientific(os.environ["ATLAS_SCIENTIFIC"])    
+        
+    pluginsPath = os.path.join(rootFolder, "Plugins")
+    
+    logger.info(f"Looking for plugin in '{pluginsPath}'")
 
-
-    pluginList: "list[IPlugin]" = []    
-    pluginsPath = os.path.join(rootFolder, "plugins")
     sys.path.append(pluginsPath)
     for file in glob.glob(os.path.join(pluginsPath, "*.py")):
         fileName = os.path.basename(file)
-        if(not fileName.startswith("IPlugin")):        
-            print(file)
+        if(not fileName.startswith("IPlugin")):                    
             moduleName = Path(file).stem            
+            logger.info(f'Loading plugin {moduleName} from "{file}"')
+
             module = importlib.import_module(f'Plugins.{moduleName}')
             pluginClass = getattr(module, moduleName)
             #Create an instance of the plugin class and add it to the list.

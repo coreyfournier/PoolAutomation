@@ -5,6 +5,7 @@
 */.git
 */.cache
 */_pycache_/*
+*/__pycache__/*
 *.db
 *.ps1
 */.gitignore

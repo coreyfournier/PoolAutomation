@@ -59,6 +59,7 @@ COPY Services/*.py /app/Services/
 COPY lib/*.py /app/lib/
 COPY data/*.json /app/data/
 COPY Devices/*.py /app/Devices/
+COPY Plugins/*.py /app/Plugins/
 
 EXPOSE 8080
 
@@ -66,7 +67,6 @@ ENV NODE_PATH=/packages/node_modules
 ENV DATA_PATH=/app/data/
 ENV FONT_PATH=/app/www/fonts/
 ENV ROOT_FOLDER=/app
-#docker build -f "Dockerfile" . -t "pool-automation:latest"
 
 RUN cd /app
 #Use for troubleshooting

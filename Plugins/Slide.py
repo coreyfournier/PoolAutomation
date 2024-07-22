@@ -37,7 +37,7 @@ class Slide(IPlugin):
         ]
 
     def slideStatusChanged(self, event:Event):    
-    #variable:Variable, oldValue:any, action:Action
+        #variable:Variable, oldValue:any, action:Action
         if(isinstance(event, VariableChangeEvent)):
             if(event.data.name in ["slide-on"]):
                 if(event.data.value):

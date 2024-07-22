@@ -5,3 +5,4 @@ display.png
 data/variables.json
 *.tar
 node_modules/
+__pyache__
