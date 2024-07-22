@@ -1,7 +1,7 @@
 from IPlugin import IPlugin
 import DependencyContainer
 from lib.Event import Event
-
+from datetime import timedelta
 from Devices.Temperature import *
 from lib.Actions import *
 from lib.Variables import *
