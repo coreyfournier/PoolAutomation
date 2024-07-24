@@ -21,7 +21,7 @@ class Display(IPlugin):
 
         
     def getAction(self)-> Action:
-        pass
+        return Action("Display", "display", self.onChange, False)
 
     def startup(self, GPIO:any, i2cBus:any) -> None:
         if("FONT_PATH" in os.environ):

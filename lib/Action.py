@@ -10,6 +10,7 @@ class Action:
     name:str
     #What is displayed to the user
     displayName:str
+    #What function to call when listening for events. It must accept Event as an argument.
     onChange:Callable = None
     #When true the schedule will not cause changes to anything
     _overrideSchedule:bool = False

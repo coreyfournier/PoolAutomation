@@ -6,7 +6,7 @@ class IPlugin:
     def __init__(self) -> None:
         pass
     
-    #Registers any actions
+    #Registers any actions that this plugin needs to perform based on events raised.
     def getAction(self)-> Action:
         pass
 
