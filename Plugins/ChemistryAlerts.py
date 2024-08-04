@@ -28,6 +28,9 @@ class ChemistryAlerts(IPlugin):
         #Only fire the event once. When it gets back in the normal range, then reset it.
         self._phEventFired = False
 
+        self._lastPhOnEvent = None
+        self._lastOrpOnEvent = None
+
     def getAction(self)-> Action:
         return Action("chemistry-changes", "Chemistry Changes",
             self.onChemistryChange
@@ -58,26 +61,32 @@ class ChemistryAlerts(IPlugin):
                 if(isinstance(event, OrpChangeEvent)):
                     if(event.data.orp > self.high_orp):                        
                         if(not self._orpEventFired):
-                            DependencyContainer.actions.nofityListners(OrpHighEvent(None, False, event.data))
                             self._orpEventFired = True;
+                            self._lastOrpOnEvent = event.data.orp
+                            DependencyContainer.actions.nofityListners(OrpHighEvent(None, False, event.data))                            
                     elif(event.data.orp < self.low_orp):
                         if(not self._orpEventFired):
-                            DependencyContainer.actions.nofityListners(OrpLowEvent(None, False, event.data))
-                            self._orpEventFired = True;
+                            self._orpEventFired = True;                            
+                            self._lastOrpOnEvent = event.data.orp
+                            DependencyContainer.actions.nofityListners(OrpLowEvent(None, False, event.data))                            
                     else: #reset it
                         self._orpEventFired = False
+                        self._lastOrpOnEvent = None
                 
                 if(isinstance(event, PhChangeEvent)):
                     if(event.data.ph > self.high_ph):
                         if(not self._phEventFired):
-                            DependencyContainer.actions.nofityListners(PhHighEvent(None, False, event.data))
                             self._phEventFired = True
+                            self._lastPhOnEvent = event.data.ph
+                            DependencyContainer.actions.nofityListners(PhHighEvent(None, False, event.data))                            
                     elif(event.data.ph < self.low_ph):
                         if(not self._phEventFired):
-                            DependencyContainer.actions.nofityListners(PhLowEvent(None, False, event.data))
                             self._phEventFired = True
+                            self._lastPhOnEvent = event.data.ph
+                            DependencyContainer.actions.nofityListners(PhLowEvent(None, False, event.data))                            
                     else: #reset it
-                        self._phEventFired = True
+                        self._phEventFired = False
+                        self._lastPhOnEvent = None
                 
 
                     
