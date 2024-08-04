@@ -25,6 +25,26 @@ class PhChangeEvent(Event):
         }
     
 @dataclass
+class PhLowEvent(PhChangeEvent):
+    data:PoolChemistry = None
+
+    def to_dict(self):
+        return {
+            "data":  self.data.to_dict(),
+            "dataType": self.dataType
+        }
+    
+@dataclass
+class PhHighEvent(PhChangeEvent):
+    data:PoolChemistry = None
+
+    def to_dict(self):
+        return {
+            "data":  self.data.to_dict(),
+            "dataType": self.dataType
+        }
+    
+@dataclass
 class OrpChangeEvent(Event):
     data:PoolChemistry = None
 
@@ -33,3 +53,24 @@ class OrpChangeEvent(Event):
             "data":  self.data.to_dict(),
             "dataType": self.dataType
         }
+    
+@dataclass
+class OrpLowEvent(OrpChangeEvent):
+    data:PoolChemistry = None
+
+    def to_dict(self):
+        return {
+            "data":  self.data.to_dict(),
+            "dataType": self.dataType
+        }
+    
+@dataclass
+class OrpHighEvent(OrpChangeEvent):
+    data:PoolChemistry = None
+
+    def to_dict(self):
+        return {
+            "data":  self.data.to_dict(),
+            "dataType": self.dataType
+        }
+
