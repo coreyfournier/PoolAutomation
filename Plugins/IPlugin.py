@@ -3,6 +3,8 @@ from lib.Actions import *
 from lib.Variables import *
 
 class IPlugin:
+    """ Allows the application to run user defined code and listen to core events.
+    """
     def __init__(self) -> None:
         pass
     

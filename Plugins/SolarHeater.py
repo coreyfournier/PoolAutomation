@@ -11,6 +11,11 @@ from Devices.DeviceController import DeviceController
 logger = DependencyContainer.get_logger(__name__)
 
 class SolarHeater(IPlugin):
+    """Controls the solar heater
+
+    Args:
+        IPlugin (_type_): _description_
+    """
     def __init__(self) -> None:
         pass
 
@@ -53,7 +58,6 @@ class SolarHeater(IPlugin):
             poolTemp = DependencyContainer.temperatureDevices.get("pool-temp").get(True)
             isSolarHeatOn = DependencyContainer.variables.get("solar-heat-on").value
 
-            logger.debug("Seeing if solar should be on or off")
             solarShouldBeOn = False
             pumpForSolar:Pump = DependencyContainer.pumps.get("main")
             solarVsPoolDifference = solarHeatTemp - poolTemp
@@ -63,7 +67,7 @@ class SolarHeater(IPlugin):
                 #Roof must greater than this
                 needRoofTemp = poolTemp + minRoofDifference
 
-                logger.debug(f"solarVsPoolDifference={solarVsPoolDifference} needRoofTemp={needRoofTemp}")
+                logger.debug(f"solarVsPoolDifference={solarVsPoolDifference} needRoofTemp={needRoofTemp} solarSetTemp={solarSetTemp} roofTemp={roofTemp} poolTemp={poolTemp} isSolarHeatOn={isSolarHeatOn}")
 
                 if(isSolarHeatOn):
                     #need to check if it should stay on
@@ -71,34 +75,33 @@ class SolarHeater(IPlugin):
                         solarShouldBeOn = False                   
                         logger.debug(f"Pool {poolTemp} > {solarSetTemp} turning off")                
 
+                    elif(solarVsPoolDifference > 0):
+                        #change the speed based on the temp of the output
+                        if(solarVsPoolDifference > 4 and pumpForSolar.currentSpeed == Speed.SPEED_3):
+                            logger.debug(f"It's hot enough, increasing the speed 2. Diff={solarVsPoolDifference}")
+                            pumpForSolar.on(Speed.SPEED_2)
+                        elif(solarVsPoolDifference > 2 and pumpForSolar.currentSpeed == Speed.SPEED_4):
+                            logger.debug(f"It's hot enough, increasing the speed to 3. Diff={solarVsPoolDifference}")
+                            pumpForSolar.on(Speed.SPEED_3)                        
+                        solarShouldBeOn = True
+
                     #If not producing heat, but the roof is still hot see if we can change the pump speed
                     elif(solarVsPoolDifference <= 0 and roofTemp >= needRoofTemp and pumpForSolar.currentSpeed != Speed.SPEED_4):
                         logger.debug(f"It's NOT hot enough, decreasing the speed to 4. Diff={solarVsPoolDifference}")
                         pumpForSolar.on(Speed.SPEED_4)
-                        solarShouldBeOn = True
-
-                    #speed the pump up if it hot enough
-                    elif(solarVsPoolDifference > 0):
-                        #change the speed based on the temp of the output
-                        if(solarVsPoolDifference > 1):
-                            if(pumpForSolar.currentSpeed == Speed.SPEED_4):
-                                logger.debug(f"It's hot enough, increasing the speed to 3. Diff={solarVsPoolDifference}")
-                                pumpForSolar.on(Speed.SPEED_3)
-                            elif(pumpForSolar.currentSpeed == Speed.SPEED_3):
-                                logger.debug(f"It's hot enough, increasing the speed 2. Diff={solarVsPoolDifference}")
-                                pumpForSolar.on(Speed.SPEED_2)
-                        solarShouldBeOn = True
+                        solarShouldBeOn = True                                  
                     else:
                         logger.debug(f"It's NOT hot enough, going to turn off Diff={solarVsPoolDifference}")
                         solarShouldBeOn = False
                 #See if it should be turned on
-                elif(roofTemp >= needRoofTemp and (poolTemp <= solarSetTemp and solarVsPoolDifference > .5)):
+                elif(roofTemp > needRoofTemp and poolTemp <= solarSetTemp):
                         logger.debug(f"Heater staying on. Pool still not warm enough {poolTemp} < {solarSetTemp}. Roof:{roofTemp} Roof temp until off:{poolTemp-needRoofTemp}")
                         solarShouldBeOn = True                        
                 else: 
                     if(isSolarHeatOn):
                         solarShouldBeOn = False                   
                         logger.debug(f"Pool {poolTemp} > {solarSetTemp} turning off")                    
+
             #If not enabled, but on, turn it off
             elif(isSolarHeatOn):
                 solarShouldBeOn = False            
@@ -116,7 +119,7 @@ class SolarHeater(IPlugin):
                 #It's not on and it should be
                 action.overrideSchedule = True
                 DependencyContainer.variables.get("solar-heat-on").value = True
-                pumpForSolar.on(Speed.SPEED_3)
+                pumpForSolar.on(Speed.SPEED_2)
                 DependencyContainer.valves.on("solar")
 
     @staticmethod
