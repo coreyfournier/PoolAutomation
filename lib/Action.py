@@ -6,6 +6,11 @@ import dataclasses
 
 @dataclass
 class Action:
+    """Actions that can perform tasks based on events.
+
+    Returns:
+        _type_: _description_
+    """
     #Name that is used when coding if necessary
     name:str
     #What is displayed to the user
@@ -37,6 +42,14 @@ class Action:
 
 @dataclass
 class OverrideChangeEvent(Event):
+    """Event fired when an override to the schedule occurs.
+
+    Args:
+        Event (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     data:Action = None
 
     def to_dict(self):

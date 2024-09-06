@@ -7,6 +7,11 @@ from Devices.Light import *
 logger = DependencyContainer.get_logger(__name__)
 
 class GloBrite(Light):
+	"""Pentair glo bright light controller.
+
+	Args:
+		Light (_type_): _description_
+	"""
 	def __init__(self, name:str, displayName:str, controller:DeviceController, delay_in_seconds:float = .5):	
 		super().__init__(name, displayName)
 		self.delay_in_seconds = delay_in_seconds

@@ -2,6 +2,9 @@ from dataclasses import dataclass
 
 @dataclass
 class Event:
+    """Base event class
+    """
+
     def __init__(self) -> None:
         pass
     #Data type is set by the server sent event process.

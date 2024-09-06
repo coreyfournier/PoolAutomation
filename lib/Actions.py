@@ -7,6 +7,8 @@ from lib.Action import Action
 logger = DependencyContainer.get_logger(__name__)
 
 class Actions:
+    """Custom actions to drive automation
+    """
     def __init__(self, actions:"list[Action]" = None, allChangeListner:Callable = None) -> None:
         """Custom actions to drive automation
 

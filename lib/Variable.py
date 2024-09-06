@@ -47,6 +47,14 @@ def JsonToValue(input):
 @dataclass_json
 @dataclass
 class Variable(JSONWizard):
+    """Holds a value and is automatically saved and can be passed around via events when changes occur.
+
+    Args:
+        JSONWizard (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     #Name you can use in code that will never change.
     name:str
     #What will be shown to the user
@@ -106,9 +114,12 @@ class Variable(JSONWizard):
             if(DependencyContainer.variables != None):
                 DependencyContainer.variables.save() 
     
-    #Allows you to set the value, but not send out any notification.
-    #This is necessary on operations that startup and need to always set an initial state.
     def setValueNoNotify(self, v:any):
+        """Allows you to set the value, but not send out any notification.
+        This is necessary on operations that startup and need to always set an initial state.
+        Args:
+            v (any): Value to set
+        """
         if(v != self._value):
             self._value = v
 
@@ -124,7 +135,11 @@ class Variable(JSONWizard):
 
     @hasExpired.setter
     def hasExpired(self, v:bool)->None:
-        #If the variable does not exists, then declare it and set the value for it
+        """If the variable does not exists, then declare it and set the value for it
+
+        Args:
+            v (bool): True if expired false otherwise
+        """
         if not hasattr(self, '_hasExpired'):
             self._hasExpired = v
 

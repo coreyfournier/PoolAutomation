@@ -9,6 +9,11 @@ os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
 
 class OneWire(Temperature):
+    """One wire temp sensors (DS18B20)
+
+    Args:
+        Temperature (_type_): _description_
+    """
     def __init__(self,id:int, name:str, displayName:str, shortDisplayName:str, deviceId:str, baseDeviceDirectory:str = "/sys/bus/w1/devices/", devicePrefix:str = "28*") -> None:
         """One wire temp sensors (DS18B20)
             Requre DI for the temp format.

@@ -14,6 +14,14 @@ from IO.GeneratorRepo import *
 logger = DependencyContainer.get_logger(__name__)
 
 class GeneratorLockout(IPlugin):
+    """Stops the pump from running if the generator is on when the service starts up. Polls for changes once detected to see when it is turned off.
+    Looks for the URL of the service via GENERATOR_DATA_URL
+    GENERATOR_GPIO the pin on the board that is checked to see if it's on or not.
+    This plugin expects to use the project https://github.com/coreyfournier/Generator
+
+    Args:
+        IPlugin (_type_): _description_
+    """
     def __init__(self) -> None:
         #Only set the generator object if the values are set
         if("GENERATOR_DATA_URL" in os.environ and "GENERATOR_GPIO" in os.environ):
@@ -41,11 +49,8 @@ class GeneratorLockout(IPlugin):
 
     def getVariables(self) -> "list[Variable|VariableGroup]":
         return [
-            #Indicates if the freeze prevention is currently running/on
-            Variable("freeze-prevention-on","Freeze prevention activated", bool, value=False),
-            Variable("freeze-prevention-temperature","Temperature to activate prevention", float, value=33),
             VariableGroup("Generator Lockout", [
-                Variable("generator-lockout-activated","Pump disabled while generator is on", bool, value = False)
+                Variable("generator-lockout-activated","Pump disabled while generator is on", bool, value = self.generatorLockoutDefaultState)
             ],
             True, 
             "generator-lockout-activated")

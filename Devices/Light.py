@@ -11,6 +11,11 @@ class Scene:
 
 @dataclass
 class Light:
+    """Generic light class.
+
+    Returns:
+        _type_: _description_
+    """
     #api name of the light. It must be unique
     name:str
     displayName:str

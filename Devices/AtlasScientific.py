@@ -5,13 +5,12 @@ from Devices.PoolChemistry import *
 
 logger = DependencyContainer.get_logger(__name__)
 
-"""
-Expects to use the wifi pool monitor software i adapted 
+
+class AtlasScientific:
+    """Expects to use the wifi pool monitor software i adapted 
 https://github.com/coreyfournier/PoolChemistry
 This is the kit https://atlas-scientific.com/kits/wi-fi-pool-kit/
-
-"""
-class AtlasScientific:
+    """
     def __init__(self, url:str, timeout = 3, maxDigits = 2, orpDigitsForChange = 0, phDigitsForChange = 1) -> None:
         self.__url = url
         self.__timeout = timeout
