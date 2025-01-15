@@ -32,9 +32,30 @@ class VariableGroup(JSONWizard):
     """
     title:str
     variables:"PyList[Variable]"
+    #Should the group be shown in the UI
     showInUi:bool = True
     #If there is a variable that holds the on status. The variable name must be a boolean
     isOnVariable:str = None
+
+    @property
+    def isOnVariable(self) -> str:
+        if hasattr(self, '_isOnVariable') and not isinstance(self._isOnVariable, property):            
+            return self._isOnVariable    
+        else:
+            return None
+    
+    @isOnVariable.setter
+    def isOnVariable(self, value:str) -> None:
+        """When set and there isn't already a variable for the name, one is added
+            This will prevent failures when the value is checked, but never set.
+        Args:
+            value (str): Name of the variable
+        """
+        if(not (value in self.variables)):
+            self.variables.append(Variable(value, "Is On", bool, False, showInUi = False))
+
+        self._isOnVariable = value
+
     #What order the variable group will appear on the UI. It defaults to the order in which it was 
     order:int = sys.maxsize
 
@@ -81,6 +102,9 @@ class Variable(JSONWizard):
         init=True, 
         repr=False,
         default=True)
+    
+    #Even if this is true, the variable must be in a group to be shown in the UI.
+    showInUi:bool = True
     
     #Abbreviated to val, because value is a reserved word. And it wasn't documented :(
     @property
@@ -158,7 +182,8 @@ class Variable(JSONWizard):
             "dataType": self.dataType,
             "displayName": self.displayName,
             "expires": self.expires,
-            "value": self.value
+            "value": self.value,
+            "showInUi": self.showInUi
         }
 
 @dataclass

@@ -57,9 +57,11 @@ class Variables:
         if(DependencyContainer.actions != None):
             DependencyContainer.actions.nofityListners(VariableChangeEvent(None, False, variable))
             
-    def get(self, name:str) -> Variable:
-        if(name in self._repo.get()):
+    def get(self, name:str, default:any = None) -> Variable:
+        if(name in self._repo.get()):            
             return self._repo.get()[name]
+        elif(default != None):
+            return Variable(name, "", None, default)
         else:
             return None   
     

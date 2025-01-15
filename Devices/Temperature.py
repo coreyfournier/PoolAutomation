@@ -42,7 +42,7 @@ class Temperature(TemperatureDevice):
         """Remembers the last temp for the last get and returns it.
 
         Returns:
-            float: _description_
+            float: gets the last value recorded
         """
         if(self.deviceId in self._tracked):   
             return Temperature.getTemperatureToLocal(
@@ -55,6 +55,16 @@ class Temperature(TemperatureDevice):
     
     @staticmethod
     def getTemperatureToLocal(celsius:float, unit:str, maxDigits:int) -> float:
+        """Converts celsius to the specified unit. When celsius is requested, it just returns the same value.
+
+        Args:
+            celsius (float): This should always be celsius. 
+            unit (str): c or f
+            maxDigits (int): Max digits to return
+
+        Returns:
+            float: _description_
+        """
         if(celsius == None):
             return None        
         if(unit == "c"):

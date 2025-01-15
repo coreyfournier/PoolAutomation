@@ -22,8 +22,7 @@ class SolarHeater(IPlugin):
     def getAction(self)-> Action:
         return Action("solar-heat", "Solar Heater",
             self.evaluateSolarStatus,
-            #if it starts up and freeze prevention is on, don't let the schedule start
-            DependencyContainer.variables.get("solar-heat-on").value
+            DependencyContainer.variables.get("solar-heat-on", False).value
         )
     
     def startup(self, GPIO:any, i2cBus:any) -> None:
@@ -43,7 +42,7 @@ class SolarHeater(IPlugin):
                 1)]
 
 
-    def evaluateSolarStatus(self, event):
+    def evaluateSolarStatus(self, event: Event):
         action = event.action
         shouldCheck = \
             (isinstance(event, TemperatureChangeEvent) and event.data.name in ["roof","solar-heat", "pool-temp"]) or  \
@@ -56,7 +55,7 @@ class SolarHeater(IPlugin):
             solarHeatTemp = DependencyContainer.temperatureDevices.get("solar-heat").get(True)
             roofTemp = DependencyContainer.temperatureDevices.get("roof").get(True)
             poolTemp = DependencyContainer.temperatureDevices.get("pool-temp").get(True)
-            isSolarHeatOn = DependencyContainer.variables.get("solar-heat-on").value
+            isSolarHeatOn = DependencyContainer.variables.get("solar-heat-on", False).value
 
             solarShouldBeOn = False
             pumpForSolar:Pump = DependencyContainer.pumps.get("main")

@@ -44,7 +44,7 @@ class GeneratorLockout(IPlugin):
             "Generator lockout", 
             self.onChange,
             #Don't let the schedule run if the generator is on
-            DependencyContainer.variables.get("generator-lockout-activated").value
+            False if(DependencyContainer.variables.get("generator-lockout-activated") == None) else DependencyContainer.variables.get("generator-lockout-activated").value
         )
 
     def getVariables(self) -> "list[Variable|VariableGroup]":
@@ -67,7 +67,7 @@ class GeneratorLockout(IPlugin):
         #Allow it to check every 5 minutes or when something changes that is not time and temp
         if((isinstance(event, TimerEvent) and event.secondsPassedTheHour % 300 == 0) or (not isinstance(event, TimerEvent) and not event.isFrequentEvent)):
             #If the generator is activated, then poll the state to see if we can disable it
-            if(isinstance(event, TimerEvent) and DependencyContainer.generator != None and DependencyContainer.variables.get("generator-lockout-activated").value):
+            if(isinstance(event, TimerEvent) and DependencyContainer.generator != None and DependencyContainer.variables.get("generator-lockout-activated", False).value):
                 if(not DependencyContainer.generator.isOn()):
                     logger.debug("Disabling generator lockout, generator is now off.")      
                     DependencyContainer.variables.get("generator-lockout-activated").value = False

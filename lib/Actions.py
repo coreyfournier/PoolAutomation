@@ -34,7 +34,7 @@ class Actions:
             try:
                 self._allChangeListner(event)
             except Exception as err:
-                logger.error(f"Failed notifying all change listners. Error:{err}")
+                logger.error(f"Failed notifying all change listners. Error:{err} Data:{event.to_dict()}")
 
         for key, action in self._registered.items():
             if(action.onChange != None):
@@ -42,7 +42,7 @@ class Actions:
                 try:
                     action.onChange(event)
                 except Exception as err:
-                    logger.error(f"Failed onChange event notification for Action:'{action.name}'. Error:{err}")
+                    logger.error(f"Failed onChange event notification for Action:'{action.name}'. Error:{err} Data:{event.to_dict()}")
                 
 
     def getScheduleOverrides(self)-> "list[Action]":

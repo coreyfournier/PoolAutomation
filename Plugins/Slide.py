@@ -20,7 +20,7 @@ class Slide(IPlugin):
             #on variable change
             self.slideStatusChanged, 
             #if it starts up and the slide is on, don't let the schedule start
-            DependencyContainer.variables.get("slide-on").value
+            False if(DependencyContainer.variables.get("slide-on") == None) else DependencyContainer.variables.get("slide-on").value
         )
     
     def startup(self, GPIO:any, i2cBus:any) -> None:
