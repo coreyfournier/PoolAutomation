@@ -122,6 +122,24 @@
       "expires": false,
       "hasExpired": true,
       "showInUi": true
+    },
+    {
+      "name": "solar-heat-on",
+      "displayName": null,
+      "dataType": "bool",
+      "value": false,
+      "expires": false,
+      "hasExpired": true,
+      "showInUi": true
+    },
+    {
+      "name": "quick-clean-expires-on",
+      "displayName": "Expires on",
+      "dataType": "datetime",
+      "value": null,
+      "expires": true,
+      "hasExpired": true,
+      "showInUi": true
     }
   ]
 }

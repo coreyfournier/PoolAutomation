@@ -32,9 +32,15 @@ class VariableRepo:
                 self._container.groups.append(variable)
                 refresh = True        
         else:
+            #the name already exists, don't add a duplicate
             if(variable.name in self._variables):    
+                index =  [i for i, x in enumerate(self._container.variables) if x.name == variable.name][0]                
+                self._container.variables[index] = variable
+                refresh = True
+            else:
                 self._container.variables.append(variable)
                 refresh = True
+
         
         if(refresh):
             self._variables = self._container.getAll()
