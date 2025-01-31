@@ -34,8 +34,11 @@ class VariableRepo:
         else:
             #the name already exists, don't add a duplicate
             if(variable.name in self._variables):    
-                index =  [i for i, x in enumerate(self._container.variables) if x.name == variable.name][0]                
-                self._container.variables[index] = variable
+                self._variables[variable.name] = variable
+                existing = [i for i, x in enumerate(self._container.variables) if x.name == variable.name]
+                if(len(existing) > 0):
+                    self._container.variables[existing[0]] = variable
+
                 refresh = True
             else:
                 self._container.variables.append(variable)
