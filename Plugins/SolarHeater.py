@@ -1,4 +1,4 @@
-from IPlugin import IPlugin
+from Plugins.IPlugin import IPlugin
 import DependencyContainer
 from lib.Event import Event
 
@@ -19,6 +19,11 @@ class SolarHeater(IPlugin):
     def __init__(self) -> None:
         #How long the heater has been running.
         self._onSince:datetime = None
+        #How long the pump will run at full speed trying to prime
+        self._defaultPrimeDurationInSeconds:int = 5 * 60
+        #How much the temperature needs to over come before a state change occurs.
+        #This is necessary because the sensor isn't very accurate
+        self._temperatureMargin:float = .3
 
     def getAction(self)-> Action:
         return Action("solar-heat", "Solar Heater",
@@ -75,8 +80,8 @@ class SolarHeater(IPlugin):
             minRoofDifference = DependencyContainer.variables.get("solar-min-roof-diff").value
             isSolarEnabled = DependencyContainer.variables.get("solar-heat-enabled").value
             solarHeatTemp = DependencyContainer.temperatureDevices.get("solar-heat").get(True)
-            roofTemp = DependencyContainer.temperatureDevices.get("roof").get(True)
-            poolTemp = DependencyContainer.temperatureDevices.get("pool-temp").get(True)
+            roofTemp = round(DependencyContainer.temperatureDevices.get("roof").get(True), 1)
+            poolTemp = round(DependencyContainer.temperatureDevices.get("pool-temp").get(True), 1)
             isSolarHeatOn = DependencyContainer.variables.get("solar-heat-on", False).value
 
             solarShouldBeOn = False
@@ -92,7 +97,7 @@ class SolarHeater(IPlugin):
 
                 if(isSolarHeatOn):
                     #need to check if it should stay on
-                    if(poolTemp >= solarSetTemp):
+                    if((poolTemp + self._temperatureMargin) >= solarSetTemp):
                         solarShouldBeOn = False                   
                         logger.debug(f"Pool {poolTemp} > {solarSetTemp} turning off")                
                               
@@ -100,7 +105,7 @@ class SolarHeater(IPlugin):
                         logger.debug(f"It's NOT hot enough, going to turn off Diff={solarVsPoolDifference}")
                         solarShouldBeOn = False
                 #See if it should be turned on
-                elif(roofTemp > needRoofTemp and poolTemp <= solarSetTemp):
+                elif((roofTemp + self._temperatureMargin) > needRoofTemp and (poolTemp - self._temperatureMargin) <= solarSetTemp):
                         logger.debug(f"Heater staying on. Pool still not warm enough {poolTemp} < {solarSetTemp}. Roof:{roofTemp} Roof temp until off:{poolTemp-needRoofTemp}")
                         solarShouldBeOn = True                        
                 else: 

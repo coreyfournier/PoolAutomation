@@ -3,7 +3,7 @@ import os
 import logging.handlers
 import socket
 import logging, platform
-from syslog_rfc5424_formatter import RFC5424Formatter
+import importlib.util
 
 #defaults to DEBUG in the get_logger
 #This must be set BEFORE any imports of custom code because it calls get_logger
@@ -83,7 +83,8 @@ def get_logger(logger_name:str) -> logging.Logger:
     logger.setLevel(log_level)
 
     #Log to a syslog if it is specified in the environment    
-    if (logServerName in os.environ and logServerPort in os.environ):        
+    if (importlib.util.find_spec("syslog_rfc5424_formatter") is not None and logServerName in os.environ and logServerPort in os.environ):   
+        from syslog_rfc5424_formatter import RFC5424Formatter     
         syslogHandler = logging.handlers.SysLogHandler(address=(os.environ[logServerName], int(os.environ[logServerPort])))        
         syslogHandler.setFormatter(RFC5424Formatter())
         logger.addHandler(syslogHandler)
