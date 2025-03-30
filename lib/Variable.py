@@ -6,11 +6,8 @@ from dataclass_wizard import JSONWizard
 import builtins 
 from marshmallow import Schema, fields, EXCLUDE
 from typing import List as PyList
-from lib.Actions import Event
 import datetime
 import DependencyContainer
-from dataclass_wizard import property_wizard
-from typing_extensions import Annotated
 import sys
 
 def dataTypeToString(dataType:type):
@@ -126,6 +123,8 @@ class Variable(JSONWizard):
         Args:
             v (any): bool|float|string|int
         """
+        from Events.VariableChangeEvent import VariableChangeEvent
+        
         #If the variable does not exists, then declare it and set the value for it
         if not hasattr(self, '_value'):
             self._value = v
@@ -134,7 +133,7 @@ class Variable(JSONWizard):
             self._value = v
             #It changed so notify everyone
             if(DependencyContainer.actions != None):
-                DependencyContainer.actions.nofityListners(VariableChangeEvent(None, False, self))
+                DependencyContainer.actions.nofityListners(VariableChangeEvent(None, False,None, self))
             if(DependencyContainer.variables != None):
                 DependencyContainer.variables.save() 
     
@@ -171,7 +170,7 @@ class Variable(JSONWizard):
             self._hasExpired = v
             #It changed so notify everyone
             if(DependencyContainer.actions != None):
-                DependencyContainer.actions.nofityListners(VariableChangeEvent(None, False, self))    
+                DependencyContainer.actions.nofityListners(VariableChangeEvent(None, False,None, self))    
             if(DependencyContainer.variables != None):
                 DependencyContainer.variables.save()
 
@@ -186,15 +185,7 @@ class Variable(JSONWizard):
             "showInUi": self.showInUi
         }
 
-@dataclass
-class VariableChangeEvent(Event):
-    data:Variable = None
 
-    def to_dict(self):
-        return {
-            "data":  self.data.to_dict(),
-            "dataType": self.dataType
-        }
     
 @dataclass_json(undefined=Undefined.EXCLUDE)
 @dataclass

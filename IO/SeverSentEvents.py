@@ -1,8 +1,8 @@
-from lib.Event import *
+from Events.Event import *
 from queue import Queue
 import time
 from typing import Callable
-from lib.Action import TimerEvent
+from Events.TimerEvent import TimerEvent
 
 class ServerSentEvents:
     def __init__(self, maxQueueSize = 15) -> None:

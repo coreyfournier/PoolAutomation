@@ -7,6 +7,7 @@ import DependencyContainer
 from Devices.Pump import *
 from Devices.Pumps import Pumps
 from IO.ScheduleRepo import *
+from Events.ScheduleChangeEvent import *
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -68,7 +69,7 @@ class Schedules:
                             #run the set speed for each pump listed
                             self._setPumpSpeed(item, item.pumps, False)
                             item.isRunning = True
-                            DependencyContainer.actions.nofityListners(ScheduleChangeEvent(None, False, item))
+                            DependencyContainer.actions.nofityListners(ScheduleChangeEvent(None, False, None, item))
                         
                     elif(item.isRunning):
                         #Turn all the pumps off

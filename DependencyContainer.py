@@ -94,7 +94,7 @@ def get_logger(logger_name:str) -> logging.Logger:
 #from Lights.GloBrite import GloBrite 
 from Devices.Pump import Pump
 from Devices.Schedules import Schedules
-from Devices.Temperature import Temperature
+from Devices.TemperatureBase import TemperatureBase
 from lib.Actions import *
 from lib.Variables import Variables
 from Devices.Valves import Valves
@@ -121,7 +121,7 @@ schedules:Schedules = None
 #List of devices available. key is the name of the device, second is the device
 temperatureDevices:TemperatureSensors = None
 
-#Custom actions / code that can execute based on the environment.
+#Custom actions / code that can execute based on events fired in the system.
 actions:Actions = None
 
 variables:Variables = None

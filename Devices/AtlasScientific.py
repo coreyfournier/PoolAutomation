@@ -1,7 +1,9 @@
 import requests
-from Devices.Temperature import Temperature
+from Devices.TemperatureBase import TemperatureBase
 import DependencyContainer
 from Devices.PoolChemistry import *
+from Events.OrpChangeEvent import *
+from Events.PhChangeEvent import *
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -32,7 +34,7 @@ This is the kit https://atlas-scientific.com/kits/wi-fi-pool-kit/
 
                 tempPc = PoolChemistry(
                     #Change the temperature to the local units
-                    Temperature.getTemperatureToLocal(
+                    TemperatureBase.getTemperatureToLocal(
                         data["RTD"],
                         DependencyContainer.temperatureUnit,
                         self.__maxDigits
@@ -47,10 +49,10 @@ This is the kit https://atlas-scientific.com/kits/wi-fi-pool-kit/
                 if(tempLast != None):
                     if(DependencyContainer.actions != None and self.__lastValue != None):
                         if(round(tempLast.orp, self.__orpDigitsForChange) != round(tempPc.orp, self.__orpDigitsForChange)):
-                            DependencyContainer.actions.nofityListners(OrpChangeEvent(None,True, tempPc))
+                            DependencyContainer.actions.nofityListners(OrpChangeEvent(None,True,None, tempPc))
 
                         if(round(tempLast.ph, self.__phDigitsForChange) != round(tempPc.ph, self.__phDigitsForChange)):
-                            DependencyContainer.actions.nofityListners(PhChangeEvent(None,True, tempPc))            
+                            DependencyContainer.actions.nofityListners(PhChangeEvent(None,True,None, tempPc))            
 
                 return self.__lastValue
             else:

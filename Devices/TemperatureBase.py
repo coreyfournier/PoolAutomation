@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 import DependencyContainer
-from lib.Event import Event
+from Events.Event import Event
 
 @dataclass
 class TemperatureDevice:
@@ -10,8 +10,17 @@ class TemperatureDevice:
     unit:str = DependencyContainer.temperatureUnit.upper()
 
 
-class Temperature(TemperatureDevice):
-    def __init__(self, id:int, name:str, displayName:str, shortDisplayName:str,deviceId:str) -> None:
+class TemperatureBase(TemperatureDevice):
+    def __init__(self, id:int, name:str, displayName:str, shortDisplayName:str, deviceId:str) -> None:
+        """_summary_
+
+        Args:
+            id (int): row number from the data store
+            name (str): api name of the device
+            displayName (str):  What is displayed to the user
+            shortDisplayName (str): What is displayed to user, but a shorter version
+            deviceId (str): Id of the device on the system
+        """
         self.id = id
         self.deviceId:str = deviceId
         self.name:str = name
@@ -28,7 +37,14 @@ class Temperature(TemperatureDevice):
         Returns:
             float: temp in fahrenheit or celsius. This is set in the Dependency container.
         """
-        pass    
+        if(self.deviceId in self._tracked):   
+            return TemperatureBase.getTemperatureToLocal(
+                self._tracked[self.deviceId],
+                DependencyContainer.temperatureUnit,
+                self._maxDigits
+            )                    
+        else:
+            return None
 
     def getAllDevices(self)-> "list[str]":
         """Gets all devices for this type of temp sensor
@@ -45,7 +61,7 @@ class Temperature(TemperatureDevice):
             float: gets the last value recorded
         """
         if(self.deviceId in self._tracked):   
-            return Temperature.getTemperatureToLocal(
+            return TemperatureBase.getTemperatureToLocal(
                 self._tracked[self.deviceId],
                 DependencyContainer.temperatureUnit,
                 self._maxDigits

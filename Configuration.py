@@ -11,7 +11,7 @@ from Devices.Valves import *
 from Devices.RelayPump import *
 from Devices.GloBrite import GloBrite 
 from Devices.Lights import Lights
-from lib.Action import OverrideChangeEvent
+from Events.OverrideChangeEvent import OverrideChangeEvent
 from Devices.AtlasScientific import *
 from IO.AtlasScientificStub import *
 import importlib.util
@@ -81,7 +81,7 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus, rootFolder:str):
 #Listens for all changes
 def allChangeNotification(event:Event):
         
-    logger.debug(f"Change detected ---- {event}")           
+    logger.debug(f"Change detected ---- {event.__class__}")           
 
     #sends notifications to the client
     DependencyContainer.serverSentEvents.raiseEvent(event)

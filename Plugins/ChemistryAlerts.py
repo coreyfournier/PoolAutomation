@@ -1,14 +1,20 @@
 from IPlugin import IPlugin
 import DependencyContainer
-from lib.Event import Event
+from Events.Event import Event
 
-from Devices.Temperature import *
+from Devices.TemperatureBase import *
 from lib.Actions import *
 from lib.Variables import *
 from Devices.Pump import *
 from Devices.IDeviceController import IDeviceController
 from Devices.PoolChemistry import *
 import datetime
+from Events.OrpChangeEvent import *
+from Events.OrpLowEvent import *
+from Events.OrpHighEvent import *
+from Events.PhChangeEvent import *
+from Events.PhLowEvent import *
+from Events.PhHighEvent import *
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -43,8 +49,7 @@ class ChemistryAlerts(IPlugin):
         return []
     
     def onChemistryChange(self, event:Event):
-        action = event.action
-        
+       
         #Note when the pump first turned on
         if(isinstance(event, PumpChangeEvent)):
             if(event.newSpeed == Speed.OFF):

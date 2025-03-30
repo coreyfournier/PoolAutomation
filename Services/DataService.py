@@ -3,7 +3,7 @@ import cherrypy
 import os
 import DependencyContainer
 import json
-from lib.Event import Event
+from Events.Event import Event
 
 logger = DependencyContainer.get_logger(__name__)
 

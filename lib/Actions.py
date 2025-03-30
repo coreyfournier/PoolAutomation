@@ -1,7 +1,6 @@
 from typing import Callable
 import DependencyContainer
-from dataclasses import dataclass
-from lib.Event import Event
+from Events.Event import Event
 from lib.Action import Action
 
 logger = DependencyContainer.get_logger(__name__)
@@ -24,18 +23,29 @@ class Actions:
                 self._registered[item.name] = item
     
     def add(self, action:Action):
+        """Registers a listner. The listner contains what action will be fired upon a new event
+
+        Args:
+            action (Action): _description_
+        """
         self._registered[action.name] = action
 
     def get(self)-> "list[Action]":
         return [item for key, item in self._registered.items()]    
 
     def nofityListners(self, event:Event):
+        """Notify all listners of the event
+
+        Args:
+            event (Event): Which event is being rasied
+        """
         if(self._allChangeListner != None):
             try:
                 self._allChangeListner(event)
             except Exception as err:
                 logger.error(f"Failed notifying all change listners. Error:{err} Data:{event.to_dict()}")
 
+        #Fire all of the actions passing in which event was raised.
         for key, action in self._registered.items():
             if(action.onChange != None):
                 event.action = action

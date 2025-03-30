@@ -1,5 +1,5 @@
 from IO.ITemperatureRepo import ITemperatureRepo
-from Devices.Temperature import Temperature,TemperatureChangeEvent, TemperatureDevice
+from Devices.TemperatureBase import TemperatureBase,TemperatureChangeEvent, TemperatureDevice
 import DependencyContainer
 
 class TemperatureSensors:
@@ -9,15 +9,15 @@ class TemperatureSensors:
         #How many digits are used to look for changes.
         self.maxPrecisionForChange = 1
 
-        self._allDevices:"list[Temperature]" = []
-        self._byId:"dict[int,Temperature]" = {}
+        self._allDevices:"list[TemperatureBase]" = []
+        self._byId:"dict[int,TemperatureBase]" = {}
 
         for key, device in self._deviceByName.items():
             self._byId[device.id] = device
             self._allDevices.append(device)
 
 
-    def get(self, name:str) -> Temperature:
+    def get(self, name:str) -> TemperatureBase:
         """Gets the devices by name
 
         Args:
@@ -28,7 +28,7 @@ class TemperatureSensors:
         """
         return self._deviceByName[name]
     
-    def getById(self, id:int) -> Temperature:
+    def getById(self, id:int) -> TemperatureBase:
         return self._byId[id]
     
     def getAll(self) -> "list[TemperatureDevice]":
@@ -53,4 +53,4 @@ class TemperatureSensors:
 
                 if(totalChange > 0.0):
                     if(DependencyContainer.actions != None):
-                        DependencyContainer.actions.nofityListners(TemperatureChangeEvent(None, True, device))
+                        DependencyContainer.actions.nofityListners(TemperatureChangeEvent(None, True,None, device))

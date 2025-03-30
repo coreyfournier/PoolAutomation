@@ -1,7 +1,7 @@
 from enum import Enum
 from dataclasses import dataclass
 from typing import Callable
-from lib.Event import Event
+from Events.Event import Event
 
 class Speed(Enum):
     OFF = 0
@@ -24,10 +24,12 @@ class Pump:
     currentSpeed:Speed    
 
     def on(self, speed:Speed):
-        pass
+        #Default implementation
+        self.currentSpeed = speed
 
     def off(self):
-        pass
+        #Default implementation
+        self.currentSpeed = Speed.OFF
 
     def speeds(self) ->"list[SpeedDisplay]":
         pass

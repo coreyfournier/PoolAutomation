@@ -43,7 +43,7 @@ class Variables:
                     item.hasExpired = True
                     #Notify anyone that it expired
                     if(DependencyContainer.actions != None):
-                        DependencyContainer.actions.nofityListners(VariableChangeEvent(None, False, item))
+                        DependencyContainer.actions.nofityListners(VariableChangeEvent(None, False,None, item))
     
     def addVariable(self, variable:"Variable|VariableGroup") -> None:        
         self._repo.add(variable)
@@ -55,7 +55,7 @@ class Variables:
         self._repo.save()
 
         if(DependencyContainer.actions != None):
-            DependencyContainer.actions.nofityListners(VariableChangeEvent(None, False, variable))
+            DependencyContainer.actions.nofityListners(VariableChangeEvent(None, False,None, variable))
             
     def get(self, name:str, default:any = None) -> Variable:
         if(name in self._repo.get()):            

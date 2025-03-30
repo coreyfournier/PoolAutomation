@@ -1,13 +1,13 @@
 from IPlugin import IPlugin
 import DependencyContainer
-from lib.Event import Event
+from Events.Event import Event
 
-from Devices.Temperature import *
+from Devices.TemperatureBase import *
 from lib.Actions import *
 from lib.Variables import *
 from Devices.Pump import *
 from Devices.IDeviceController import IDeviceController
-from lib.Action import TimerEvent
+from Events.TimerEvent import TimerEvent
 
 logger = DependencyContainer.get_logger(__name__)
 

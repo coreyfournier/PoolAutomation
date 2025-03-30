@@ -1,8 +1,8 @@
 from IPlugin import IPlugin
 import DependencyContainer
-from lib.Event import Event
+from Events.Event import Event
 
-from Devices.Temperature import *
+from Devices.TemperatureBase import *
 from lib.Actions import *
 from lib.Variables import *
 from Devices.Pump import *
@@ -14,7 +14,7 @@ class FreezePrevention(IPlugin):
 
     def __init__(self) -> None:
         #default freeze temperature in celsius
-        self.DefaultFreezePreventionValue = Temperature.getTemperatureToLocal(2, DependencyContainer.temperatureUnit, 1)
+        self.DefaultFreezePreventionValue = TemperatureBase.getTemperatureToLocal(2, DependencyContainer.temperatureUnit, 1)
 
         pass
 

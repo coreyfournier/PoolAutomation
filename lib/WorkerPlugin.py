@@ -1,13 +1,10 @@
 import threading
 import time
-import datetime
-import logging
-import cherrypy
 from cherrypy.process.plugins import SimplePlugin
 from Devices.Schedule import *
 import DependencyContainer
 from Devices.Pump import *
-from lib.Action import TimerEvent
+from Events.TimerEvent import TimerEvent
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -74,11 +71,11 @@ class WorkerPlugin(SimplePlugin):
                     DependencyContainer.schedules.checkSchedule()
                 
                 #Reading any temperature sensors
-                try:                
-                    if(DependencyContainer.temperatureDevices != None):
-                        DependencyContainer.temperatureDevices.checkAll()
-                except Exception  as err:
-                    logger.error(f"Failed when getting the temperature. Error:{err}")
+                #try:                
+                if(DependencyContainer.temperatureDevices != None):
+                    DependencyContainer.temperatureDevices.checkAll()
+                #except Exception  as err:
+                #    logger.error(f"Failed when getting the temperature. Error:{err}")
 
                 try:
                     if(DependencyContainer.variables != None)                :
@@ -95,7 +92,7 @@ class WorkerPlugin(SimplePlugin):
             #I want this to fire more often
             try:
                 if(DependencyContainer.actions != None):
-                    DependencyContainer.actions.nofityListners(TimerEvent(None,False, secondsPassed))
+                    DependencyContainer.actions.nofityListners(TimerEvent(None,False, None, secondsPassed))
             except Exception  as err:
                 logger.error(f"Failed when notifying for a timer event. Error:{err}")
 

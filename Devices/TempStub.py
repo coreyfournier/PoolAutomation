@@ -1,9 +1,9 @@
-from Devices.Temperature import Temperature
+from Devices.TemperatureBase import TemperatureBase
 import DependencyContainer
 import random
 from typing import Callable
 
-class TempStub(Temperature):
+class TempStub(TemperatureBase):
     def __init__(self,id:int, name:str, displayName:str, shortDisplayName:str) -> None:
         super().__init__(id, name, displayName, shortDisplayName, str(random.random()))
         
@@ -13,7 +13,7 @@ class TempStub(Temperature):
 
         self._tracked[self.deviceId] = temp
 
-        return Temperature.getTemperatureToLocal(
+        return TemperatureBase.getTemperatureToLocal(
             temp,
             DependencyContainer.temperatureUnit,
             self._maxDigits

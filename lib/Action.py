@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 import DependencyContainer
 from typing import Callable
-from lib.Event import Event
-import dataclasses
+import typing
+
+if typing.TYPE_CHECKING:
+    from Events.OverrideChangeEvent import OverrideChangeEvent
 
 @dataclass
 class Action:
@@ -25,7 +27,13 @@ class Action:
         return self._overrideSchedule
 
     @overrideSchedule.setter
-    def overrideSchedule(self, v: bool) -> None:        
+    def overrideSchedule(self, v: bool) -> None:
+        """Allows the action to prevent a schedule from running
+            TODO: We shouldn't be preventing the schedule from using using an action. It should be stored somewhere else.
+        Args:
+            v (bool): True to override it, False to not.
+        """
+
         #Only make changes if it actually changed.
         if(v != self._overrideSchedule):
             self._overrideSchedule = v
@@ -40,36 +48,5 @@ class Action:
             "overrideSchedule":self._overrideSchedule
         }
 
-@dataclass
-class OverrideChangeEvent(Event):
-    """Event fired when an override to the schedule occurs.
 
-    Args:
-        Event (_type_): _description_
 
-    Returns:
-        _type_: _description_
-    """
-    data:Action = None
-
-    def to_dict(self):
-        return {
-            "data":  self.data.to_dict(),
-            "dataType": self.dataType
-        }
-
-@dataclass
-class TimerEvent(Event):
-    """An event fired at a set time based on the worker.
-    """
-    #Number of seconds passed the hour
-    #If you want to do something every 20 seconds then take
-    # secondsPassedTheHour % 20 and check for the result of zero.
-    #This lets you use any interval as long as it 5 or more
-    secondsPassedTheHour:int = 0
-
-    def to_dict(self):
-        return {
-            "data":  self.secondsPassedTheHour,
-            "dataType": self.dataType
-        }

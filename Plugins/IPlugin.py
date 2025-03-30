@@ -1,4 +1,4 @@
-from lib.Event import Event
+from Events.Event import Event
 from lib.Actions import *
 from lib.Variables import *
 

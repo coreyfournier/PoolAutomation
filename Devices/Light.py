@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json
 from dataclass_wizard import JSONWizard
-from lib.Event import Event
+from Events.Event import Event
 
 @dataclass_json
 @dataclass
@@ -34,13 +34,5 @@ class Light:
             "lightScenes" : [x.to_dict() for x in self.lightScenes()]
         }
 
-@dataclass
-class LightChangeEvent(Event):
-    data:Light = None
 
-    def to_dict(self):
-        return {
-            "data":  self.data.to_dict(),
-            "dataType": self.dataType
-        }
     

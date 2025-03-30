@@ -1,5 +1,5 @@
 import requests
-from Devices.Temperature import Temperature
+from Devices.TemperatureBase import TemperatureBase
 from Devices.AtlasScientific import *
 from Devices.PoolChemistry import PoolChemistry
 

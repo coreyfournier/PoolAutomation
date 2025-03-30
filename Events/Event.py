@@ -1,4 +1,8 @@
 from dataclasses import dataclass
+import typing
+
+if typing.TYPE_CHECKING:
+    from lib.Action import Action
 
 @dataclass
 class Event:
@@ -12,5 +16,8 @@ class Event:
     #Is this event one that fires frequently
     isFrequentEvent:bool = False
 
+    #Which action needed to be fired
+    action:"Action" = None        
+
     def to_dict():
-        pass
+        return {"Not Defined":"Not Defined"}

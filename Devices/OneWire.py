@@ -2,13 +2,13 @@ import os
 import glob
 import time
 import DependencyContainer
-from Devices.Temperature import Temperature
+from Devices.TemperatureBase import TemperatureBase
 logger = DependencyContainer.get_logger(__name__)
 
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
 
-class OneWire(Temperature):
+class OneWire(TemperatureBase):
     """One wire temp sensors (DS18B20)
 
     Args:
@@ -20,6 +20,7 @@ class OneWire(Temperature):
             See this for how the devices work and configuration on the pi
             https://www.circuitbasics.com/raspberry-pi-ds18b20-temperature-sensor-tutorial/
         Args:
+            id (int): row number from the data store
             name (str): api name of the device
             displayName (str): What is displayed to the user
             shortDisplayName (str): What is displayed to user, but a shorter version
@@ -74,7 +75,7 @@ class OneWire(Temperature):
             tempC = self.__read_temp(self.deviceId)
             self._tracked[self.deviceId] = tempC
             
-        return Temperature.getTemperatureToLocal(
+        return TemperatureBase.getTemperatureToLocal(
             tempC,
             DependencyContainer.temperatureUnit,
             self._maxDigits
