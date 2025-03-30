@@ -1,9 +1,10 @@
 from Devices.Valve import Valve
-from Devices.DeviceController import DeviceController
+from Devices.IDeviceController import IDeviceController
 import json
+from IO.IValveRepo import IValveRepo
 
 
-class ValveRepo():
+class ValveRepo(IValveRepo):
     def __init__(self, file:str,GPIO, i2cBus) -> None:
         self.__file:str = file
         self.__GPIO = GPIO
@@ -20,12 +21,12 @@ class ValveRepo():
                     if("useBoardPins" not in row or row["useBoardPins"] == None or row["useBoardPins"] == ''):
                         raise Exception(f"'useBoardPins' is required with using the valve type {row['type']}")
 
-                    controller  = DeviceController.getController(row["type"],row["pin"], None, self._i2cbus,self.__GPIO, row["useBoardPins"])
+                    controller  = IDeviceController.getController(row["type"],row["pin"], None, self._i2cbus,self.__GPIO, row["useBoardPins"])
 
                 elif(row["type"] == "I2cController"):
                     if("address" not in row or row["address"] == None or row["address"] == ''):
                         raise Exception(f"'address' is required with using the valve type {row['type']}")
-                    controller  = DeviceController.getController(row["type"],row["pin"], row["address"], self._i2cbus,self.__GPIO)
+                    controller  = IDeviceController.getController(row["type"],row["pin"], row["address"], self._i2cbus,self.__GPIO)
                 else:
                     raise Exception(f"Unknown valve type '{row['type']}'")
 

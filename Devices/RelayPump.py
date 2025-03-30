@@ -1,16 +1,16 @@
 from Devices.Pump import *
 from IO.GpioController import GpioController
 import DependencyContainer
-from Devices.DeviceController import DeviceController
+from Devices.IDeviceController import IDeviceController
 
 logger = DependencyContainer.get_logger(__name__)
 
 
 class RelayPump(Pump):
-    def __init__(self, id:int, name:str, displayName:str, speedToGpio:"dict[int,DeviceController]"):
+    def __init__(self, id:int, name:str, displayName:str, speedToGpio:"dict[int,IDeviceController]"):
         super().__init__(id, name, displayName, Speed.OFF)
 
-        self.speedToGpio:"dict[int,DeviceController]" = speedToGpio
+        self.speedToGpio:"dict[int,IDeviceController]" = speedToGpio
         self.allSpeeds = [SpeedDisplay(Speed.OFF.name, False)]
         self.allSpeeds.extend(list([SpeedDisplay(x.name, False) for x in self.speedToGpio.keys()]))
         self.currentSpeed = Speed.OFF

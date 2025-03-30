@@ -3,7 +3,7 @@ from Devices.RelayPump import *
 from IO.GpioController import *
 from IO.I2cController import *
 from IO.I2cRelay import *
-from Devices.DeviceController import DeviceController
+from Devices.IDeviceController import IDeviceController
 
 import json
 
@@ -28,12 +28,12 @@ class PumpRepo():
                             if("useBoardPins" not in speed or speed["useBoardPins"] == None or speed["useBoardPins"] == ''):
                                 raise Exception(f"'useBoardPins' is required with using the speed type {speed['type']}")
 
-                            allSpeeds[Speed[speed["name"]]]  = DeviceController.getController(speed["type"],speed["pin"], None, self._i2cbus,self.__GPIO, speed["useBoardPins"])
+                            allSpeeds[Speed[speed["name"]]]  = IDeviceController.getController(speed["type"],speed["pin"], None, self._i2cbus,self.__GPIO, speed["useBoardPins"])
 
                         elif(speed["type"] == "I2cController"):
                             if("address" not in speed or speed["address"] == None or speed["address"] == ''):
                                 raise Exception(f"'address' is required with using the speed type {speed['type']}")
-                            allSpeeds[Speed[speed["name"]]]  = DeviceController.getController(speed["type"],speed["pin"], speed["address"], self._i2cbus,self.__GPIO)
+                            allSpeeds[Speed[speed["name"]]]  = IDeviceController.getController(speed["type"],speed["pin"], speed["address"], self._i2cbus,self.__GPIO)
 
                         else:
                             raise Exception(f"Unknown speed type '{speed['type']}'")

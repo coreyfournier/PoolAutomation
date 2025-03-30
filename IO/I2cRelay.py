@@ -1,10 +1,10 @@
 from IO.SmbusStub import SMBus
 import DependencyContainer
-from Devices.DeviceController import DeviceController
+from Devices.IDeviceController import IDeviceController
 
 logger = DependencyContainer.get_logger(__name__)
 
-class I2cRelay(DeviceController):
+class I2cRelay(IDeviceController):
     def __init__(self, relayAddress:int, bus:SMBus) -> None:
         """Used to control an i2c relay. This for sure works on:
         https://www.amazon.com/dp/B07JGSNWFF?psc=1&ref=ppx_yo2ov_dt_b_product_details

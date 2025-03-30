@@ -1,4 +1,4 @@
-from Devices.DeviceController import DeviceController
+from Devices.IDeviceController import IDeviceController
 from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json
 
@@ -8,7 +8,7 @@ class Valve:
     displayName:str
     id:int
     isOn:bool
-    controller:DeviceController
+    controller:IDeviceController
 
     def to_dict(self):
         return {

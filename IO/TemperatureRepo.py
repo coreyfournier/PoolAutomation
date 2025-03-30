@@ -3,10 +3,11 @@ from Devices.OneWire import OneWire
 from Devices.Temperature import Temperature
 from Devices.TempStub import TempStub
 import DependencyContainer
+from IO.ITemperatureRepo import ITemperatureRepo
 
 logger = DependencyContainer.get_logger(__name__)
 
-class TemperatureRepo:
+class TemperatureRepo(ITemperatureRepo):
     def __init__(self, file:str) -> None:
         self.__file:str = file
     

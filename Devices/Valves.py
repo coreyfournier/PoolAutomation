@@ -2,11 +2,11 @@ from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json
 import builtins 
 from marshmallow import Schema, fields
-from Devices.DeviceController import DeviceController
+from Devices.IDeviceController import IDeviceController
 from typing import Callable
 from lib.Actions import Event
 import DependencyContainer
-from IO.ValveRepo import ValveRepo
+from IO.IValveRepo import IValveRepo
 from Devices.Valve import Valve
 import dataclasses
 
@@ -21,7 +21,7 @@ class ValveChangeEvent(Event):
         }
 
 class Valves:
-    def __init__(self, repo:ValveRepo) -> None:
+    def __init__(self, repo:IValveRepo) -> None:
         self._valves = repo.getValves()
         self._byId:"dict[int, Valve]" = {}
 

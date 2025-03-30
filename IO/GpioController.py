@@ -1,10 +1,10 @@
 from time import sleep
 import DependencyContainer
-from Devices.DeviceController import DeviceController
+from Devices.IDeviceController import IDeviceController
 logger = DependencyContainer.get_logger(__name__)
 
 #Controller as an implementation interface to the target
-class GpioController(DeviceController):
+class GpioController(IDeviceController):
 	def __init__(self, gpio, gpio_pin:int, useBoardPins:bool = True, allowWarnings:bool = False):	
 		"""Interface to flip pins on the pie
 

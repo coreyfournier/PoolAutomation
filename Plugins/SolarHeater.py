@@ -6,7 +6,7 @@ from Devices.Temperature import *
 from lib.Actions import *
 from lib.Variables import *
 from Devices.Pump import *
-from Devices.DeviceController import DeviceController
+from Devices.IDeviceController import IDeviceController
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -135,7 +135,7 @@ class SolarHeater(IPlugin):
         
 
     @staticmethod
-    def turnOffPumpIfNoActiveSchedule(pump:DeviceController):
+    def turnOffPumpIfNoActiveSchedule(pump:IDeviceController):
         """This expects overrideSchedule to be set to False for the action.
         This would fire an event for the Schedule to resume. If none resumed, then none will be running.
         When no schedules are running, then the pump will turn off

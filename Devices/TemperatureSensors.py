@@ -1,9 +1,9 @@
-from IO.TemperatureRepo import TemperatureRepo
+from IO.ITemperatureRepo import ITemperatureRepo
 from Devices.Temperature import Temperature,TemperatureChangeEvent, TemperatureDevice
 import DependencyContainer
 
 class TemperatureSensors:
-    def __init__(self, repo:TemperatureRepo) -> None:
+    def __init__(self, repo:ITemperatureRepo) -> None:
         self._repo = repo
         self._deviceByName =  repo.getDevices()
         #How many digits are used to look for changes.

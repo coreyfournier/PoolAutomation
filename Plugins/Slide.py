@@ -6,7 +6,7 @@ from Devices.Temperature import *
 from lib.Actions import *
 from lib.Variables import *
 from Devices.Pump import *
-from Devices.DeviceController import DeviceController
+from Devices.IDeviceController import IDeviceController
 from Plugins.SolarHeater import *
 
 logger = DependencyContainer.get_logger(__name__)

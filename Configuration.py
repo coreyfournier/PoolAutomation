@@ -1,7 +1,7 @@
 import DependencyContainer
 from lib.Actions import *
 from Devices.Pump import *
-from Devices.DeviceController import *
+from Devices.IDeviceController import *
 from IO.GpioController import GpioController
 from lib.Actions import *
 from lib.Variables import Variables

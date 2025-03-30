@@ -1,4 +1,4 @@
-class DeviceController:
+class IDeviceController:
     def __init__(self) -> None:
         pass
     def on(self):
