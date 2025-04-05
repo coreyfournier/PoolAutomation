@@ -48,6 +48,25 @@ export class ScheduleEditComponent {
     return this.scheduleForm.controls["schedules"] as FormArray;
   }
 
+  checkFirstDropdown(event:any){
+    /*
+    this.cities=cityList.filter(c=>c.cid===$event);
+     let  itm=this.cities[0];
+     this.form.controls['city'].setValue(itm.id);
+     */
+    console.log(event);
+ }
+
+ getSpeedsForPump(pumpName:string)
+ {
+    var found = this.avaliablePumps.filter(x=>  x.name == pumpName);
+    if(found.length > 0)
+      return found[0].speeds;
+    else
+      return [];
+
+ }
+
   schedulePumps(index:number, control:any):FormArray
   {
 
