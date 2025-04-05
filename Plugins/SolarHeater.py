@@ -143,7 +143,11 @@ class SolarHeater(IPlugin):
         Args:
             pump (DeviceController): _description_
         """
-        if(DependencyContainer.schedules != None):
+        
+        #If there are no schedules, then turn it off
+        if(DependencyContainer.schedules == None):
+            pump.off()
+        else:
             activeSchedules = DependencyContainer.schedules.getRunning()
             #If no schedules are running, then turn the pump off
             if(len(activeSchedules) == 0):                
