@@ -19,7 +19,7 @@ class TemperatureService:
             {
                 "id": item.id,
                 "name": item.displayName, 
-                "temp": item.get(),
+                "temp": item.getAsLocal(True),
                 "unit": DependencyContainer.temperatureUnit.upper()
             } 
             #Loop through all the items creating the dictionary output

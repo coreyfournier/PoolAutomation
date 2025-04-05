@@ -19,26 +19,38 @@ DependencyContainer.logServerName = "none"
 
 def test_turnOn():
     GPIO = GpioStub()
-    dataPath = os.path.join(tempfile.gettempdir(), "unit_test")
-        
+    
+    DependencyContainer.variables = Variables(None, VariableRepoStub())
+
+    #Given: #1 the pump is off
     mainPump = Pump(1,"main","", Speed.OFF)
-    solarHeaterValve = Valve("solar","",1, False, GpioController(GpioStub(), 1))
+    solarHeaterValve = Valve("solar","",1, False, GpioController(GPIO, 1))
     roofTemp = TemperatureStub(1, "roof", "Roof","roof", 1)
     solarTemp = TemperatureStub(1, "solar-heat", "solar-heat","solar-heat", 2)
     poolTemp = TemperatureStub(1, "pool-temp", "pool-temp","pool-temp", 3)
 
+    sh = SolarHeater()
+
+    for var in sh.getVariables():
+        DependencyContainer.variables.addVariable(var)
+
+    #Given: #2 Make sure the header is enabled
+    DependencyContainer.variables.get("solar-heat-enabled").value = True
+    #Given: #3 Target temp of the pool is higher than the current temp
+    DependencyContainer.variables.get("solar-heat-temperature").value = 30
+
     DependencyContainer.valves = Valves(ValveRepoStub(
         [solarHeaterValve]
     ))
-    
     DependencyContainer.pumps = Pumps(PumpRepoStub(
         [mainPump]
     ))    
     
-    DependencyContainer.variables = Variables(None, VariableRepoStub())
-    
+       
+    #When the roof is hot enough and the pool temp is 
     roofTemp.set(49) #120F
     solarTemp.set(0)
+    #Current pool temp
     poolTemp.set(26) #80F
 
     DependencyContainer.temperatureDevices = TemperatureSensors(TemperatureRepoStub(
@@ -46,14 +58,7 @@ def test_turnOn():
         "solar-heat" : solarTemp,
         "pool-temp" : poolTemp}
     )) 
-
-    sh = SolarHeater()
-
-    for var in sh.getVariables():
-        DependencyContainer.variables.addVariable(var)
-
-    #Make sure the header is enabled
-    DependencyContainer.variables.get("solar-heat-enabled").value = True
+ 
 
     heaterAction = sh.getAction()
 
@@ -61,6 +66,7 @@ def test_turnOn():
         TemperatureChangeEvent("", False, heaterAction, TemperatureBase(1,"roof","","",1))
                                )
     
+    #Then:
     #Solar heater value should now be on
     assert solarHeaterValve.isOn, "Heater was not on as expected."
 

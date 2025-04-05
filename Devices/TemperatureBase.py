@@ -35,16 +35,21 @@ class TemperatureBase(TemperatureDevice):
         """Gets the temp of the device id
 
         Returns:
-            float: temp in fahrenheit or celsius. This is set in the Dependency container.
+            float: temp in celsius.
         """
         if(self.deviceId in self._tracked):   
-            return TemperatureBase.getTemperatureToLocal(
-                self._tracked[self.deviceId],
-                DependencyContainer.temperatureUnit,
-                self._maxDigits
-            )                    
+            return self._tracked[self.deviceId]
         else:
             return None
+        
+    def getAsLocal(self, allowCached:bool = True)-> float:
+        """Gets the temp of the device id
+
+        Returns:
+            float: temp in celsius.
+        """
+        val = self.get(allowCached)
+        return None if val == None else TemperatureBase.getTemperatureToLocal(val, DependencyContainer.temperatureUnit, self._maxDigits)
 
     def getAllDevices(self)-> "list[str]":
         """Gets all devices for this type of temp sensor
@@ -60,14 +65,15 @@ class TemperatureBase(TemperatureDevice):
         Returns:
             float: gets the last value recorded
         """
-        if(self.deviceId in self._tracked):   
-            return TemperatureBase.getTemperatureToLocal(
-                self._tracked[self.deviceId],
-                DependencyContainer.temperatureUnit,
-                self._maxDigits
-            )                    
-        else:
-            return None
+        return self.get(True)
+        
+    def getLastAsLocal(self) -> float:
+        """Remembers the last temp for the last get and returns it.
+
+        Returns:
+            float: gets the last value recorded
+        """
+        return self.getAsLocal(True)
     
     @staticmethod
     def getTemperatureToLocal(celsius:float, unit:str, maxDigits:int) -> float:
