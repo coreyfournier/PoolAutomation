@@ -1,74 +1,75 @@
 <form  (ngSubmit)="onSubmit()">
-<h3>Edit schedule</h3>
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">Schedules</h3>
+        <h3 class="panel-title">Edit Schedules</h3>
     </div>
     
     <div class="panel-body" [formGroup]="scheduleForm">
         <div id="schedule">            
-        <table class="table">
-            <tr><th>Name</th><th>Start</th><th>End</th><th>Pump & Speed</th><th></th></tr>
+        <mat-list>
+            
             <ng-container formArrayName="schedules">
                 <ng-container *ngFor="let schedule of schedules.controls; let s = index">
-                <tr [formGroupName]="s">
-                    <td class="">
-                        <mat-form-field appearance="fill">
-                            <input matInput
-                                   formControlName="name"
-                                   placeholder="Schedule Name">
-                        </mat-form-field>
-                    </td> 
-                    <td class="">
-                        <mat-form-field appearance="fill">
-                            <input matInput
-                                type="time"
-                                formControlName="startTime"
-                                placeholder="Start">
-                        </mat-form-field>
-                    </td> 
-                    <td class="">
-                        <mat-form-field appearance="fill">
-                            <input matInput
-                                type="time"
-                                formControlName="endTime"
-                                placeholder="End">
-                        </mat-form-field>
-                    </td>
-                    <td>
-                        <table>
+                <mat-list-item [formGroupName]="s">
+                    <span matListItemTitle>{{schedule.value.name}}</span>
+                    <span matListItemLine>
+                        <p>
+                            <mat-form-field appearance="outline">
+                                <mat-label>Schedule Name</mat-label>
+                                <input matInput
+                                    formControlName="name"
+                                    placeholder="Schedule Name">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline">
+                                <mat-label>Start Time</mat-label>
+                                <input matInput
+                                    type="time"
+                                    formControlName="startTime"
+                                    placeholder="Start">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline">
+                                <mat-label>End Time</mat-label>
+                                <input matInput
+                                    type="time"
+                                    formControlName="endTime"
+                                    placeholder="End">
+                            </mat-form-field>
+                        </p>
+                    </span>
+                    <span matListItemLine>
+                        <p>
                             <ng-container formArrayName="pumps">
-                                <tbody *ngFor="let row of schedulePumps(s, schedule).controls; let p = index">
-                                    <tr [formGroupName]="p">
-                                        <td>
-                                            <mat-form-field>
-                                                <mat-select [value]="row.value.name">
-                                                    <mat-option [value]="pump.name" *ngFor="let pump of avaliablePumps">  
-                                                        {{pump.name}}
-                                                    </mat-option>
-                                                </mat-select>
-                                            </mat-form-field>
-                                        </td>                
-                                        <td>    
-                                            <mat-form-field>
-                                                <mat-select #pumpSpeed [value]="row.value.speedName" (selectionChange)="row.value.speedName = pumpSpeed.value">
-                                                    <mat-option [value]="speed.name" [selected]="speed.name == row.value.speedName"  *ngFor="let speed of getSpeedsForPump(row.value.name)">  
-                                                        {{speed.name}}
-                                                    </mat-option>
-                                                </mat-select>
-                                            </mat-form-field>                                                 
-                                        </td>
-                                    </tr>
-                                </tbody>
+                                <ng-container *ngFor="let row of schedulePumps(s, schedule).controls; let p = index">
+                                    <ng-container [formGroupName]="p">                                        
+                                        <mat-form-field  appearance="outline">
+                                            <mat-label>Pump</mat-label>
+                                            <mat-select [value]="row.value.name">
+                                                <mat-option [value]="pump.name" *ngFor="let pump of avaliablePumps">  
+                                                    {{pump.name}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                        
+                                        <mat-form-field  appearance="outline">
+                                            <mat-label>Speed</mat-label>
+                                            <mat-select #pumpSpeed [value]="row.value.speedName" (selectionChange)="row.value.speedName = pumpSpeed.value">
+                                                <mat-option [value]="speed.name" [selected]="speed.name == row.value.speedName"  *ngFor="let speed of getSpeedsForPump(row.value.name)">  
+                                                    {{speed.name}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>                                                 
+                                        
+                                    </ng-container>
+                                </ng-container>
                             </ng-container>  
-                        </table>                      
-                    </td>
-                    <td><button mat-button type="button" (click)="deleteItem(s, schedule.value)">Delete</button></td>
-                </tr>
+                        <button mat-button type="button" (click)="deleteItem(s, schedule.value)">Delete</button>
+                        </p>
+                    </span>
+                </mat-list-item>
             </ng-container>
             </ng-container>
-        </table>
-        <button mat-button type="button" (click)="addItem()">Add</button>
+        </mat-list>
+        <button mat-button type="button" (click)="addItem()">Add New</button>
         
     </div>
     </div>

@@ -1,0 +1,9 @@
+.mat-list-item {
+    height: 200px;
+  }
+
+  .mdc-list-item.mdc-list-item--with-three-lines
+  {
+    height:auto;
+
+  }

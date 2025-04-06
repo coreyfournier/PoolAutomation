@@ -23,6 +23,8 @@ import { PoolChemistryComponent } from './poolChemistry/poolChemistry.component'
 import {MatSelectModule} from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import {MatGridListModule} from '@angular/material/grid-list';
+import {MatListModule} from '@angular/material/list';
 
 @NgModule({
   declarations: [
@@ -52,7 +54,9 @@ import { MatInputModule } from '@angular/material/input';
     MatSlideToggleModule,
     MatSelectModule ,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatGridListModule,
+    MatListModule
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA],
   providers: [],
