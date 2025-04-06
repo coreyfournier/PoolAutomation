@@ -25,6 +25,9 @@ class Schedules:
             self._byId[item.id] = item
 
     def save(self, schedules:"list[PumpSchedule]"):
+        #make sure it's always sorted so it's easier to read.
+        schedules = sorted(schedules, key = lambda item: f"{item.startTime.strftime('%Y-%m-%dT%H:%M:%S.%fZ')}-{item.isActive}")
+        
         self.__repo.saveSchedules(schedules)
         #reload the schedules
         self._scheduleData = self.__repo.getSchedules()

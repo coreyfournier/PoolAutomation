@@ -78,7 +78,7 @@ export class EventInfo{
     constructor(jsonParsed:any){
         this.newSpeed = jsonParsed.newSpeed;
         this.oldSpeed = jsonParsed.oldSpeed;
-        this.pump = new Pump(jsonParsed.pump)
+        this.pump = Pump.fromJson(jsonParsed.pump)
       }
   }
 

@@ -56,10 +56,7 @@ export class ScheduleEditComponent {
       return found[0].speeds;
     else
       return [];
-
  }
-
-
 
   schedulePumps(index:number, control:any):FormArray
   {
@@ -80,32 +77,67 @@ export class ScheduleEditComponent {
       this.avaliablePumps = p;
     });
     
-    this.getSchedules().subscribe(s=> 
+    this.getSchedules().subscribe(scheduleInfo=> 
     {
-        this.scheduleInfo = s;
+        this.scheduleInfo = scheduleInfo;
 
         this.scheduleForm = this.formBuilder.group({
-          schedules : this.formBuilder.array(s.schedules.map(sch=>{
-
-            return  this.formBuilder.group({
-              name:[sch.name, Validators.required],
-              startTime:[this.datepipe.transform(sch.startTime, "hh:mm"), Validators.required],
-              endTime:[this.datepipe.transform(sch.endTime, "hh:mm"), Validators.required],
-              id:[sch.id, Validators.required],
-              pumps:this.formBuilder.array(sch.pumps.map(p=>{
-
-                return this.formBuilder.group({
-                  name:[p.name, Validators.required],
-                  speedName:[p.speedName, Validators.required],
-                  id:[p.id, Validators.required],
-                  displayName:[p.displayName, Validators.required]
-                })
-              }))
-            });
+          schedules : this.formBuilder.array(scheduleInfo.schedules.map(sch=>{
+            return this.scheduleToForm(sch);            
           }))
 
         });              
       });   
+  }
+
+  
+
+  addItem():void
+  {
+    let nextId = 0;
+    //Figure out what the next id will be. Probably need to remove this as it will not be relevant if switching to a db.
+
+    this.scheduleInfo.schedules.forEach(element => {
+      if(element.id > nextId)
+        nextId = element.id;
+    });
+
+    nextId ++;
+    let newSchedule = new Schedule();
+    newSchedule.id = nextId;
+    newSchedule.name = 'New Schedule';
+    newSchedule.startTime = new Date("0001-01-01T08:00:00");
+    newSchedule.scheduleStart = newSchedule.startTime ; 
+    newSchedule.endTime = new Date("9999-01-01T09:00:00");
+    newSchedule.scheduleEnd = newSchedule.endTime;
+    newSchedule.pumps[0] = this.avaliablePumps[0];
+
+    let speeds = this.getSpeedsForPump(newSchedule.pumps[0].name);
+    newSchedule.pumps[0].speedName = speeds[0].name;
+    
+    let newItem = this.scheduleToForm(newSchedule);
+
+    //let s = this.getSchedules();
+    this.schedules.push(newItem);
+  }
+
+  scheduleToForm(sch:Schedule) : FormGroup
+  {
+    return  this.formBuilder.group({
+      name:[sch.name, Validators.required],
+      startTime:[this.datepipe.transform(sch.startTime, "hh:mm"), Validators.required],
+      endTime:[this.datepipe.transform(sch.endTime, "hh:mm"), Validators.required],
+      id:[sch.id, Validators.required],
+      pumps:this.formBuilder.array(sch.pumps.map(p=>{
+
+        return this.formBuilder.group({
+          name:[p.name, Validators.required],
+          speedName:[p.speedName, Validators.required],
+          id:[p.id, Validators.required],
+          displayName:[p.displayName, Validators.required]
+        })
+      }))
+    });
   }
 
   getPumps():Observable<Pump[]>{
@@ -122,7 +154,6 @@ export class ScheduleEditComponent {
 
     const scheduleCopy = JSON.parse(JSON.stringify(this.scheduleForm?.value.schedules));
     scheduleCopy.forEach((schedule:any, index:number, array:any)=>{
-
       schedule.startTime = "0001-01-01T" + schedule.startTime;
       schedule.endTime = "9999-01-01T" + schedule.endTime;
     });
@@ -139,28 +170,13 @@ export class ScheduleEditComponent {
     });
   }
 
-  addItem():void
-  {
-    let nextId = 0;
-    this.scheduleInfo.schedules.forEach(element => {
-      if(element.id > nextId)
-        nextId = element.id;
-    });
+  
 
-    nextId ++;
+  deleteItem(index:number, row:Schedule):void {
+    
+    console.log(`Deleting schedule ${row.id}`);
 
-    const newItem = this.formBuilder.group({
-        name:['', Validators.required],
-        scheduleStart:['', Validators.required],
-        scheduleEnd:['', Validators.required],
-        id:[nextId, Validators.required]
-      });
-
-      this.schedules.push(newItem);
-  }
-
-  deleteLesson(lessonIndex: number):void {
-    //this.lessons.removeAt(lessonIndex);
+    this.schedules.removeAt(index);
   }
 
 }

@@ -9,6 +9,7 @@ export interface ScheduleInfo {
   }
 
   export class Schedule {
+
     id: number = 0;
     name: string = '';
     isActive:boolean = false;
@@ -23,20 +24,25 @@ export interface ScheduleInfo {
 
   export class Pump
   {
-    id: number;
-    name: string;
+    id: number = 0;
+    name: string = '';
     //Current speed
-    speedName:string;
-    displayName:string;    
+    speedName:string = '';
+    displayName:string = '';    
 
     speeds:Speed[] = [];
+    constructor(){};
 
-    constructor(jsonParsed:any){
-      this.id = jsonParsed.id;
-      this.name = jsonParsed.name;
-      this.speedName = jsonParsed.speedName;
-      this.displayName = jsonParsed.displayName;
-    }
+    static fromJson(jsonParsed:any): Pump
+    {
+      let t = new Pump();
+
+      t.id = jsonParsed.id;
+      t.name = jsonParsed.name;
+      t.speedName = jsonParsed.speedName;
+      t.displayName = jsonParsed.displayName;
+      return t;
+    }    
   }
 
   export class Speed{

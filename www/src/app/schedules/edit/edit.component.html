@@ -8,7 +8,7 @@
     <div class="panel-body" [formGroup]="scheduleForm">
         <div id="schedule">            
         <table class="table">
-            <tr><th>Name</th><th>Start</th><th>End</th><th>Pump & Speed</th></tr>
+            <tr><th>Name</th><th>Start</th><th>End</th><th>Pump & Speed</th><th></th></tr>
             <ng-container formArrayName="schedules">
                 <ng-container *ngFor="let schedule of schedules.controls; let s = index">
                 <tr [formGroupName]="s">
@@ -62,8 +62,8 @@
                                 </tbody>
                             </ng-container>  
                         </table>                      
-                    </td>    
-                      
+                    </td>
+                    <td><button mat-button type="button" (click)="deleteItem(s, schedule.value)">Delete</button></td>
                 </tr>
             </ng-container>
             </ng-container>
