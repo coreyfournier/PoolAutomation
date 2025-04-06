@@ -19,37 +19,44 @@ class ScheduleService:
         Returns:
             Schedule: All schedule information
         """
+        
         if(cherrypy.request.method == 'GET'):
-            schedules = [item.to_dict() for item in DependencyContainer.schedules.get()]
-
-            if(DependencyContainer.pumps != None):
-                for schedule in schedules:
-                    for pump in schedule["pumps"]:                
-                        pumpInfo = DependencyContainer.pumps.get(pump["name"])
-                        if(pumpInfo == None):
-                            pump["displayName"] = "Missing"
-                        else:
-                            pump["displayName"] = pumpInfo.displayName
-                            
-            return {
-                "overrides": [{"name": item.name, "displayName": item.displayName } for item in DependencyContainer.actions.getScheduleOverrides()],
-                "schedules": schedules
-            }
+            return  self.get_schedules()
         elif(cherrypy.request.method == 'POST'):
-            cl = cherrypy.request.headers['Content-Length']
-            rawbody = cherrypy.request.body.read(int(cl)).decode('ascii')
-            data = PumpSchedule.schema().loads(rawbody, many=True) 
+            return self.post_schedules(cherrypy.request)
+        
+    def post_schedules(self, request):
+        cl = request.headers['Content-Length']
+        rawbody = request.body.read(int(cl)).decode('ascii')
+        data = PumpSchedule.schema().loads(rawbody, many=True) 
 
-            try:    
-                DependencyContainer.schedules.save(data)
+        try:    
+            DependencyContainer.schedules.save(data)
 
-                return {
-                    "success":True
-                }
-            except Exception as e :
-                return {
-                    "success":False,
-                    "error": str(e)
-                }
+            return {
+                "success":True
+            }
+        except Exception as e :
+            return {
+                "success":False,
+                "error": str(e)
+            }
+        
+    def get_schedules(self):
+        schedules = [item.to_dict() for item in DependencyContainer.schedules.get()]
+
+        if(DependencyContainer.pumps != None):
+            for schedule in schedules:
+                for pump in schedule["pumps"]:                
+                    pumpInfo = DependencyContainer.pumps.get(pump["name"])
+                    if(pumpInfo == None):
+                        pump["displayName"] = "Missing"
+                    else:
+                        pump["displayName"] = pumpInfo.displayName
+                        
+        return {
+            "overrides": [{"name": item.name, "displayName": item.displayName } for item in DependencyContainer.actions.getScheduleOverrides()],
+            "schedules": schedules
+        }
                 
             

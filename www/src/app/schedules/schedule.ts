@@ -16,6 +16,8 @@ export interface ScheduleInfo {
     duration:number = 0;
     scheduleStart:Date = new Date();
     scheduleEnd:Date = new Date();
+    endTime:Date = new Date();
+    startTime:Date = new Date();
     pumps:Pump[] = [];    
   }
 

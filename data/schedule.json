@@ -1,16 +1,18 @@
 [
-    {
+  {
+    "id": 1,
+    "startTime": "0001-01-01T07:00:00",
+    "endTime": "9999-01-01T23:59:00",
+    "name": "Morning",
+    "pumps": [
+      {
         "id": 1,
-        "startTime": "0001-01-01T07:00:00",
-        "endTime": "9999-01-01T10:59:00",
-        "name": "Morning",
-        "pumps": [
-            {
-                "id": 1,
-                "name": "main",
-                "speedName": "SPEED_1"
-            }
-        ],
-        "valves": []
-    }
+        "name": "main",
+        "speedName": "SPEED_1",
+        "displayName": "Main"
+      }
+    ],
+    "valves": [],
+    "isActive": true
+  }
 ]

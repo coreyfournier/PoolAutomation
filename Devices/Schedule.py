@@ -17,6 +17,7 @@ class PumpControl(JSONWizard):
     name:str
     #Name value of Pump.Speed
     speedName:str
+    displayName:str
 
 @dataclass_json
 @dataclass

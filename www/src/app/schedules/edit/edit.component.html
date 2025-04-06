@@ -23,7 +23,7 @@
                         <mat-form-field appearance="fill">
                             <input matInput
                                 type="time"
-                                formControlName="scheduleStart"
+                                formControlName="startTime"
                                 placeholder="Start">
                         </mat-form-field>
                     </td> 
@@ -31,7 +31,7 @@
                         <mat-form-field appearance="fill">
                             <input matInput
                                 type="time"
-                                formControlName="scheduleEnd"
+                                formControlName="endTime"
                                 placeholder="End">
                         </mat-form-field>
                     </td>
@@ -39,10 +39,10 @@
                         <table>
                             <ng-container formArrayName="pumps">
                                 <tbody *ngFor="let row of schedulePumps(s, schedule).controls; let p = index">
-                                    <tr [formGroupName]="p" >
+                                    <tr [formGroupName]="p">
                                         <td>
                                             <mat-form-field>
-                                                <mat-select [value]="row.value.name" (change)="checkFirstDropdown(row)">
+                                                <mat-select [value]="row.value.name">
                                                     <mat-option [value]="pump.name" *ngFor="let pump of avaliablePumps">  
                                                         {{pump.name}}
                                                     </mat-option>
@@ -51,8 +51,8 @@
                                         </td>                
                                         <td>    
                                             <mat-form-field>
-                                                <mat-select [value]="row.value.speed">
-                                                    <mat-option [value]="speed.name" [selected]="speed.name == row.value.speed" *ngFor="let speed of getSpeedsForPump(row.value.name)">  
+                                                <mat-select #pumpSpeed [value]="row.value.speedName" (selectionChange)="row.value.speedName = pumpSpeed.value">
+                                                    <mat-option [value]="speed.name" [selected]="speed.name == row.value.speedName"  *ngFor="let speed of getSpeedsForPump(row.value.name)">  
                                                         {{speed.name}}
                                                     </mat-option>
                                                 </mat-select>

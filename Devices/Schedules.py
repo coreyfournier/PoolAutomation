@@ -26,6 +26,8 @@ class Schedules:
 
     def save(self, schedules:"list[PumpSchedule]"):
         self.__repo.saveSchedules(schedules)
+        #reload the schedules
+        self._scheduleData = self.__repo.getSchedules()
 
     def get(self) -> "list[PumpSchedule]":
         return self._scheduleData

@@ -64,7 +64,7 @@ class ScheduleRepo:
 
         dictList = [s.toDictionary() for s in schedules]
 
-        data = json.dumps(dictList)
+        data = json.dumps(dictList, indent=2)
 
         with open(self.__scheduleFile, mode = "w") as f:
             f.write(data)

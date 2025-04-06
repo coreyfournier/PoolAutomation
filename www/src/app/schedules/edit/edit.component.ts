@@ -48,14 +48,6 @@ export class ScheduleEditComponent {
     return this.scheduleForm.controls["schedules"] as FormArray;
   }
 
-  checkFirstDropdown(event:any){
-    /*
-    this.cities=cityList.filter(c=>c.cid===$event);
-     let  itm=this.cities[0];
-     this.form.controls['city'].setValue(itm.id);
-     */
-    console.log(event);
- }
 
  getSpeedsForPump(pumpName:string)
  {
@@ -67,24 +59,11 @@ export class ScheduleEditComponent {
 
  }
 
+
+
   schedulePumps(index:number, control:any):FormArray
   {
-
-    //let schedule = this.scheduleInfo.schedules[0];
-
     return control.controls.pumps;
-    
-    /*
-    //var  = this.scheduleInfo.schedules.find(x=> x.id == schedule.id);
-    return this.formBuilder.array(schedule.pumps.map(p=>{
-      return this.formBuilder.group({
-        name:[p.name, Validators.required],
-        speed:[p.speedName, Validators.required],
-        id:[p.id, Validators.required],
-        displayName:[p.displayName, Validators.required]
-      })
-    }));
-    */
   }
 
   private scheduleUrl = environment.apiUrl + 'schedule/schedules';  // URL to web api
@@ -110,14 +89,14 @@ export class ScheduleEditComponent {
 
             return  this.formBuilder.group({
               name:[sch.name, Validators.required],
-              scheduleStart:[this.datepipe.transform(sch.scheduleStart, "HH:mm"), Validators.required],
-              scheduleEnd:[this.datepipe.transform(sch.scheduleEnd, "HH:mm"), Validators.required],
+              startTime:[this.datepipe.transform(sch.startTime, "hh:mm"), Validators.required],
+              endTime:[this.datepipe.transform(sch.endTime, "hh:mm"), Validators.required],
               id:[sch.id, Validators.required],
               pumps:this.formBuilder.array(sch.pumps.map(p=>{
 
                 return this.formBuilder.group({
                   name:[p.name, Validators.required],
-                  speed:[p.speedName, Validators.required],
+                  speedName:[p.speedName, Validators.required],
                   id:[p.id, Validators.required],
                   displayName:[p.displayName, Validators.required]
                 })
@@ -141,9 +120,14 @@ export class ScheduleEditComponent {
   {    
     console.log("Submitted form");    
 
-    this.http.post<SaveResponse>(
-      this.scheduleUrl, 
-      this.scheduleForm?.value.schedules)
+    const scheduleCopy = JSON.parse(JSON.stringify(this.scheduleForm?.value.schedules));
+    scheduleCopy.forEach((schedule:any, index:number, array:any)=>{
+
+      schedule.startTime = "0001-01-01T" + schedule.startTime;
+      schedule.endTime = "9999-01-01T" + schedule.endTime;
+    });
+
+    this.http.post<SaveResponse>(this.scheduleUrl, scheduleCopy)
     .subscribe(s=>{
       if(s.success)
         console.log("Saved!!!");
