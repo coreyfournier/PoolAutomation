@@ -69,7 +69,7 @@ class OneWire(TemperatureBase):
             return round(temp_c, self._maxDigits)
     
     def get(self, allowCached:bool = True)-> float:
-        if(allowCached):
+        if(allowCached and self.deviceId in self._tracked):
             tempC = self._tracked[self.deviceId]
         else:
             tempC = self.__read_temp(self.deviceId)

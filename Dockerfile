@@ -60,6 +60,7 @@ COPY lib/*.py /app/lib/
 COPY data/*.json /app/data/
 COPY Devices/*.py /app/Devices/
 COPY Plugins/*.py /app/Plugins/
+COPY Events/*.py /app/Events/
 
 EXPOSE 8080
 

@@ -2,10 +2,7 @@ import datetime
 import cherrypy
 import os
 
-#stub class for testing and dry runs
-from IO.GpioStub import GpioStub
-from IO.GpioController import GpioController
-from IO.I2cController import I2cController
+
 from cherrypy.process.plugins import Daemonizer
 from Services.LightService import LightService
 from Services.PoolChemistry import PoolChemistryService
@@ -71,6 +68,7 @@ if __name__ == '__main__':
         config_root['tools.CORS.on'] = False
     except Exception as e:
         print(f"Running locally - {e}")
+        from IO.GpioStub import GpioStub
         #Running locally
         GPIO = GpioStub()
         logger.info("Using GPIO Stub. Live pins will NOT be used.")
@@ -117,8 +115,7 @@ if __name__ == '__main__':
     logger.debug("Loading pumps")
     DependencyContainer.pumps = Pumps(PumpRepo(os.path.join(dataPath, "pumps.json"),GPIO, i2cBus))
     
-    logger.debug("Loading temperature")
-    
+    logger.debug("Loading temperature")    
     DependencyContainer.temperatureDevices = TemperatureSensors(TemperatureRepo(temperatureFile))    
     
     logger.debug("Loading schedules")

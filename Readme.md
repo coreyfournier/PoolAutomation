@@ -15,6 +15,10 @@ You can configure custom actions that listen for events to make decisions. Each 
 If you need to override anything at any time you get access to the individual devices. This is helpful when backwashing or emptying the pump basket.
 ![Alt text](assets/pool-automation-device-control.PNG "Device Control")
 
+Created to run on a raspberry pi
+![Alt text](assets/pool-automation-raspberrypi.PNG "Pi in enclosure")
+![Alt text](assets/pool-automation-control-box.PNG "Control Box")
+
 
 ## Local environment setup
 1. Install latest version of VS Code
