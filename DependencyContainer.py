@@ -23,6 +23,9 @@ hour_format = "%I %p"
 dateFormat = "%m/%d/%Y"
 timeFormat = "%H:%M"
 
+MAX_YEAR:int = 2100
+MIN_YEAR:int = 1970
+
 logServerName = 'ENV_LOG_SERVER_NAME'
 logServerPort = 'ENV_LOG_SERVER_PORT'
 

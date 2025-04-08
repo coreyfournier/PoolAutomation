@@ -64,7 +64,8 @@ def toIsoFormat(time:datetime):
 
 @dataclass_json
 @dataclass
-class PumpSchedule(Control):
+class PumpSchedule(Control):   
+
     #Seperate time and date, so the schedule can support specific dates and times, or just time with no date specified.
     startTime:datetime = field(
         metadata=config(
@@ -121,14 +122,14 @@ class PumpSchedule(Control):
     
     def getScheduleStart(self, now)->datetime.datetime:        
         #It was the default year, so put it to today
-        if(self.startTime.year == 1):          
+        if(self.startTime.year == DependencyContainer.MIN_YEAR):          
             return self.startTime.replace(year=now.year, month=now.month, day=now.day, second = 0)
         else:
             return self.startTime
     
     def getScheduleEnd(self, now)->datetime.datetime:        
         #It was the default year, so put it to today
-        if(self.endTime.year == 9999):          
+        if(self.endTime.year == DependencyContainer.MAX_YEAR):          
             return self.endTime.replace(year=now.year, month=now.month, day=now.day, second = 59)
         else:
             return self.endTime
@@ -148,7 +149,7 @@ class PumpSchedule(Control):
             "name":self.name,
             "pumps": [] if self.pumps == None else [p.to_dict() for p in self.pumps] ,
             "valves": [] if self.valves == None else [v.to_dict() for v in self.valves],
-            "isActive": self.isActive
+            "isActive": self.isActive,
         }
         
 

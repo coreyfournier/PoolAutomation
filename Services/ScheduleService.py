@@ -56,7 +56,9 @@ class ScheduleService:
                         
         return {
             "overrides": [{"name": item.name, "displayName": item.displayName } for item in DependencyContainer.actions.getScheduleOverrides()],
-            "schedules": schedules
+            "schedules": schedules,
+            "MAX_YEAR" : DependencyContainer.MAX_YEAR,
+            "MIN_YEAR" : DependencyContainer.MIN_YEAR
         }
                 
             

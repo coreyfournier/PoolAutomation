@@ -3,11 +3,15 @@ import json
 import DependencyContainer
 from datetime import datetime
 
-class ScheduleRepo:
-    minDate:datetime = datetime(1,1,1)
-    maxDate:datetime = datetime(9999, 1,1)
+class ScheduleRepo:    
+
+    minDate:datetime = None
+    maxDate:datetime = None
 
     def __init__(self, file:str) -> None:
+        self.minDate:datetime = datetime(DependencyContainer.MIN_YEAR,1,1)
+        self.maxDate:datetime = datetime(DependencyContainer.MAX_YEAR, 1,1)
+
         self.__scheduleFile:str = file
         #Loads the schedules on startup
         self.schedules:"list[PumpSchedule]" =  self.getSchedules()

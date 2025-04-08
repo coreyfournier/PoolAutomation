@@ -39,7 +39,9 @@ export class ScheduleEditComponent {
 
   scheduleInfo:ScheduleInfo = {
     schedules:[],
-    overrides:[]
+    overrides:[],
+    MIN_YEAR:0,
+    MAX_YEAR:0
   };
 
   avaliablePumps:Pump[] = [];
@@ -106,9 +108,9 @@ export class ScheduleEditComponent {
     let newSchedule = new Schedule();
     newSchedule.id = nextId;
     newSchedule.name = 'New Schedule';
-    newSchedule.startTime = new Date("0001-01-01T08:00:00");
+    newSchedule.startTime = new Date(`${this.scheduleInfo.MIN_YEAR}-01-01T08:00:00`);
     newSchedule.scheduleStart = newSchedule.startTime ; 
-    newSchedule.endTime = new Date("9999-01-01T09:00:00");
+    newSchedule.endTime = new Date(`${this.scheduleInfo.MAX_YEAR}-01-01T09:00:00`);
     newSchedule.scheduleEnd = newSchedule.endTime;
     newSchedule.pumps[0] = this.avaliablePumps[0];
 
@@ -154,8 +156,8 @@ export class ScheduleEditComponent {
 
     const scheduleCopy = JSON.parse(JSON.stringify(this.scheduleForm?.value.schedules));
     scheduleCopy.forEach((schedule:any, index:number, array:any)=>{
-      schedule.startTime = "0001-01-01T" + schedule.startTime;
-      schedule.endTime = "9999-01-01T" + schedule.endTime;
+      schedule.startTime = `${this.scheduleInfo.MIN_YEAR}-01-01T` + schedule.startTime;
+      schedule.endTime = `${this.scheduleInfo.MAX_YEAR}-01-01T` + schedule.endTime;
     });
 
     this.http.post<SaveResponse>(this.scheduleUrl, scheduleCopy)

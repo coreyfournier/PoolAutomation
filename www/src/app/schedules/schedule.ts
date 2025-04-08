@@ -1,6 +1,8 @@
 export interface ScheduleInfo {
     schedules:Schedule[];
     overrides:Override[];
+    MIN_YEAR:number;
+    MAX_YEAR:number;
   }
 
   export interface Override{

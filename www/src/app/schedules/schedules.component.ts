@@ -19,7 +19,9 @@ export class SchedulesComponent {
   
   scheduleInfo:ScheduleInfo = {
     schedules:[],
-    overrides:[]
+    overrides:[],
+    MIN_YEAR:0,
+    MAX_YEAR:0
   };
 
   private scheduleUrl = environment.apiUrl + 'schedule/schedules';  // URL to web api
