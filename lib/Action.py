@@ -33,6 +33,7 @@ class Action:
         Args:
             v (bool): True to override it, False to not.
         """
+        from Events.OverrideChangeEvent import OverrideChangeEvent
 
         #Only make changes if it actually changed.
         if(v != self._overrideSchedule):

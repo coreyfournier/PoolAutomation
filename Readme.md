@@ -16,8 +16,8 @@ If you need to override anything at any time you get access to the individual de
 ![Alt text](assets/pool-automation-device-control.PNG "Device Control")
 
 Created to run on a raspberry pi
-![Alt text](assets/pool-automation-raspberrypi.PNG "Pi in enclosure")
-![Alt text](assets/pool-automation-control-box.PNG "Control Box")
+![Alt text](assets/pool-automation-raspberrypi.jpg "Pi in enclosure")
+![Alt text](assets/pool-automation-control-box.jpg "Control Box")
 
 
 ## Local environment setup

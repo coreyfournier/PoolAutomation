@@ -50,7 +50,7 @@
           "name": "quick-clean-expires-in-hours",
           "displayName": "Expires in (hours)",
           "dataType": "float",
-          "value": 0,
+          "value": 3.5,
           "expires": false,
           "hasExpired": true,
           "showInUi": true
@@ -102,7 +102,7 @@
           "name": "solar-heat-enabled",
           "displayName": "Enabled",
           "dataType": "bool",
-          "value": false,
+          "value": true,
           "expires": false,
           "hasExpired": true,
           "showInUi": true

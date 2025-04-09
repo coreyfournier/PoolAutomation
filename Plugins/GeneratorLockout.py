@@ -61,7 +61,7 @@ class GeneratorLockout(IPlugin):
         if(isinstance(event, VariableChangeEvent) and event.data.name in ["generator-lockout-activated"]):
             if(event.data.value):
                 event.action.overrideSchedule = True
-                DependencyContainer.pumps.get("main").on(Speed.OFF)
+                DependencyContainer.pumps.get("main").off()
             else:
                 event.action.overrideSchedule = False
 

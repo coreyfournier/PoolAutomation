@@ -163,6 +163,8 @@ class Variable(JSONWizard):
         Args:
             v (bool): True if expired false otherwise
         """
+        from Events.VariableChangeEvent import VariableChangeEvent
+        
         if not hasattr(self, '_hasExpired'):
             self._hasExpired = v
 

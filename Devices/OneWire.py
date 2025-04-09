@@ -75,11 +75,7 @@ class OneWire(TemperatureBase):
             tempC = self.__read_temp(self.deviceId)
             self._tracked[self.deviceId] = tempC
             
-        return TemperatureBase.getTemperatureToLocal(
-            tempC,
-            DependencyContainer.temperatureUnit,
-            self._maxDigits
-        )
+        return tempC
     
     def __str__(self) -> str:
         return f"{self.name} - {self.get()}"

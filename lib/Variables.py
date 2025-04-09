@@ -4,6 +4,7 @@ from lib.Variable import *
 import DependencyContainer
 import time
 import datetime
+from Events.VariableChangeEvent import VariableChangeEvent
 
 logger = DependencyContainer.get_logger(__name__)
 
