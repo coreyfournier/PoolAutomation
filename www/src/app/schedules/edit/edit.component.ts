@@ -8,6 +8,7 @@ import { EventInfo, ScheduleChangeEvent } from '../../app.events';
 import { FormBuilder, FormGroup, Validators,FormArray, FormControl } from '@angular/forms';
 import { MatDateFormats, MAT_NATIVE_DATE_FORMATS, DateAdapter } from '@angular/material/core';
 import { SaveResponse } from '../SaveResponse';
+import { Router } from '@angular/router';
 
 export const GRI_DATE_FORMATS: MatDateFormats = {
   ...MAT_NATIVE_DATE_FORMATS,
@@ -27,6 +28,7 @@ export const GRI_DATE_FORMATS: MatDateFormats = {
   
 })
 export class ScheduleEditComponent {
+  
 
   scheduleForm: FormGroup = this.formBuilder.group(
     {
@@ -70,7 +72,7 @@ export class ScheduleEditComponent {
   datepipe: DatePipe = new DatePipe(environment.locale);
   timeFormat:string = environment.timeFormat;
 
-  constructor(private http: HttpClient, public zone: NgZone, private formBuilder: FormBuilder, private readonly adapter: DateAdapter<Date>) { 
+  constructor(private http: HttpClient, public zone: NgZone, private formBuilder: FormBuilder, private readonly adapter: DateAdapter<Date>, private router: Router) { 
     this.adapter.setLocale("en-EN");
   }     
 
@@ -152,7 +154,6 @@ export class ScheduleEditComponent {
 
   onSubmit():void 
   {    
-    console.log("Submitted form");    
 
     const scheduleCopy = JSON.parse(JSON.stringify(this.scheduleForm?.value.schedules));
     scheduleCopy.forEach((schedule:any, index:number, array:any)=>{
@@ -163,7 +164,10 @@ export class ScheduleEditComponent {
     this.http.post<SaveResponse>(this.scheduleUrl, scheduleCopy)
     .subscribe(s=>{
       if(s.success)
+      {
         console.log("Saved!!!");
+        this.router.navigate(['/']);
+      }
       else
       {
         console.log(`Failed to save: ${s.error}`);
@@ -180,5 +184,4 @@ export class ScheduleEditComponent {
 
     this.schedules.removeAt(index);
   }
-
 }

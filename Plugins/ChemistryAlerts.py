@@ -68,12 +68,12 @@ class ChemistryAlerts(IPlugin):
                         if(not self._orpEventFired):
                             self._orpEventFired = True;
                             self._lastOrpOnEvent = event.data.orp
-                            DependencyContainer.actions.nofityListners(OrpHighEvent(None, False, event.data))                            
+                            DependencyContainer.actions.nofityListners(OrpHighEvent(None, False,None, event.data))                            
                     elif(event.data.orp < self.low_orp):
                         if(not self._orpEventFired):
                             self._orpEventFired = True;                            
                             self._lastOrpOnEvent = event.data.orp
-                            DependencyContainer.actions.nofityListners(OrpLowEvent(None, False, event.data))                            
+                            DependencyContainer.actions.nofityListners(OrpLowEvent(None, False,None, event.data))                            
                     else: #reset it
                         self._orpEventFired = False
                         self._lastOrpOnEvent = None
@@ -83,12 +83,12 @@ class ChemistryAlerts(IPlugin):
                         if(not self._phEventFired):
                             self._phEventFired = True
                             self._lastPhOnEvent = event.data.ph
-                            DependencyContainer.actions.nofityListners(PhHighEvent(None, False, event.data))                            
+                            DependencyContainer.actions.nofityListners(PhHighEvent(None, False, None, event.data))                            
                     elif(event.data.ph < self.low_ph):
                         if(not self._phEventFired):
                             self._phEventFired = True
                             self._lastPhOnEvent = event.data.ph
-                            DependencyContainer.actions.nofityListners(PhLowEvent(None, False, event.data))                            
+                            DependencyContainer.actions.nofityListners(PhLowEvent(None, False,None, event.data))                            
                     else: #reset it
                         self._phEventFired = False
                         self._lastPhOnEvent = None

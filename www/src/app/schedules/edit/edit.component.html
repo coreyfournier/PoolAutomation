@@ -11,7 +11,7 @@
             <ng-container formArrayName="schedules">
                 <ng-container *ngFor="let schedule of schedules.controls; let s = index">
                 <mat-list-item [formGroupName]="s">
-                    <span matListItemTitle>{{schedule.value.name}}</span>
+                    <span matListItemTitle><b>{{schedule.value.name}}</b></span>
                     <span matListItemLine>
                         <p>
                             <mat-form-field appearance="outline">
@@ -20,6 +20,9 @@
                                     formControlName="name"
                                     placeholder="Schedule Name">
                             </mat-form-field>
+                            <button style="float:right;" mat-button type="button" (click)="deleteItem(s, schedule.value)">Delete</button>
+                        </p>
+                        <p>
                             <mat-form-field appearance="outline">
                                 <mat-label>Start Time</mat-label>
                                 <input matInput
@@ -62,7 +65,7 @@
                                     </ng-container>
                                 </ng-container>
                             </ng-container>  
-                        <button mat-button type="button" (click)="deleteItem(s, schedule.value)">Delete</button>
+                        
                         </p>
                     </span>
                 </mat-list-item>

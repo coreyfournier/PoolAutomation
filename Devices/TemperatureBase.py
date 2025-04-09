@@ -103,7 +103,7 @@ class TemperatureBase(TemperatureDevice):
                 "id": self.id,
                 "name": self.displayName, 
                 "shortName": self.shortDisplayName,
-                "temp": self.getLast(),
+                "temp": self.getLastAsLocal(),
                 "unit": self.unit
             }
     

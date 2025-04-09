@@ -32,10 +32,10 @@ class StateLogging(IPlugin):
 
                 #Using the nameing convention where the Id number matches the number of the column. Temp sensor 1 matches temperature1
                 DependencyContainer.stateLogger.add(
-                    temperature1 = DependencyContainer.temperatureDevices.getById(1).getLast(),
-                    temperature2 = DependencyContainer.temperatureDevices.getById(2).getLast(),
-                    temperature3 = DependencyContainer.temperatureDevices.getById(3).getLast(),
-                    temperature4 = DependencyContainer.temperatureDevices.getById(4).getLast(),
+                    temperature1 = DependencyContainer.temperatureDevices.getById(1).getLastAsLocal(),
+                    temperature2 = DependencyContainer.temperatureDevices.getById(2).getLastAsLocal(),
+                    temperature3 = DependencyContainer.temperatureDevices.getById(3).getLastAsLocal(),
+                    temperature4 = DependencyContainer.temperatureDevices.getById(4).getLastAsLocal(),
                     pumpState1 = DependencyContainer.pumps.getById(1).currentSpeed.name,
                     valveState1 = DependencyContainer.valves.getById(1).isOn,
                     valveState2 = DependencyContainer.valves.getById(2).isOn,
