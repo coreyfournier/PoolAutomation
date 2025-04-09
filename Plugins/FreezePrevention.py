@@ -46,7 +46,7 @@ class FreezePrevention(IPlugin):
                 
                 freezePreventionTemp = DependencyContainer.variables.get("freeze-prevention-temperature", self.DefaultFreezePreventionValue).value
 
-                if(event.data.getLast() <= freezePreventionTemp):                    
+                if(event.data.getLastAsLocal() <= freezePreventionTemp):                    
 
                     isFreezePreventionEnabled = DependencyContainer.variables.get("freeze-prevention-enabled", False).value
                     if(isFreezePreventionEnabled):

@@ -81,7 +81,7 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus, rootFolder:str):
 #Listens for all changes
 def allChangeNotification(event:Event):
         
-    logger.debug(f"Change detected ---- {event.__class__}")           
+    logger.debug(f"Change detected from {event.__class__.__name__}")           
 
     #sends notifications to the client
     DependencyContainer.serverSentEvents.raiseEvent(event)
