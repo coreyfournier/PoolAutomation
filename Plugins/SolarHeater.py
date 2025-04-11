@@ -80,9 +80,9 @@ class SolarHeater(IPlugin):
             solarSetTemp = DependencyContainer.variables.get("solar-heat-temperature").value
             minRoofDifference = DependencyContainer.variables.get("solar-min-roof-diff").value
             isSolarEnabled = DependencyContainer.variables.get("solar-heat-enabled").value
-            solarHeatTemp = DependencyContainer.temperatureDevices.get("solar-heat").get(True)
-            roofTemp = round(DependencyContainer.temperatureDevices.get("roof").get(True), 1)
-            poolTemp = round(DependencyContainer.temperatureDevices.get("pool-temp").get(True), 1)
+            solarHeatTemp = DependencyContainer.temperatureDevices.get("solar-heat").getAsLocal(True)
+            roofTemp = round(DependencyContainer.temperatureDevices.get("roof").getAsLocal(True), 1)
+            poolTemp = round(DependencyContainer.temperatureDevices.get("pool-temp").getAsLocal(True), 1)
             isSolarHeatOn = DependencyContainer.variables.get("solar-heat-on", False).value
 
             solarShouldBeOn = False

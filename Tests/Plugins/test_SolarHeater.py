@@ -40,6 +40,7 @@ def test_turnOn():
     DependencyContainer.variables.get("solar-heat-enabled").value = True
     #Given: #3 Target temp of the pool is higher than the current temp
     DependencyContainer.variables.get("solar-heat-temperature").value = 30
+    DependencyContainer.temperatureUnit = 'c'
 
     DependencyContainer.valves = Valves(ValveRepoStub(
         [solarHeaterValve]
