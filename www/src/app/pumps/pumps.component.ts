@@ -32,7 +32,14 @@ export class PumpsComponent {
 
         if(d.dataType == "PumpChangeEvent")
         {
-          console.log(`Even=${d.dataType}`);
+          let foundPump = this.pumps.find(x=> x.id == d.data.id);
+          if(foundPump)
+          {
+            foundPump.speeds.forEach(speed => {
+              //Update the active status on all of the speeds
+              speed.isActive = speed.name == d.data.currentSpeed;
+            });            
+          }
         }
       });
     }

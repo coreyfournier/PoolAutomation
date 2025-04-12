@@ -16,6 +16,7 @@ class RelayPump(Pump):
         self.currentSpeed = Speed.OFF
 
     def on(self, speed:Speed):
+        from Events.PumpChangeEvent import PumpChangeEvent
         currentSpeed = self.currentSpeed
 
         if(speed in self.speedToGpio):
@@ -42,7 +43,8 @@ class RelayPump(Pump):
 
     def off(self):
         """Ensures that the pump is completely off by switching off all relays for the pump
-        """        
+        """       
+        from Events.PumpChangeEvent import PumpChangeEvent 
         currentSpeed = self.currentSpeed
 
         self.__setOffSpeedStatus(True)

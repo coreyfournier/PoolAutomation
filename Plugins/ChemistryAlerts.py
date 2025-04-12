@@ -15,6 +15,7 @@ from Events.OrpHighEvent import *
 from Events.PhChangeEvent import *
 from Events.PhLowEvent import *
 from Events.PhHighEvent import *
+from Events.PumpChangeEvent import PumpChangeEvent
 
 logger = DependencyContainer.get_logger(__name__)
 

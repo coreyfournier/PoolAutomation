@@ -10,15 +10,6 @@ from IO.IValveRepo import IValveRepo
 from Devices.Valve import Valve
 import dataclasses
 
-@dataclass
-class ValveChangeEvent(Event):
-    data:Valve = None
-
-    def to_dict(self):
-        return {
-            "data":  self.data.to_dict(),
-            "dataType": self.dataType
-        }
 
 class Valves:
     def __init__(self, repo:IValveRepo) -> None:
@@ -39,7 +30,7 @@ class Valves:
         return [item for key, item in self._valves.items()]
     
     def on(self, name:"str|int"):
-        
+        from Events.ValveChangeEvent import ValveChangeEvent
         #Allow a lookup by id
         if(type(name) == int):
             name = self._byId[name].name
@@ -48,9 +39,10 @@ class Valves:
         self._valves[name].isOn = True
         
         if(DependencyContainer.actions != None):
-            DependencyContainer.actions.nofityListners(ValveChangeEvent(None, False, self._valves[name]))
+            DependencyContainer.actions.nofityListners(ValveChangeEvent(None, False,None, self._valves[name]))
 
     def off(self, name:"str|int"):
+        from Events.ValveChangeEvent import ValveChangeEvent
         #Allow a lookup by id
         if(type(name) == int):
             name = self._byId[name].name
@@ -59,6 +51,6 @@ class Valves:
         self._valves[name].isOn = False
 
         if(DependencyContainer.actions != None):
-            DependencyContainer.actions.nofityListners(ValveChangeEvent(None, False, self._valves[name]))
+            DependencyContainer.actions.nofityListners(ValveChangeEvent(None, False, None, self._valves[name]))
 
         
