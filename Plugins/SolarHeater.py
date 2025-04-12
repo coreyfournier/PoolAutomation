@@ -102,12 +102,16 @@ class SolarHeater(IPlugin):
                         solarShouldBeOn = False                   
                         logger.debug(f"Pool {poolTemp} > {solarSetTemp} turning off")                
                               
+                    #Is it warmer than the minimum temp required
+                    elif((roofTemp + self._temperatureMargin) > needRoofTemp):
+                        logger.debug(f"Heater staying on. Pool still not warm enough {poolTemp} < {solarSetTemp}. Roof:{roofTemp} Roof temp until off:{needRoofTemp-poolTemp}")
+                        solarShouldBeOn = True
                     else:
                         logger.debug(f"It's NOT hot enough, going to turn off Diff={solarVsPoolDifference}")
                         solarShouldBeOn = False
                 #See if it should be turned on
                 elif((roofTemp + self._temperatureMargin) > needRoofTemp and (poolTemp - self._temperatureMargin) <= solarSetTemp):
-                        logger.debug(f"Heater staying on. Pool still not warm enough {poolTemp} < {solarSetTemp}. Roof:{roofTemp} Roof temp until off:{poolTemp-needRoofTemp}")
+                        logger.debug(f"Heater turning on. Pool still not warm enough {poolTemp} < {solarSetTemp}. Roof:{roofTemp} Roof temp until off:{needRoofTemp-poolTemp}")
                         solarShouldBeOn = True                        
                 else: 
                     if(isSolarHeatOn):
