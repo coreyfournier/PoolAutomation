@@ -55,8 +55,8 @@ class Display(IPlugin):
             #Using the temp ensures the display only changs every 30 seconds
             if(self.displayRotation == 1):
                 toDisplay = ["Temperatures"]
-                temps = [f"{(device.shortDisplayName + ':').ljust(13)}{round(device.get(),1)}{DependencyContainer.temperatureUnit}" for device in DependencyContainer.temperatureDevices.getAll()]
-                toDisplay+= temps    
+                temps = [f"{(device.shortDisplayName + ':').ljust(13)}{device.getAsLocal()}{DependencyContainer.temperatureUnit}" for device in DependencyContainer.temperatureDevices.getAll()]
+                toDisplay += temps    
                 self.display.write(toDisplay)            
             elif(self.displayRotation == 2):
                 toDisplay = ["Schedule Running"]
