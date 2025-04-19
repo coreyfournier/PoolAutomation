@@ -59,12 +59,7 @@ class SolarHeater(IPlugin):
             self._positions = site.get_solarposition(times)
             
         return self._positions["zenith"][int(datetime.now().strftime('%H'))]
-    
-    def zenithToSpeed(self, zenith:float)-> Speed:
-        if(zenith == None):
-            return self._defaultSpeed
-        elif(zenith <= self._minZenithForFastSpeed):
-            return self._fastSpeed
+
 
     def getAction(self)-> Action:
         return Action("solar-heat", "Solar Heater",
@@ -82,7 +77,9 @@ class SolarHeater(IPlugin):
                     Variable("solar-heat-temperature","Heater temp", float,value=90.0),                                    
                     #The roof must be this temp + current pool temp before the heater turns on.
                     Variable("solar-min-roof-diff","Minimum roof diff", float, value=5),
-                    Variable("solar-heat-enabled","Enabled", bool, value=False)
+                    Variable("solar-heat-enabled","Enabled", bool, value=False),
+                    #For this to be used, you must set ZIP_CODE and LOCAL in the environment variables
+                    Variable("solar-heat-optimize","Optimize for sun angle", bool, value=False)
                 ], 
                 True, 
                 "solar-heat-on", 
@@ -175,11 +172,23 @@ class SolarHeater(IPlugin):
                 #It's not on and it should be
                 action.overrideSchedule = True
                 DependencyContainer.variables.get("solar-heat-on").value = True
-                zenith = self.getZenith()
                 
-                pumpForSolar.on(
-                    self._defaultSpeed if zenith == None else self.zenithToSpeed(zenith))
+                
+                pumpForSolar.on(self.getSpeed(roofTemp, solarHeatTemp))
                 self._changeSolarState(True)
+
+    def getSpeed(self, roofTemp:float, setTemp:float, minRoofDifference:float) -> Speed:
+        zenith = self.getZenith()
+        extra:float = 5
+        optimizeForSunAngle:bool = DependencyContainer.variables.get("solar-heat-optimize", False).value        
+
+        if(zenith == None or not optimizeForSunAngle):
+            return self._defaultSpeed
+        elif(zenith <= self._minZenithForFastSpeed):
+            necessaryTemp = setTemp + minRoofDifference + extra
+            if(roofTemp > necessaryTemp):
+                logger.info(f'Position {zenith} and extra roof temp {necessaryTemp} is right, increasing the speed of the pump')
+            return self._fastSpeed
         
 
     @staticmethod
