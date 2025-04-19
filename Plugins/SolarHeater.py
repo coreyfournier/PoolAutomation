@@ -8,6 +8,13 @@ from lib.Variables import *
 from Devices.Pump import *
 from Devices.IDeviceController import IDeviceController
 from Events.VariableChangeEvent import *
+import pvlib
+from pvlib.location import Location
+import tzlocal
+import pgeocode
+from datetime import datetime
+import pandas as pd
+import os
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -25,6 +32,39 @@ class SolarHeater(IPlugin):
         #How much the temperature needs to over come before a state change occurs.
         #This is necessary because the sensor isn't very accurate
         self._temperatureMargin:float = .3
+        self._positions = None
+        self._defaultSpeed:Speed = Speed.SPEED_3
+        self._fastSpeed:Speed = Speed.SPEED_2
+        self._minZenithForFastSpeed:float = 44
+        #Local postal code to get the correct lat and long
+        self._zipCode:str = os.environ['ZIP_CODE'] if 'ZIP_CODE' in os.environ else None
+        #Country Ex: 'us'
+        self._local:str = os.environ["LOCAL"] if 'LOCAL' in os.environ else None
+
+    def getZenith(self)-> float:
+
+        if(self._zipCode == None or self._local == None):
+            return None
+
+        if(self._positions == None):
+            nomi = pgeocode.Nominatim(self._local)
+            a = nomi.query_postal_code(self._zipCode)
+
+            site = Location(a['latitude'], a['longitude'], tzlocal.get_localzone().key, 651, 'city, state') # latitude, longitude, time_zone, altitude, name
+
+            # Definition of a time range of simulation
+            times = pd.date_range(datetime.now().strftime('%Y-%m-%d 00:00:00'), datetime.now().strftime('%Y-%m-%d 23:59:00'), closed='left', freq='H', tz=site.tz)
+
+            # Estimate Solar Position with the 'Location' object
+            self._positions = site.get_solarposition(times)
+            
+        return self._positions["zenith"][int(datetime.now().strftime('%H'))]
+    
+    def zenithToSpeed(self, zenith:float)-> Speed:
+        if(zenith == None):
+            return self._defaultSpeed
+        elif(zenith <= self._minZenithForFastSpeed):
+            return self._fastSpeed
 
     def getAction(self)-> Action:
         return Action("solar-heat", "Solar Heater",
@@ -135,7 +175,10 @@ class SolarHeater(IPlugin):
                 #It's not on and it should be
                 action.overrideSchedule = True
                 DependencyContainer.variables.get("solar-heat-on").value = True
-                pumpForSolar.on(Speed.SPEED_3)
+                zenith = self.getZenith()
+                
+                pumpForSolar.on(
+                    self._defaultSpeed if zenith == None else self.zenithToSpeed(zenith))
                 self._changeSolarState(True)
         
 
