@@ -40,7 +40,7 @@ class StateLogging(IPlugin):
                         pumpState1 = DependencyContainer.pumps.getById(1).currentSpeed.name,
                         valveState1 = DependencyContainer.valves.getById(1).isOn,
                         valveState2 = DependencyContainer.valves.getById(2).isOn,
-                        ScheduleActive1 = DependencyContainer.schedules.getById(1).isRunning,
+                        ScheduleActive1 = False,
                         ActionActive1 = DependencyContainer.actions.get()[0].overrideSchedule,
                         ActionActive2 = DependencyContainer.actions.get()[1].overrideSchedule,
                         ActionActive3 = DependencyContainer.actions.get()[2].overrideSchedule,

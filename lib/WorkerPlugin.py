@@ -71,23 +71,23 @@ class WorkerPlugin(SimplePlugin):
                     DependencyContainer.schedules.checkSchedule()
                 
                 #Reading any temperature sensors
-                #try:                
-                if(DependencyContainer.temperatureDevices != None):
-                    DependencyContainer.temperatureDevices.checkAll()
-                #except Exception  as err:
-                #    logger.error(f"Failed when getting the temperature. Error:{err}")
+                try:                
+                    if(DependencyContainer.temperatureDevices != None):
+                        DependencyContainer.temperatureDevices.checkAll()
+                except Exception  as err:
+                    logger.exception(f"Failed when getting the temperature. Error:{err}")
 
                 try:
                     if(DependencyContainer.variables != None)                :
                         DependencyContainer.variables.checkForExpiredVariables()
                 except Exception  as err:
-                    logger.error(f"Failed when checkForExpiredVariables. Error:{err}")   
+                    logger.exception(f"Failed when checkForExpiredVariables. Error:{err}")   
 
                 try:
                     if(DependencyContainer.enviromentalSensor != None):
                         DependencyContainer.enviromentalSensor.get(False)
                 except Exception  as err:
-                    logger.error(f"Failed when enviromental sensors. Error:{err}")   
+                    logger.exception(f"Failed when enviromental sensors. Error:{err}")                       
 
             #I want this to fire more often
             try:
