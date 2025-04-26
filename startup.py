@@ -123,7 +123,7 @@ if __name__ == '__main__':
     
     logger.debug("Loading variables")
     variableRepo = VariableRepo(os.path.join(dataPath, "variables.json"))
-    
+   
     #All custom changes are here
     Configuration.configure(variableRepo, GPIO, i2cBus, rootFolder)    
 

@@ -57,16 +57,19 @@ class OneWire(TemperatureBase):
         lines = self.__read_temp_raw(deviceId)
         if(lines == None):
             return 0            
-        else:
+        elif(len(lines) > 0):
             while lines[0].strip()[-3:] != 'YES':
                 time.sleep(0.2)
                 lines = self.__read_temp_raw(deviceId)
-
-        equals_pos = lines[1].find('t=')
-        if equals_pos != -1:
-            temp_string = lines[1][equals_pos+2:]
-            temp_c = float(temp_string) / 1000.0                        
-            return round(temp_c, self._maxDigits)
+            
+            equals_pos = lines[1].find('t=')
+            if equals_pos != -1:
+                temp_string = lines[1][equals_pos+2:]
+                temp_c = float(temp_string) / 1000.0                        
+                return round(temp_c, self._maxDigits)
+        
+        return 0
+        
     
     def get(self, allowCached:bool = True)-> float:
         if(allowCached and self.deviceId in self._tracked):
