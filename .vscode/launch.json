@@ -11,7 +11,11 @@
             "request": "launch",
             "program": "startup.py",
             "console": "integratedTerminal",
-            "justMyCode": true
+            "justMyCode": true,
+            "env": {
+                
+            },
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

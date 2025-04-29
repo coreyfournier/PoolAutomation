@@ -94,7 +94,7 @@ def get_logger(logger_name:str) -> logging.Logger:
     
     return logger
 
-#from Lights.GloBrite import GloBrite 
+
 from Devices.Pump import Pump
 from Devices.Schedules import Schedules
 from Devices.TemperatureBase import TemperatureBase
@@ -108,6 +108,7 @@ from IO.StateLoggerDuckDbRepo import StateLoggerDuckDbRepo
 from IO.SeverSentEvents import *
 from Devices.AtlasScientific import *
 from IO.GeneratorRepo import *
+from Infrastructure.Db.SqlDb import SqlDb
 
 
 
@@ -136,3 +137,21 @@ stateLogger:StateLoggerDuckDbRepo = None
 enviromentalSensor:AtlasScientific = None
 
 generator:GeneratorRepo = None
+
+sqlDb:SqlDb = None
+
+from sqlalchemy.orm import (scoped_session, sessionmaker, relationship,
+                            backref)
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import (create_engine)
+from IO.StateLoggerMsSqlRepo import parseConnectionString
+parsedConnection = parseConnectionString(os.environ["PoolAutomationSqlConnection"])
+
+Base = declarative_base()
+connectionString = f"mssql+pyodbc://{parsedConnection['userName']}:{parsedConnection['userPassword']}@{parsedConnection['server']}/{parsedConnection['databaseName']}?driver=SQL+Server+Native+Client+11.0"
+engine = create_engine(connectionString)
+
+session = scoped_session(sessionmaker(autocommit=False,
+                                            autoflush=False,
+                                            bind=engine))
+Base.query = session.query_property()

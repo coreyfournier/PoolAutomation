@@ -12,3 +12,4 @@
 display.png
 Dockerfile
 assets/*
+.env

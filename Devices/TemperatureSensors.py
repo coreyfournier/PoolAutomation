@@ -29,7 +29,11 @@ class TemperatureSensors:
         return self._deviceByName[name]
     
     def getById(self, id:int) -> TemperatureBase:
-        return self._byId[id]
+        if(id in self._byId):            
+            return self._byId[id]
+        else:
+            #This will ensure get local calls will not crash if the device isn't found
+            return TemperatureBase(0,'not-found', 'Not Found', 'NF','not-found')
     
     def getAll(self) -> "list[TemperatureDevice]":
         """Gets all devices

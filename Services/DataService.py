@@ -4,12 +4,41 @@ import os
 import DependencyContainer
 import json
 from Events.Event import Event
+import graphene
 
 logger = DependencyContainer.get_logger(__name__)
 
 class DataService():
     def __init__(self) -> None:
         pass
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def gql(self):
+        """Graph ql end point
+
+        Returns:
+            _type_: _description_
+        """
+        from Infrastructure.Db.GraphQl.Query import Query
+        schema = graphene.Schema(query=Query)
+
+        if(cherrypy.request.process_request_body):
+            body = cherrypy.request.body.read()
+
+            if(body == None):
+                return "Supply a query body"    
+            else:
+                query = body.decode('ascii')
+                result = schema.execute(query, context_value={'session': DependencyContainer.getDbSession()})
+
+                if(result.errors != None and len(result.errors) > 0):
+                    return result.errors[0].message
+                return result.data
+            
+        else:
+            return "Supply a query body"
+
    
     @cherrypy.expose
     def getUpdate(self, _=None):

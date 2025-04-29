@@ -9,6 +9,36 @@ from odata_query.sql import AstToSqlVisitor
 
 logger = DependencyContainer.get_logger(__name__)
 
+def parseConnectionString(sqlConnection:str):
+    databaseName = None
+    userId = re.findall("User Id=([a-zA-Z0-9\-_\.]+);", sqlConnection)
+    password = re.findall("Password=([a-zA-Z0-9\+\-_=!\.]+);", sqlConnection)
+    server = re.findall("Server=([a-zA-Z0-9\-_\.]+);", sqlConnection)        
+    logger.debug(f"password='{password}'")
+
+    if(databaseName == None):
+        databaseName = re.findall("Database=([a-zA-Z0-9\-_\.]+);", sqlConnection)
+        if(len(databaseName) == 0):
+            databaseName = None
+        else:
+            databaseName = databaseName[0]                
+
+    if(len(userId) == 0):
+        raise Exception("User Id=X; not found in connection string")
+    if(len(password) == 0):
+        raise Exception("Password=X; not found in connection string")        
+    if(len(server) == 0):
+        raise Exception("Server=X; not found in connection string")
+    if(databaseName == None):
+        raise Exception("Database=X; not found in connection string")
+    
+    return {
+        "server" : server[0],
+        "databaseName" : databaseName,
+        "userName" : userId[0],
+        "userPassword" : password[0]
+        }
+
 class StateLoggerMsSqlRepo():
     """
     Example command to start sql on docker
@@ -19,31 +49,12 @@ class StateLoggerMsSqlRepo():
         self.__lexer = ODataLexer()
         self.__parser = ODataParser()
 
-        userId = re.findall("User Id=([a-zA-Z0-9\-_\.]+);", sqlConnection)
-        password = re.findall("Password=([a-zA-Z0-9\+\-_=!\.]+);", sqlConnection)
-        server = re.findall("Server=([a-zA-Z0-9\-_\.]+);", sqlConnection)        
-        logger.debug(f"password='{password}'")
-        if(databaseName == None):
-            databaseName = re.findall("Database=([a-zA-Z0-9\-_\.]+);", sqlConnection)
-            if(len(databaseName) == 0):
-                databaseName = None
-            else:
-                databaseName = databaseName[0]
-                
-
-        if(len(userId) == 0):
-            raise Exception("User Id=X; not found in connection string")
-        if(len(password) == 0):
-            raise Exception("Password=X; not found in connection string")        
-        if(len(server) == 0):
-            raise Exception("Server=X; not found in connection string")
-        if(databaseName == None):
-            raise Exception("Database=X; not found in connection string")
+        parsedConnection = parseConnectionString(sqlConnection)
         
-        self._server = server[0]
-        self._databaseName = databaseName
-        self._userName = userId[0]
-        self._userPassword = password[0]
+        self._server = parsedConnection['server']
+        self._databaseName = parsedConnection['databaseName']
+        self._userName = parsedConnection['userName']
+        self._userPassword = parsedConnection['userPassword']
 
         try:
             connection = pytds.connect(self._server, self._databaseName, self._userName, self._userPassword, autocommit=True)
@@ -64,7 +75,7 @@ class StateLoggerMsSqlRepo():
             else:
                 raise ex
 
-        tableScript = """USE PoolAutomation;
+        tableScript = """
             IF OBJECT_ID('StateLogs', 'U') IS NULL 
             BEGIN
                 CREATE TABLE StateLogs(
@@ -215,7 +226,7 @@ class StateLoggerMsSqlRepo():
                 cursor.execute(f"SELECT {select} FROM StateLogs WHERE {where}")
                 return cursor.fetchall()
 
-    def agg(self, where:str=None,columns:"list[str]" = None) -> list:
+    def agg(self, where:str=None, columns:"list[str]" = None) -> list:
         with pytds.connect(self._server, self._databaseName, self._userName, self._userPassword, autocommit=True) as connection:
             with connection.cursor() as cursor:
                 query = f"""SELECT 
@@ -231,6 +242,7 @@ class StateLoggerMsSqlRepo():
                 logger.debug(query)
                 cursor.execute(query)
                 return cursor.fetchall()
+    
         
     def netTemperatureChange(self, sensorColumn:str = "[temperature4]", daysFromNow:int = 30, pumpStateColumn = "[pumpState1]"):
         """Calculates the net temperature change from day to day
@@ -239,7 +251,8 @@ class StateLoggerMsSqlRepo():
             sensorColumn (str, optional): Which sql column you are interested in. Defaults to "[temperature4]".
             daysFromNow (int, optional): How many days in the past you want to include. Defaults to 30.
             pumpStateColumn (str, optional): Which column tracks the pump state. This is so we don't include values when the pump is off. Defaults to "[pumpState1]".
-        """        
+        """  
+
         query = f"""        
         SELECT
             PoolTemp,
@@ -302,3 +315,28 @@ class StateLoggerMsSqlRepo():
         visitor = AstToSqlVisitor()
         #I have no idea why it does this
         return visitor.visit(ast).replace(" DATE ", "").replace(" TIMESTAMP ","")
+    
+    def tempTrendQuery(self, days:int):
+        """Gets the trends of the max temps by day where the pump isn't off.
+        Will use spark lines
+        https://apexcharts.com/javascript-chart-demos/sparklines/basic/
+        """
+        query = f"""
+    SELECT  
+        MAX([temperature1]) AS [temperature1],
+        MAX([temperature2]) AS [temperature2],
+        MAX([temperature3]) AS [temperature3],
+        MAX([temperature4]) AS [temperature4],
+        MAX([temperature5]) AS [temperature5],
+        CAST([CreatedDate] AS DATE) AS [Date]
+    FROM 
+        [dbo].[StateLogs]
+    WHERE
+        pumpState1 != 'OFF'
+        AND CreatedDate BETWEEN DATEADD(MONTH,{int(days) * -1},GETDATE()) AND GETDATE()
+    GROUP BY
+        CAST([CreatedDate] AS DATE) 
+    ORDER BY CAST([CreatedDate] AS DATE) ASC
+        """
+
+        return query
