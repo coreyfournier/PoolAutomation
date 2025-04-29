@@ -31,7 +31,7 @@ class TemperatureService:
                 {
                 "id": 99,
                 "name": "Environmental", 
-                "temp": DependencyContainer.enviromentalSensor.get().temperature,
+                "temp": DependencyContainer.enviromentalSensor.get(True).temperature,
                 "unit": DependencyContainer.temperatureUnit.upper()
             })            
 

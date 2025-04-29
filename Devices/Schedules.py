@@ -35,7 +35,7 @@ class Schedules:
     def get(self) -> "list[PumpSchedule]":
         return self._scheduleData
     
-    def getById(self, id:int) -> PumpSchedule | None:
+    def getById(self, id:int) -> PumpSchedule:
         if(id in self._byId):
             return self._byId[id]
         else:
