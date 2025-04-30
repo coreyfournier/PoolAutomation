@@ -94,7 +94,7 @@ class WorkerPlugin(SimplePlugin):
                 if(DependencyContainer.actions != None):
                     DependencyContainer.actions.nofityListners(TimerEvent(None,False, None, secondsPassed))
             except Exception  as err:
-                logger.error(f"Failed when notifying for a timer event. Error:{err}")
+                logger.exception(f"Failed when notifying for a timer event. Error:{err}")
 
 
             secondsPassed += self._sleep

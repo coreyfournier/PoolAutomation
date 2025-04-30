@@ -83,11 +83,14 @@ def allChangeNotification(event:Event):
         
     logger.debug(f"Change detected from {event.__class__.__name__}")           
 
-    #sends notifications to the client
-    DependencyContainer.serverSentEvents.raiseEvent(event)
+    try:
+        #sends notifications to the client
+        DependencyContainer.serverSentEvents.raiseEvent(event)
+    except Exception as err:
+        logger.exception(f"Failed sending server sent events. Error:{err}")
 
     #If an override changes, check to see if the schedule should be reevaluated
     if(isinstance(event, OverrideChangeEvent)):
-        logger.debug(f"Action '{event.data.name}' changed to {event.data.overrideSchedule}")    
+        logger.debug(f"Action Override for '{event.data.name}' changed to {event.data.overrideSchedule}")    
         logger.debug("Checking to see if the schedule needs to make changes")           
         DependencyContainer.schedules.checkSchedule()    
