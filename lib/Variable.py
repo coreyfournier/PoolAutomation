@@ -48,7 +48,8 @@ class VariableGroup(JSONWizard):
         Args:
             value (str): Name of the variable
         """
-        if(not (value in self.variables)):
+        
+        if(len([x.name for x in self.variables if x.name == value]) == 0):
             self.variables.append(Variable(value, "Is On", bool, False, showInUi = False))
 
         self._isOnVariable = value

@@ -1,4 +1,4 @@
-from IPlugin import IPlugin
+from Plugins.IPlugin import IPlugin
 import DependencyContainer
 from Events.Event import Event
 
@@ -32,9 +32,9 @@ class Slide(IPlugin):
             #Denotes if the slide is on or off. This will be a button
                 VariableGroup("Slide", [
                     Variable("slide-on", None, bool,value=False)
-                ], 
-                True,
-                "slide-on")
+                    ], 
+                    True,
+                    "slide-on")
         ]
 
     def slideStatusChanged(self, event:Event):    
