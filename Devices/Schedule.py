@@ -37,7 +37,7 @@ class Control(JSONWizard):
     pumps:PyList['PumpControl']  = None
     #list of valves and the state
     valves:PyList['ValveControl'] = None
-    
+    #If the schedule is allowed to run
     isActive:bool = True
     #Pump speed to set when the schedule expires. Should be off
     offSpeedName:str = Pump.Speed.OFF.name

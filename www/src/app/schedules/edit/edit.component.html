@@ -20,6 +20,11 @@
                                     formControlName="name"
                                     placeholder="Schedule Name">
                             </mat-form-field>
+                            
+                            <mat-checkbox formControlName="isActive">
+                                Is Active
+                            </mat-checkbox>
+                            
                             <button style="float:right;" mat-button type="button" (click)="deleteItem(s, schedule.value)">Delete</button>
                         </p>
                         <p>

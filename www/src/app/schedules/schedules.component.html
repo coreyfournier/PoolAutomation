@@ -10,8 +10,9 @@
             
         <table class="table">
             <tr><th></th><th>Start</th><th>End</th><th>Pumps</th></tr>
-            <tr *ngFor="let row of scheduleInfo.schedules" id="schedule-{{row.id}}">
-                <th class="">{{row.name}} <span *ngIf="row.isRunning">*</span></th>
+            <tr *ngFor="let row of scheduleInfo.schedules" id="schedule-{{row.id}}" [ngClass]="{'inactive-schedule': !row.isActive}">
+                <th><span *ngIf="row.isRunning" class="running-schedule"></span> {{row.name}} 
+                </th>
                 <td>{{datepipe.transform(row.scheduleStart, timeFormat)}}</td>
                 <td>{{datepipe.transform(row.scheduleEnd, timeFormat)}} ({{row.duration.toFixed(1)}}hrs)</td>
                 <td>

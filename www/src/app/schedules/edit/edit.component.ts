@@ -132,6 +132,7 @@ export class ScheduleEditComponent {
       startTime:[this.datepipe.transform(sch.startTime, "HH:mm"), Validators.required],
       endTime:[this.datepipe.transform(sch.endTime, "HH:mm"), Validators.required],
       id:[sch.id, Validators.required],
+      isActive:sch.isActive,
       pumps:this.formBuilder.array(sch.pumps.map(p=>{
 
         return this.formBuilder.group({

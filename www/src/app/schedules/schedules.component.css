@@ -7,3 +7,16 @@
     height:auto;
 
   }
+
+.inactive-schedule {
+  text-decoration: line-through;
+}  
+
+.running-schedule{
+  width: 10px; /* Example width */
+  height: 10px; /* Must match width for a perfect circle */
+  background-color: green;
+  border-radius: 50%;
+  display: inline-block;
+
+}

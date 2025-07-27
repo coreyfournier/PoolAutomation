@@ -67,7 +67,7 @@
           "name": "slide-on",
           "displayName": null,
           "dataType": "bool",
-          "value": true,
+          "value": false,
           "expires": false,
           "hasExpired": true,
           "showInUi": true
