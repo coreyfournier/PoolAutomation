@@ -45,7 +45,7 @@ All devices are stubbed out when it can't find the pi libraries.
 2. Add your local repo as a trusted repository on both the build and destination machine: https://stackoverflow.com/questions/49674004/docker-repository-server-gave-http-response-to-https-client
 ### Testing on the pi with docker
 #### Locally
-1. docker build -f "Dockerfile" . -t "pool-automation:latest" --platform=linux/arm/v7
+1. docker build -f "Dockerfile" . -t "pool-automation:latest" --platform=linux/arm64/v8
 2. docker tag "pool-automation:latest" "192.168.1.4:5050/pool-automation:latest"
 3. docker push 192.168.1.4:5050/pool-automation:latest
 
