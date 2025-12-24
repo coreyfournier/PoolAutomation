@@ -43,7 +43,7 @@ class ScheduleService:
             }
         
     def get_schedules(self):
-        schedules = [item.to_dict() for item in DependencyContainer.schedules.get()]
+        schedules = [item.toDictionary() for item in DependencyContainer.schedules.get()]
 
         if(DependencyContainer.pumps != None):
             for schedule in schedules:

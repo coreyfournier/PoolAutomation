@@ -16,13 +16,16 @@ class Display:
         self._height = height
         self._font = ImageFont.truetype(os.path.join(fontDirectory,"Anonymous Pro.ttf"), 10)
         #self._font = ImageFont.load_default()        
+        self._color = 255
 
     def _getImage(self, text:"list[str]"):
         image = Image.new("1", (self._width, self._height))
         # Get drawing object to draw on image.
         draw = ImageDraw.Draw(image)
-
-        (font_width, font_height) = self._font.getsize(text[0])
+        
+        bbox = self._font.getbbox(text[0])
+        font_width = bbox[2] - bbox[0]
+        font_height = bbox[3] - bbox[1]
         
 
         lineNumber:int = 0
@@ -31,15 +34,10 @@ class Display:
                 position = font_height * lineNumber
             else:
                 position = (font_height * lineNumber)  + 3
+            
+            textPosition = (0, position)
 
-
-            draw.text(
-                (0, 
-                position),
-                row,
-                font=self._font,
-                fill=255
-            )
+            draw.text(textPosition, row, font=self._font, fill = self._color)
             lineNumber +=1
             
         return image

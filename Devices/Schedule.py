@@ -6,7 +6,7 @@ import dataclasses
 from dataclasses_json import dataclass_json, LetterCase, config
 from typing import List as PyList
 from dataclass_wizard import JSONWizard
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, EXCLUDE
 from lib.Actions import Event
 import DependencyContainer
 
@@ -65,7 +65,6 @@ def toIsoFormat(time:datetime):
 @dataclass_json
 @dataclass
 class PumpSchedule(Control):   
-
     #Seperate time and date, so the schedule can support specific dates and times, or just time with no date specified.
     startTime:datetime = field(
         metadata=config(
@@ -83,8 +82,6 @@ class PumpSchedule(Control):
         ),
         default= None
     )
-    
-    duration:float = None
 
     scheduleStart:str = None
     scheduleEnd:str = None
@@ -105,8 +102,7 @@ class PumpSchedule(Control):
 
     @scheduleEnd.setter
     def scheduleEnd(self, stuff):
-        pass
-        
+        pass        
 
     @property
     def duration(self) -> float:
@@ -144,14 +140,11 @@ class PumpSchedule(Control):
         """
         return {
             "id":self.id,
-            "startTime": toLocalTime(self.startTime),
-            "endTime": toLocalTime(self.endTime),
+            "scheduleStart": toLocalTime(self.startTime),
+            "scheduleEnd": toLocalTime(self.endTime),
             "name":self.name,
             "pumps": [] if self.pumps == None else [p.to_dict() for p in self.pumps] ,
             "valves": [] if self.valves == None else [v.to_dict() for v in self.valves],
             "isActive": self.isActive,
+            "duration": self.duration
         }
-        
-
-
-   

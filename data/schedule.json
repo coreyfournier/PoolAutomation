@@ -13,6 +13,7 @@
       }
     ],
     "valves": [],
-    "isActive": false
+    "isActive": true,
+    "duration": 10.999722222222223
   }
 ]

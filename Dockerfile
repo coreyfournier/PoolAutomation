@@ -1,4 +1,4 @@
-FROM node:20.5-slim AS NODE_BASE
+FROM arm64v8/node:20.5.0-slim AS node_base
 #Only copy over the packages so we don't change the layer unless the packages change.
 WORKDIR /app
 COPY www/package.json package.json
@@ -12,13 +12,14 @@ RUN npm ci
 COPY www/ /app
 
 #Create a new layer that is only for the final build that very light weight
-FROM node_base AS NODE_FINAL
+FROM node_base AS node_final
 WORKDIR /app
-RUN npm run build --prod
+
+RUN npm run build -- --configuration production
 #remove all of the node modules as it's no longer need in the final layer. This makes the file really small.
 RUN rm -r /app/node_modules
 
-FROM arm32v7/python:3.10.10-slim AS PYTHON_BASE
+FROM arm64v8/python:3.14.2-slim AS python_base
 WORKDIR /app/
 RUN pip install --upgrade pip setuptools wheel
 
@@ -39,7 +40,7 @@ RUN apt-get install libjpeg-dev -y
 RUN apt-get install zlib1g-dev -y
 RUN apt-get install libfreetype6-dev -y
 RUN apt-get install libopenjp2-7 -y
-RUN apt-get install libtiff5 -y
+RUN apt-get install libtiff6 -y
 RUN apt-get install unzip
 
 RUN pip install --upgrade pip
@@ -47,7 +48,7 @@ RUN pip install --upgrade pip
 COPY requirements.txt /app/
 RUN pip install -r /app/requirements.txt
 
-COPY --from=NODE_FINAL /app /app/www
+COPY --from=node_final /app /app/www
 #Set the directory that contains the built angular app
 ENV STATIC_DIRECTORY=/app/www/dist/www
 

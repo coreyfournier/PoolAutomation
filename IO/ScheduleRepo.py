@@ -19,7 +19,7 @@ class ScheduleRepo:
     def getSchedules(self) -> "list[PumpSchedule]":
         with open(self.__scheduleFile) as f:
             scheduleJson = f.read()
-            data = PumpSchedule.schema().loads(scheduleJson, many=True) 
+            data = PumpSchedule.schema().loads(scheduleJson, many=True, unknown=EXCLUDE) 
             return data
         
     def saveSchedules(self, schedules:"list[PumpSchedule]"):

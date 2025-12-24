@@ -1,10 +1,10 @@
 ninja==1.11.1
-CherryPy==18.6.1
-cherrypy-cors==1.6
-dataclasses_json==0.5.7
-dataclass_wizard==0.22.2
+CherryPy==18.10.0
+cherrypy-cors==1.7.0
+dataclasses_json==0.6.7
+dataclass_wizard==0.37.0
 dataclasses==0.6
-pillow==9.4.0
+pillow==12.0.0
 board==1.0
 python-tds==1.12.0
 odata-query==0.8.0
