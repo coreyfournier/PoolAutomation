@@ -4,14 +4,15 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
         {
-            "name": "Python: Current File",
-            "type": "python",
+            "name": "Python Debugger: Startup",
+            "type": "debugpy",
             "request": "launch",
             "program": "startup.py",
             "console": "integratedTerminal",
-            "justMyCode": true
+            "env": {
+                "ATLAS_SCIENTIFIC":"stub"
+            }
         }
     ]
 }

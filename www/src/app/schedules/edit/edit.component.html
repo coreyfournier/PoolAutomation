@@ -1,86 +1,82 @@
-<form  (ngSubmit)="onSubmit()">
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Edit Schedules</h3>
-    </div>
-    
-    <div class="panel-body" [formGroup]="scheduleForm">
-        <div id="schedule">            
-        <mat-list>
-            
-            <ng-container formArrayName="schedules">
-                <ng-container *ngFor="let schedule of schedules.controls; let s = index">
-                <mat-list-item [formGroupName]="s">
-                    <span matListItemTitle><b>{{schedule.value.name}}</b></span>
-                    <span matListItemLine>
-                        <p>
-                            <mat-form-field appearance="outline">
-                                <mat-label>Schedule Name</mat-label>
-                                <input matInput
-                                    formControlName="name"
-                                    placeholder="Schedule Name">
-                            </mat-form-field>
-                            
-                            <mat-checkbox formControlName="isActive">
-                                Is Active
-                            </mat-checkbox>
-                            
-                            <button style="float:right;" mat-button type="button" (click)="deleteItem(s, schedule.value)">Delete</button>
-                        </p>
-                        <p>
-                            <mat-form-field appearance="outline">
-                                <mat-label>Start Time</mat-label>
-                                <input matInput
-                                    type="time"
-                                    formControlName="startTime"
-                                    placeholder="Start">
-                            </mat-form-field>
-                            <mat-form-field appearance="outline">
-                                <mat-label>End Time</mat-label>
-                                <input matInput
-                                    type="time"
-                                    formControlName="endTime"
-                                    placeholder="End">
-                            </mat-form-field>
-                        </p>
-                    </span>
-                    <span matListItemLine>
-                        <p>
-                            <ng-container formArrayName="pumps">
-                                <ng-container *ngFor="let row of schedulePumps(s, schedule).controls; let p = index">
-                                    <ng-container [formGroupName]="p">                                        
-                                        <mat-form-field  appearance="outline">
-                                            <mat-label>Pump</mat-label>
-                                            <mat-select [value]="row.value.name">
-                                                <mat-option [value]="pump.name" *ngFor="let pump of avaliablePumps">  
-                                                    {{pump.name}}
-                                                </mat-option>
-                                            </mat-select>
-                                        </mat-form-field>
-                                        
-                                        <mat-form-field  appearance="outline">
-                                            <mat-label>Speed</mat-label>
-                                            <mat-select #pumpSpeed [value]="row.value.speedName" (selectionChange)="row.value.speedName = pumpSpeed.value">
-                                                <mat-option [value]="speed.name" [selected]="speed.name == row.value.speedName"  *ngFor="let speed of getSpeedsForPump(row.value.name)">  
-                                                    {{speed.name}}
-                                                </mat-option>
-                                            </mat-select>
-                                        </mat-form-field>                                                 
-                                        
+<form (ngSubmit)="onSubmit()">
+    <div class="tile tile--full" style="opacity: 1; animation: none;">
+        <div class="tile__header">
+            <h2 class="tile__title">Edit Schedules</h2>
+            <div class="tile__actions">
+                <button class="btn" type="button" (click)="addItem()">Add New</button>
+                <button class="btn" type="submit">Save</button>
+            </div>
+        </div>
+
+        <div class="tile__body" [formGroup]="scheduleForm">
+            <mat-list>
+                <ng-container formArrayName="schedules">
+                    <ng-container *ngFor="let schedule of schedules.controls; let s = index">
+                        <mat-list-item [formGroupName]="s" class="schedule-edit-item">
+                            <span matListItemTitle><strong>{{schedule.value.name}}</strong></span>
+                            <span matListItemLine>
+                                <div class="schedule-edit-row">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Schedule Name</mat-label>
+                                        <input matInput
+                                            formControlName="name"
+                                            placeholder="Schedule Name">
+                                    </mat-form-field>
+
+                                    <mat-checkbox formControlName="isActive">
+                                        Is Active
+                                    </mat-checkbox>
+
+                                    <button class="btn" type="button" (click)="deleteItem(s, schedule.value)">Delete</button>
+                                </div>
+                                <div class="schedule-edit-row">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Start Time</mat-label>
+                                        <input matInput
+                                            type="time"
+                                            formControlName="startTime"
+                                            placeholder="Start">
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>End Time</mat-label>
+                                        <input matInput
+                                            type="time"
+                                            formControlName="endTime"
+                                            placeholder="End">
+                                    </mat-form-field>
+                                </div>
+                            </span>
+                            <span matListItemLine>
+                                <div class="schedule-edit-row">
+                                    <ng-container formArrayName="pumps">
+                                        <ng-container *ngFor="let row of schedulePumps(s, schedule).controls; let p = index">
+                                            <ng-container [formGroupName]="p">
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>Pump</mat-label>
+                                                    <mat-select [value]="row.value.name">
+                                                        <mat-option [value]="pump.name" *ngFor="let pump of avaliablePumps">
+                                                            {{pump.name}}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+
+                                                <mat-form-field appearance="outline">
+                                                    <mat-label>Speed</mat-label>
+                                                    <mat-select #pumpSpeed [value]="row.value.speedName" (selectionChange)="row.value.speedName = pumpSpeed.value">
+                                                        <mat-option [value]="speed.name" [selected]="speed.name == row.value.speedName" *ngFor="let speed of getSpeedsForPump(row.value.name)">
+                                                            {{speed.name}}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                </mat-form-field>
+                                            </ng-container>
+                                        </ng-container>
                                     </ng-container>
-                                </ng-container>
-                            </ng-container>  
-                        
-                        </p>
-                    </span>
-                </mat-list-item>
-            </ng-container>
-            </ng-container>
-        </mat-list>
-        <button mat-button type="button" (click)="addItem()">Add New</button>
-        
+                                </div>
+                            </span>
+                        </mat-list-item>
+                    </ng-container>
+                </ng-container>
+            </mat-list>
+        </div>
     </div>
-    </div>
-</div>
-    <button mat-button type="submit">Save</button>
 </form>

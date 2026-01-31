@@ -1,10 +1,11 @@
-<div class="col-sm-2"  *ngFor="let sensor of sensors">
-  <div class="panel panel-default">
-      <div class="panel-heading">
-          <h3 class="panel-title">{{sensor.name}}</h3>
-      </div>
-      <div class="panel-body">
-          <div>{{sensor.temp}} {{sensor.unit}}</div>
-      </div>
-  </div>  
+<div class="tile__header">
+    <h2 class="tile__title">Temperature</h2>
+</div>
+<div class="tile__body">
+    <div class="sensor-grid">
+        <div class="sensor-card" *ngFor="let sensor of sensors">
+            <div class="sensor-card__name">{{sensor.name}}</div>
+            <div class="sensor-card__value">{{sensor.temp}}{{sensor.unit}}</div>
+        </div>
+    </div>
 </div>

@@ -36,7 +36,9 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus, rootFolder:str):
     ])
 
     if("ATLAS_SCIENTIFIC" not in os.environ or os.environ["ATLAS_SCIENTIFIC"] is None):
-        DependencyContainer.enviromentalSensor = AtlasScientificStub()
+        DependencyContainer.enviromentalSensor = None
+    elif(os.environ["ATLAS_SCIENTIFIC"] == "stub"):
+        DependencyContainer.enviromentalSensor = AtlasScientificStub() 
     else:
         DependencyContainer.enviromentalSensor = AtlasScientific(os.environ["ATLAS_SCIENTIFIC"])    
         

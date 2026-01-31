@@ -1,12 +1,18 @@
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Pump</h3>
-    </div>
-    <div class="panel-body" id="pumps">
-        <div class="panel-body form-group" *ngFor="let pump of pumps">
-            <label for="pump-{{pump.name}}">{{pump.displayName}}</label> 
-            <select (change)="speedChanged(pump, $event)" id="pump-{{pump.name}}" class="form-control">
-                <option *ngFor="let speed of pump.speeds" [selected]="speed.isActive == true" [value]="speed.name">{{speed.name}}</option>
+<div class="tile__header">
+    <h2 class="tile__title">Pumps</h2>
+</div>
+<div class="tile__body">
+    <div class="control-list">
+        <div class="control-item" *ngFor="let pump of pumps">
+            <span class="control-label">{{pump.displayName}}</span>
+            <select (change)="speedChanged(pump, $event)"
+                    id="pump-{{pump.name}}"
+                    class="form-control">
+                <option *ngFor="let speed of pump.speeds"
+                        [selected]="speed.isActive == true"
+                        [value]="speed.name">
+                    {{speed.name}}
+                </option>
             </select>
         </div>
     </div>

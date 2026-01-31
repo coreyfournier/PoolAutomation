@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pool Automation - Proposed UI Design</title>
+
+    <!-- Typography: Young Serif (display) + Martian Mono (data) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Martian+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <style>
+        /* ═══════════════════════════════════════════════════════════════
+           CSS CUSTOM PROPERTIES - "HYDROLOGICAL CONTROL" THEME
+           Inspired by: Scientific instruments, depth charts, SCADA systems
+           ═══════════════════════════════════════════════════════════════ */
+        :root {
+            /* Color Palette */
+            --bg-deep: #0A1628;
+            --bg-card: #0F2133;
+            --bg-card-hover: #142a42;
+            --bg-elevated: #1a3550;
+
+            --accent-cyan: #00CED1;
+            --accent-cyan-glow: rgba(0, 206, 209, 0.3);
+            --accent-amber: #F4A460;
+            --accent-amber-glow: rgba(244, 164, 96, 0.3);
+
+            --status-active: #20B2AA;
+            --status-inactive: #FF6B6B;
+            --status-warning: #FFD93D;
+
+            --text-primary: #E8F4F8;
+            --text-secondary: #8BA9B3;
+            --text-muted: #4A6572;
+
+            --border-subtle: rgba(0, 206, 209, 0.15);
+            --border-accent: rgba(0, 206, 209, 0.4);
+
+            /* Typography */
+            --font-display: 'Young Serif', Georgia, serif;
+            --font-mono: 'Martian Mono', 'Courier New', monospace;
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Animation */
+            --transition-fast: 150ms ease-out;
+            --transition-base: 250ms ease-out;
+            --transition-slow: 400ms ease-out;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RESET & BASE
+           ═══════════════════════════════════════════════════════════════ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-mono);
+            font-weight: 400;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-deep);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           ATMOSPHERIC BACKGROUND
+           Topographic contour pattern suggesting water depth charts
+           ═══════════════════════════════════════════════════════════════ */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                /* Radial glow top-left */
+                radial-gradient(ellipse 80% 50% at 20% 20%, rgba(0, 206, 209, 0.08) 0%, transparent 50%),
+                /* Radial glow bottom-right */
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(244, 164, 96, 0.05) 0%, transparent 50%),
+                /* Topographic lines - horizontal */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 60px,
+                    rgba(0, 206, 209, 0.03) 60px,
+                    rgba(0, 206, 209, 0.03) 61px
+                ),
+                /* Topographic lines - diagonal */
+                repeating-linear-gradient(
+                    35deg,
+                    transparent,
+                    transparent 80px,
+                    rgba(0, 206, 209, 0.02) 80px,
+                    rgba(0, 206, 209, 0.02) 81px
+                );
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Animated water ripple effect */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 200vmax;
+            height: 200vmax;
+            transform: translate(-50%, -50%);
+            background:
+                radial-gradient(circle at center, transparent 0%, transparent 30%, rgba(0, 206, 209, 0.02) 30.5%, transparent 31%),
+                radial-gradient(circle at center, transparent 0%, transparent 50%, rgba(0, 206, 209, 0.015) 50.5%, transparent 51%),
+                radial-gradient(circle at center, transparent 0%, transparent 70%, rgba(0, 206, 209, 0.01) 70.5%, transparent 71%);
+            animation: ripple 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes ripple {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           LAYOUT CONTAINER
+           ═══════════════════════════════════════════════════════════════ */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-lg);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           HEADER
+           ═══════════════════════════════════════════════════════════════ */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-lg) 0;
+            margin-bottom: var(--space-xl);
+            border-bottom: 1px solid var(--border-subtle);
+            animation: fadeSlideDown 0.6s ease-out;
+        }
+
+        @keyframes fadeSlideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .app-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .app-title span {
+            color: var(--accent-cyan);
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--status-active);
+            box-shadow: 0 0 8px var(--status-active);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--status-active); }
+            50% { opacity: 0.6; box-shadow: 0 0 16px var(--status-active); }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           DASHBOARD GRID
+           ═══════════════════════════════════════════════════════════════ */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: var(--space-lg);
+        }
+
+        /* Tile base styles */
+        .tile {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            overflow: hidden;
+            transition:
+                transform var(--transition-base),
+                box-shadow var(--transition-base),
+                border-color var(--transition-base);
+
+            /* Staggered entrance animation */
+            opacity: 0;
+            animation: tileEnter 0.5s ease-out forwards;
+        }
+
+        .tile:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                0 0 0 1px var(--border-accent);
+            border-color: var(--border-accent);
+        }
+
+        @keyframes tileEnter {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Staggered delays */
+        .tile:nth-child(1) { animation-delay: 0.1s; }
+        .tile:nth-child(2) { animation-delay: 0.15s; }
+        .tile:nth-child(3) { animation-delay: 0.2s; }
+        .tile:nth-child(4) { animation-delay: 0.25s; }
+        .tile:nth-child(5) { animation-delay: 0.3s; }
+        .tile:nth-child(6) { animation-delay: 0.35s; }
+        .tile:nth-child(7) { animation-delay: 0.4s; }
+        .tile:nth-child(8) { animation-delay: 0.45s; }
+
+        /* Tile sizes */
+        .tile--full { grid-column: span 12; }
+        .tile--half { grid-column: span 6; }
+        .tile--third { grid-column: span 4; }
+        .tile--quarter { grid-column: span 3; }
+
+        @media (max-width: 1024px) {
+            .tile--half { grid-column: span 12; }
+            .tile--third { grid-column: span 6; }
+            .tile--quarter { grid-column: span 6; }
+        }
+
+        @media (max-width: 640px) {
+            .tile--third { grid-column: span 12; }
+            .tile--quarter { grid-column: span 12; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TILE HEADER
+           ═══════════════════════════════════════════════════════════════ */
+        .tile__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-subtle);
+            background: linear-gradient(
+                180deg,
+                rgba(0, 206, 209, 0.05) 0%,
+                transparent 100%
+            );
+        }
+
+        .tile__title {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            font-weight: 400;
+            color: var(--text-primary);
+        }
+
+        .tile__actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .btn {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: var(--space-xs) var(--space-md);
+            border: 1px solid var(--border-accent);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--accent-cyan);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-deep);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TILE BODY
+           ═══════════════════════════════════════════════════════════════ */
+        .tile__body {
+            padding: var(--space-lg);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CHEMISTRY TILE - Large metric display
+           ═══════════════════════════════════════════════════════════════ */
+        .metrics-row {
+            display: flex;
+            gap: var(--space-xl);
+        }
+
+        .metric {
+            flex: 1;
+        }
+
+        .metric__label {
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: var(--space-xs);
+        }
+
+        .metric__value {
+            font-family: var(--font-mono);
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--accent-cyan);
+            line-height: 1;
+            text-shadow: 0 0 30px var(--accent-cyan-glow);
+        }
+
+        .metric__value--warning {
+            color: var(--status-warning);
+            text-shadow: 0 0 30px rgba(255, 217, 61, 0.3);
+        }
+
+        .metric__unit {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-left: var(--space-xs);
+        }
+
+        .metric__range {
+            font-size: 0.625rem;
+            color: var(--text-muted);
+            margin-top: var(--space-xs);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TEMPERATURE SENSORS - Compact cards
+           ═══════════════════════════════════════════════════════════════ */
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .sensor-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: var(--space-md);
+            text-align: center;
+            transition: all var(--transition-fast);
+        }
+
+        .sensor-card:hover {
+            border-color: var(--accent-amber);
+            background: rgba(244, 164, 96, 0.1);
+        }
+
+        .sensor-card__name {
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .sensor-card__value {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--accent-amber);
+            text-shadow: 0 0 20px var(--accent-amber-glow);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           SCHEDULES TABLE
+           ═══════════════════════════════════════════════════════════════ */
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .schedule-table th {
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            text-align: left;
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .schedule-table td {
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--border-subtle);
+            vertical-align: middle;
+        }
+
+        .schedule-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .schedule-table tr:hover td {
+            background: rgba(0, 206, 209, 0.03);
+        }
+
+        .schedule-name {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .schedule-status {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .schedule-status--active {
+            background: var(--status-active);
+            box-shadow: 0 0 8px var(--status-active);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .schedule-status--inactive {
+            background: var(--text-muted);
+        }
+
+        .schedule-time {
+            font-family: var(--font-mono);
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+
+        .schedule-duration {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .schedule-inactive {
+            opacity: 0.4;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CONTROLS - Toggles, Selects
+           ═══════════════════════════════════════════════════════════════ */
+        .control-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .control-item:last-child {
+            border-bottom: none;
+        }
+
+        .control-label {
+            font-size: 0.8125rem;
+            color: var(--text-primary);
+        }
+
+        /* Custom Toggle Switch */
+        .toggle {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            transition: all var(--transition-fast);
+        }
+
+        .toggle--active {
+            background: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+        }
+
+        .toggle--active::after {
+            left: 26px;
+            background: var(--bg-deep);
+        }
+
+        /* Custom Select */
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select {
+            appearance: none;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            padding: var(--space-sm) var(--space-lg) var(--space-sm) var(--space-md);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            min-width: 140px;
+        }
+
+        .select:hover, .select:focus {
+            border-color: var(--accent-cyan);
+            outline: none;
+        }
+
+        .select-wrapper::after {
+            content: '';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 4px solid var(--text-secondary);
+            pointer-events: none;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           VARIABLE GROUPS
+           ═══════════════════════════════════════════════════════════════ */
+        .variable-group {
+            margin-bottom: var(--space-lg);
+        }
+
+        .variable-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .variable-group__title {
+            font-family: var(--font-display);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .variable-input {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            width: 80px;
+            padding: var(--space-sm);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            color: var(--accent-cyan);
+            text-align: right;
+            transition: all var(--transition-fast);
+        }
+
+        .variable-input:hover, .variable-input:focus {
+            border-color: var(--accent-cyan);
+            outline: none;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CHART CONTAINER - ApexCharts
+           ═══════════════════════════════════════════════════════════════ */
+        .chart-container {
+            min-height: 220px;
+            border-radius: 8px;
+        }
+
+        /* ApexCharts dark theme overrides */
+        .apexcharts-canvas {
+            background: transparent !important;
+        }
+
+        .apexcharts-text,
+        .apexcharts-title-text,
+        .apexcharts-xaxis-label,
+        .apexcharts-yaxis-label {
+            fill: var(--text-secondary) !important;
+            font-family: var(--font-mono) !important;
+        }
+
+        .apexcharts-gridline {
+            stroke: var(--border-subtle) !important;
+        }
+
+        .apexcharts-xaxis line,
+        .apexcharts-yaxis line {
+            stroke: var(--border-subtle) !important;
+        }
+
+        .apexcharts-tooltip {
+            background: var(--bg-elevated) !important;
+            border: 1px solid var(--border-accent) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .apexcharts-tooltip-title {
+            background: var(--bg-card) !important;
+            border-bottom: 1px solid var(--border-subtle) !important;
+            font-family: var(--font-mono) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .apexcharts-tooltip-text {
+            font-family: var(--font-mono) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .apexcharts-legend-text {
+            color: var(--text-secondary) !important;
+            font-family: var(--font-mono) !important;
+        }
+
+        /* Date picker styling */
+        .chart-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .date-input {
+            font-family: var(--font-mono);
+            font-size: 0.8125rem;
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .date-input:hover,
+        .date-input:focus {
+            border-color: var(--accent-cyan);
+            outline: none;
+        }
+
+        /* Color scheme for date input icon */
+        .date-input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            opacity: 0.6;
+            cursor: pointer;
+        }
+
+        .date-input::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           OVERRIDES BANNER
+           ═══════════════════════════════════════════════════════════════ */
+        .overrides-banner {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            margin-bottom: var(--space-md);
+            font-size: 0.75rem;
+            color: var(--status-inactive);
+        }
+
+        .overrides-banner__icon {
+            font-size: 1rem;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RESPONSIVE ADJUSTMENTS
+           ═══════════════════════════════════════════════════════════════ */
+        @media (max-width: 640px) {
+            .app-container {
+                padding: var(--space-md);
+            }
+
+            .app-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-md);
+            }
+
+            .app-title {
+                font-size: 1.5rem;
+            }
+
+            .metrics-row {
+                flex-direction: column;
+                gap: var(--space-lg);
+            }
+
+            .metric__value {
+                font-size: 2rem;
+            }
+
+            .tile__header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-sm);
+            }
+
+            .schedule-table {
+                font-size: 0.75rem;
+            }
+
+            .schedule-table th:nth-child(4),
+            .schedule-table td:nth-child(4) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="app-title">Pool <span>Automation</span></h1>
+            <div class="system-status">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>System Online</span>
+                </div>
+                <span>Last update: 14:32:08</span>
+            </div>
+        </header>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+
+            <!-- Chemistry Tile -->
+            <div class="tile tile--half">
+                <div class="tile__header">
+                    <h2 class="tile__title">Chemistry</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="metrics-row">
+                        <div class="metric">
+                            <div class="metric__label">pH Level</div>
+                            <div class="metric__value">
+                                7.4<span class="metric__unit">pH</span>
+                            </div>
+                            <div class="metric__range">Optimal: 7.2 - 7.6</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric__label">ORP</div>
+                            <div class="metric__value metric__value--warning">
+                                680<span class="metric__unit">mV</span>
+                            </div>
+                            <div class="metric__range">Optimal: 700 - 750 mV</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Temperature Sensors Tile -->
+            <div class="tile tile--half">
+                <div class="tile__header">
+                    <h2 class="tile__title">Temperature</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="sensor-grid">
+                        <div class="sensor-card">
+                            <div class="sensor-card__name">Pool</div>
+                            <div class="sensor-card__value">78.5°F</div>
+                        </div>
+                        <div class="sensor-card">
+                            <div class="sensor-card__name">Spa</div>
+                            <div class="sensor-card__value">102°F</div>
+                        </div>
+                        <div class="sensor-card">
+                            <div class="sensor-card__name">Air</div>
+                            <div class="sensor-card__value">84°F</div>
+                        </div>
+                        <div class="sensor-card">
+                            <div class="sensor-card__name">Solar</div>
+                            <div class="sensor-card__value">118°F</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedules Tile -->
+            <div class="tile tile--full">
+                <div class="tile__header">
+                    <h2 class="tile__title">Schedules</h2>
+                    <div class="tile__actions">
+                        <button class="btn">Edit</button>
+                    </div>
+                </div>
+                <div class="tile__body">
+                    <div class="overrides-banner">
+                        <span class="overrides-banner__icon">!</span>
+                        <span>Active Override: <strong>Spa Mode</strong></span>
+                    </div>
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Schedule</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Equipment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="schedule-name">
+                                        <div class="schedule-status schedule-status--active"></div>
+                                        <span>Morning Filter</span>
+                                    </div>
+                                </td>
+                                <td><span class="schedule-time">06:00 AM</span></td>
+                                <td>
+                                    <span class="schedule-time">10:00 AM</span>
+                                    <span class="schedule-duration">(4.0 hrs)</span>
+                                </td>
+                                <td>Main Pump (Medium)</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="schedule-name">
+                                        <div class="schedule-status schedule-status--inactive"></div>
+                                        <span>Afternoon Run</span>
+                                    </div>
+                                </td>
+                                <td><span class="schedule-time">02:00 PM</span></td>
+                                <td>
+                                    <span class="schedule-time">06:00 PM</span>
+                                    <span class="schedule-duration">(4.0 hrs)</span>
+                                </td>
+                                <td>Main Pump (High)</td>
+                            </tr>
+                            <tr class="schedule-inactive">
+                                <td>
+                                    <div class="schedule-name">
+                                        <div class="schedule-status schedule-status--inactive"></div>
+                                        <span>Night Filter</span>
+                                    </div>
+                                </td>
+                                <td><span class="schedule-time">10:00 PM</span></td>
+                                <td>
+                                    <span class="schedule-time">12:00 AM</span>
+                                    <span class="schedule-duration">(2.0 hrs)</span>
+                                </td>
+                                <td>Main Pump (Low)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Stats Tile -->
+            <div class="tile tile--full">
+                <div class="tile__header">
+                    <h2 class="tile__title">Stats</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="chart-controls">
+                        <label style="font-size: 0.75rem; color: var(--text-secondary);">Choose a date:</label>
+                        <input type="date" class="date-input" id="chart-date" value="2026-01-30">
+                    </div>
+                    <div class="chart-container">
+                        <div id="temperature-chart"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Variable Groups Tile -->
+            <div class="tile tile--half">
+                <div class="tile__header">
+                    <h2 class="tile__title">Spa Controls</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="variable-group">
+                        <div class="control-list">
+                            <div class="control-item">
+                                <span class="control-label">Spa Mode</span>
+                                <div class="toggle toggle--active"></div>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-label">Heat Enabled</span>
+                                <div class="toggle toggle--active"></div>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-label">Target Temp</span>
+                                <input type="number" class="variable-input" value="102">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lights Tile -->
+            <div class="tile tile--half">
+                <div class="tile__header">
+                    <h2 class="tile__title">Lights</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="control-list">
+                        <div class="control-item">
+                            <span class="control-label">Pool Light</span>
+                            <div class="select-wrapper">
+                                <select class="select">
+                                    <option>SAm Mode</option>
+                                    <option>Party Mode</option>
+                                    <option>Romance</option>
+                                    <option>Caribbean</option>
+                                    <option>Off</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-label">Spa Light</span>
+                            <div class="select-wrapper">
+                                <select class="select">
+                                    <option>Caribbean</option>
+                                    <option>Party Mode</option>
+                                    <option>Romance</option>
+                                    <option>Off</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pumps Tile -->
+            <div class="tile tile--third">
+                <div class="tile__header">
+                    <h2 class="tile__title">Pumps</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="control-list">
+                        <div class="control-item">
+                            <span class="control-label">Main Pump</span>
+                            <div class="select-wrapper">
+                                <select class="select">
+                                    <option>Medium</option>
+                                    <option>Off</option>
+                                    <option>Low</option>
+                                    <option>High</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-label">Booster</span>
+                            <div class="select-wrapper">
+                                <select class="select">
+                                    <option>Off</option>
+                                    <option>On</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Valves Tile -->
+            <div class="tile tile--third">
+                <div class="tile__header">
+                    <h2 class="tile__title">Valves</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="control-list">
+                        <div class="control-item">
+                            <span class="control-label">Pool Return</span>
+                            <div class="toggle toggle--active"></div>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-label">Spa Return</span>
+                            <div class="toggle"></div>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-label">Solar</span>
+                            <div class="toggle toggle--active"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pool Mode Tile -->
+            <div class="tile tile--third">
+                <div class="tile__header">
+                    <h2 class="tile__title">Pool Controls</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="control-list">
+                        <div class="control-item">
+                            <span class="control-label">Solar Heat</span>
+                            <div class="toggle toggle--active"></div>
+                        </div>
+                        <div class="control-item">
+                            <span class="control-label">Target Temp</span>
+                            <input type="number" class="variable-input" value="82">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ApexCharts Initialization -->
+    <script>
+        // Dark theme configuration for ApexCharts
+        // This matches the "Hydrological Control" color scheme
+        const chartOptions = {
+            chart: {
+                type: 'line',
+                height: 200,
+                width: '100%',
+                id: 'temperature-chart',
+                background: 'transparent',
+                fontFamily: "'Martian Mono', 'Courier New', monospace",
+                toolbar: {
+                    show: false
+                },
+                zoom: {
+                    enabled: false
+                },
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800,
+                    animateGradually: {
+                        enabled: true,
+                        delay: 150
+                    },
+                    dynamicAnimation: {
+                        enabled: true,
+                        speed: 350
+                    }
+                }
+            },
+            series: [
+                {
+                    name: 'Pool',
+                    data: [76, 77, 78, 79, 80, 81, 82, 81, 80, 79, 78, 77]
+                },
+                {
+                    name: 'Spa',
+                    data: [100, 101, 102, 102, 103, 102, 101, 100, 101, 102, 102, 101]
+                },
+                {
+                    name: 'Air',
+                    data: [72, 75, 78, 82, 86, 88, 89, 87, 84, 80, 76, 73]
+                },
+                {
+                    name: 'Solar',
+                    data: [85, 95, 108, 118, 125, 128, 126, 120, 110, 98, 88, 82]
+                }
+            ],
+            colors: ['#00CED1', '#F4A460', '#20B2AA', '#FFD93D'],
+            stroke: {
+                curve: 'smooth',
+                width: 2
+            },
+            markers: {
+                size: 0,
+                hover: {
+                    size: 5
+                }
+            },
+            xaxis: {
+                categories: ['6AM', '7AM', '8AM', '9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM'],
+                labels: {
+                    style: {
+                        colors: '#8BA9B3',
+                        fontSize: '10px',
+                        fontFamily: "'Martian Mono', monospace"
+                    }
+                },
+                axisBorder: {
+                    color: 'rgba(0, 206, 209, 0.15)'
+                },
+                axisTicks: {
+                    color: 'rgba(0, 206, 209, 0.15)'
+                }
+            },
+            yaxis: {
+                labels: {
+                    style: {
+                        colors: '#8BA9B3',
+                        fontSize: '10px',
+                        fontFamily: "'Martian Mono', monospace"
+                    },
+                    formatter: function(val) {
+                        return val + '°F';
+                    }
+                }
+            },
+            grid: {
+                borderColor: 'rgba(0, 206, 209, 0.1)',
+                strokeDashArray: 3
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'right',
+                floating: true,
+                offsetY: -8,
+                labels: {
+                    colors: '#8BA9B3'
+                },
+                markers: {
+                    width: 8,
+                    height: 8,
+                    radius: 2
+                },
+                itemMargin: {
+                    horizontal: 12
+                }
+            },
+            tooltip: {
+                theme: 'dark',
+                x: {
+                    show: true
+                },
+                y: {
+                    formatter: function(val) {
+                        return val + '°F';
+                    }
+                }
+            },
+            title: {
+                text: 'Avg Temperature by Hour',
+                align: 'left',
+                style: {
+                    fontSize: '12px',
+                    fontWeight: 400,
+                    fontFamily: "'Young Serif', Georgia, serif",
+                    color: '#E8F4F8'
+                }
+            }
+        };
+
+        // Initialize chart when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const chart = new ApexCharts(
+                document.querySelector('#temperature-chart'),
+                chartOptions
+            );
+            chart.render();
+        });
+    </script>
+</body>
+</html>

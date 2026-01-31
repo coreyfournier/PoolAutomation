@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pool Automation - Light Theme Proposal</title>
+
+    <!-- Typography: Cormorant (elegant display) + JetBrains Mono (technical) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ═══════════════════════════════════════════════════════════════
+           CSS CUSTOM PROPERTIES - "BOTANICAL INDUSTRIAL" THEME
+           Inspired by: Modern greenhouse systems, clean tech, natural warmth
+           ═══════════════════════════════════════════════════════════════ */
+        :root {
+            /* Color Palette - Warm Earth Tones */
+            --bg-cream: #F7F4EF;
+            --bg-card: #FFFFFF;
+            --bg-subtle: #EDE9E3;
+
+            --accent-forest: #1B4332;
+            --accent-forest-light: #2D6A4F;
+            --accent-terracotta: #C45C26;
+            --accent-terracotta-light: #E07B45;
+
+            --status-active: #40916C;
+            --status-inactive: #BC4749;
+            --status-warning: #E9C46A;
+
+            --text-primary: #1A1A1A;
+            --text-secondary: #5C5C5C;
+            --text-muted: #9B9B9B;
+
+            --border-subtle: #E0DCD6;
+            --border-accent: #1B4332;
+
+            /* Typography */
+            --font-display: 'Cormorant', Georgia, serif;
+            --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(27, 67, 50, 0.08);
+            --shadow-md: 0 4px 12px rgba(27, 67, 50, 0.1);
+            --shadow-lg: 0 12px 40px rgba(27, 67, 50, 0.12);
+
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+
+            /* Animation */
+            --transition-fast: 150ms ease-out;
+            --transition-base: 250ms ease-out;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RESET & BASE
+           ═══════════════════════════════════════════════════════════════ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-mono);
+            font-weight: 400;
+            font-size: 0.8125rem;
+            line-height: 1.7;
+            color: var(--text-primary);
+            background: var(--bg-cream);
+            min-height: 100vh;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           BACKGROUND PATTERN
+           Subtle organic grid pattern
+           ═══════════════════════════════════════════════════════════════ */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                /* Soft radial warmth */
+                radial-gradient(ellipse 100% 80% at 50% 0%, rgba(196, 92, 38, 0.04) 0%, transparent 50%),
+                /* Organic dot pattern */
+                radial-gradient(circle at center, var(--border-subtle) 1px, transparent 1px);
+            background-size: 100% 100%, 24px 24px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           LAYOUT
+           ═══════════════════════════════════════════════════════════════ */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           HEADER
+           ═══════════════════════════════════════════════════════════════ */
+        .app-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            padding-bottom: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+            border-bottom: 2px solid var(--accent-forest);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .app-title {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: var(--accent-forest);
+            letter-spacing: -0.02em;
+            font-style: italic;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            background: var(--status-active);
+            animation: blink 3s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { opacity: 1; }
+            95% { opacity: 0.3; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           DASHBOARD GRID - Masonry-inspired
+           ═══════════════════════════════════════════════════════════════ */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+        }
+
+        /* Tile base */
+        .tile {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 2px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-base);
+
+            opacity: 0;
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        .tile:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Staggered delays */
+        .tile:nth-child(1) { animation-delay: 0.05s; }
+        .tile:nth-child(2) { animation-delay: 0.1s; }
+        .tile:nth-child(3) { animation-delay: 0.15s; }
+        .tile:nth-child(4) { animation-delay: 0.2s; }
+        .tile:nth-child(5) { animation-delay: 0.25s; }
+        .tile:nth-child(6) { animation-delay: 0.3s; }
+        .tile:nth-child(7) { animation-delay: 0.35s; }
+        .tile:nth-child(8) { animation-delay: 0.4s; }
+        .tile:nth-child(9) { animation-delay: 0.45s; }
+
+        /* Tile sizes */
+        .tile--wide { grid-column: span 2; }
+        .tile--full { grid-column: span 3; }
+        .tile--tall { grid-row: span 2; }
+
+        @media (max-width: 900px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .tile--wide { grid-column: span 2; }
+            .tile--full { grid-column: span 2; }
+        }
+
+        @media (max-width: 600px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .tile--wide,
+            .tile--full { grid-column: span 1; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TILE HEADER
+           ═══════════════════════════════════════════════════════════════ */
+        .tile__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--bg-subtle);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .tile__title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--accent-forest);
+        }
+
+        .tile__badge {
+            font-family: var(--font-mono);
+            font-size: 0.625rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: var(--space-xs) var(--space-sm);
+            background: var(--accent-terracotta);
+            color: white;
+            border-radius: 2px;
+        }
+
+        .btn {
+            font-family: var(--font-mono);
+            font-size: 0.6875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--accent-forest);
+            border-radius: 0;
+            background: transparent;
+            color: var(--accent-forest);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn:hover {
+            background: var(--accent-forest);
+            color: white;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TILE BODY
+           ═══════════════════════════════════════════════════════════════ */
+        .tile__body {
+            padding: var(--space-lg);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CHEMISTRY - Gauge Style
+           ═══════════════════════════════════════════════════════════════ */
+        .gauge-row {
+            display: flex;
+            gap: var(--space-2xl);
+            justify-content: center;
+        }
+
+        .gauge {
+            text-align: center;
+            flex: 1;
+            max-width: 180px;
+        }
+
+        .gauge__visual {
+            position: relative;
+            width: 120px;
+            height: 60px;
+            margin: 0 auto var(--space-md);
+            overflow: hidden;
+        }
+
+        .gauge__arc {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border: 8px solid var(--bg-subtle);
+            border-radius: 50%;
+            border-bottom-color: transparent;
+            border-left-color: transparent;
+            transform: rotate(-45deg);
+        }
+
+        .gauge__fill {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border: 8px solid transparent;
+            border-radius: 50%;
+            border-top-color: var(--accent-forest);
+            border-right-color: var(--accent-forest);
+            transform: rotate(-45deg);
+            clip-path: polygon(0 0, 75% 0, 75% 100%, 0 100%);
+        }
+
+        .gauge__fill--warning {
+            border-top-color: var(--accent-terracotta);
+            border-right-color: var(--accent-terracotta);
+            clip-path: polygon(0 0, 60% 0, 60% 100%, 0 100%);
+        }
+
+        .gauge__value {
+            font-family: var(--font-mono);
+            font-size: 1.75rem;
+            font-weight: 300;
+            color: var(--accent-forest);
+        }
+
+        .gauge__value--warning {
+            color: var(--accent-terracotta);
+        }
+
+        .gauge__label {
+            font-family: var(--font-display);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        .gauge__range {
+            font-size: 0.625rem;
+            color: var(--text-muted);
+            margin-top: var(--space-xs);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TEMPERATURE CARDS - Vertical stack
+           ═══════════════════════════════════════════════════════════════ */
+        .temp-stack {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .temp-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-md);
+            background: var(--bg-subtle);
+            border-left: 3px solid var(--accent-terracotta);
+            transition: all var(--transition-fast);
+        }
+
+        .temp-row:hover {
+            background: var(--bg-cream);
+            border-left-color: var(--accent-forest);
+        }
+
+        .temp-row__name {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .temp-row__value {
+            font-family: var(--font-mono);
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--accent-terracotta);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           SCHEDULES - Clean list
+           ═══════════════════════════════════════════════════════════════ */
+        .schedule-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .schedule-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: var(--space-md);
+            align-items: center;
+            padding: var(--space-md);
+            background: var(--bg-cream);
+            border: 1px solid var(--border-subtle);
+            transition: all var(--transition-fast);
+        }
+
+        .schedule-item:hover {
+            border-color: var(--accent-forest);
+        }
+
+        .schedule-item--inactive {
+            opacity: 0.5;
+        }
+
+        .schedule-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+
+        .schedule-dot--active {
+            background: var(--status-active);
+            box-shadow: 0 0 0 3px rgba(64, 145, 108, 0.2);
+        }
+
+        .schedule-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .schedule-name {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .schedule-times {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .schedule-equipment {
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CONTROLS
+           ═══════════════════════════════════════════════════════════════ */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+        }
+
+        .control-card {
+            padding: var(--space-md);
+            background: var(--bg-cream);
+            border: 1px solid var(--border-subtle);
+            transition: border-color var(--transition-fast);
+        }
+
+        .control-card:hover {
+            border-color: var(--accent-forest);
+        }
+
+        .control-card__label {
+            font-family: var(--font-display);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-sm);
+        }
+
+        /* Toggle - Pill style */
+        .toggle-pill {
+            display: flex;
+            border: 1px solid var(--border-subtle);
+            border-radius: 0;
+            overflow: hidden;
+        }
+
+        .toggle-pill__option {
+            flex: 1;
+            padding: var(--space-sm) var(--space-md);
+            font-family: var(--font-mono);
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .toggle-pill__option--active {
+            background: var(--accent-forest);
+            color: white;
+        }
+
+        /* Select - Minimal */
+        .select-minimal {
+            width: 100%;
+            appearance: none;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            padding: var(--space-sm) var(--space-md);
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231B4332' d='M2 4l4 4 4-4'/%3E%3C/svg%3E") no-repeat right var(--space-sm) center;
+            border: 1px solid var(--border-subtle);
+            border-radius: 0;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: border-color var(--transition-fast);
+        }
+
+        .select-minimal:hover,
+        .select-minimal:focus {
+            border-color: var(--accent-forest);
+            outline: none;
+        }
+
+        /* Number input */
+        .input-number {
+            width: 100%;
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            font-weight: 500;
+            padding: var(--space-sm) var(--space-md);
+            background: white;
+            border: 1px solid var(--border-subtle);
+            border-radius: 0;
+            color: var(--accent-forest);
+            text-align: center;
+            transition: border-color var(--transition-fast);
+        }
+
+        .input-number:hover,
+        .input-number:focus {
+            border-color: var(--accent-forest);
+            outline: none;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CHART AREA
+           ═══════════════════════════════════════════════════════════════ */
+        .chart-area {
+            height: 160px;
+            background:
+                linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px),
+                linear-gradient(var(--border-subtle) 1px, transparent 1px);
+            background-size: 40px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-area svg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-area .line {
+            fill: none;
+            stroke: var(--accent-forest);
+            stroke-width: 2;
+            stroke-dasharray: 800;
+            stroke-dashoffset: 800;
+            animation: draw 2s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+
+        .chart-area .area {
+            fill: url(#areaGradient);
+            opacity: 0;
+            animation: fadeArea 0.5s ease-out forwards;
+            animation-delay: 2s;
+        }
+
+        @keyframes draw {
+            to { stroke-dashoffset: 0; }
+        }
+
+        @keyframes fadeArea {
+            to { opacity: 0.4; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           OVERRIDE ALERT
+           ═══════════════════════════════════════════════════════════════ */
+        .alert-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            background: rgba(196, 92, 38, 0.1);
+            border-left: 3px solid var(--accent-terracotta);
+            margin-bottom: var(--space-md);
+            font-size: 0.75rem;
+            color: var(--accent-terracotta);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════════════════════════ */
+        @media (max-width: 600px) {
+            .app-container {
+                padding: var(--space-md);
+            }
+
+            .app-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-md);
+            }
+
+            .app-title {
+                font-size: 1.75rem;
+            }
+
+            .gauge-row {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="app-title">Pool Automation</h1>
+            <div class="system-status">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>Online</span>
+                </div>
+                <span>14:32:08</span>
+            </div>
+        </header>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+
+            <!-- Chemistry Tile -->
+            <div class="tile tile--wide">
+                <div class="tile__header">
+                    <h2 class="tile__title">Chemistry</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="gauge-row">
+                        <div class="gauge">
+                            <div class="gauge__visual">
+                                <div class="gauge__arc"></div>
+                                <div class="gauge__fill"></div>
+                            </div>
+                            <div class="gauge__value">7.4</div>
+                            <div class="gauge__label">pH Level</div>
+                            <div class="gauge__range">Optimal: 7.2 - 7.6</div>
+                        </div>
+                        <div class="gauge">
+                            <div class="gauge__visual">
+                                <div class="gauge__arc"></div>
+                                <div class="gauge__fill gauge__fill--warning"></div>
+                            </div>
+                            <div class="gauge__value gauge__value--warning">680</div>
+                            <div class="gauge__label">ORP (mV)</div>
+                            <div class="gauge__range">Optimal: 700 - 750</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Temperature Tile -->
+            <div class="tile tile--tall">
+                <div class="tile__header">
+                    <h2 class="tile__title">Temperature</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="temp-stack">
+                        <div class="temp-row">
+                            <span class="temp-row__name">Pool</span>
+                            <span class="temp-row__value">78.5°F</span>
+                        </div>
+                        <div class="temp-row">
+                            <span class="temp-row__name">Spa</span>
+                            <span class="temp-row__value">102°F</span>
+                        </div>
+                        <div class="temp-row">
+                            <span class="temp-row__name">Air</span>
+                            <span class="temp-row__value">84°F</span>
+                        </div>
+                        <div class="temp-row">
+                            <span class="temp-row__name">Solar</span>
+                            <span class="temp-row__value">118°F</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedules Tile -->
+            <div class="tile tile--wide">
+                <div class="tile__header">
+                    <h2 class="tile__title">Schedules</h2>
+                    <button class="btn">Edit</button>
+                </div>
+                <div class="tile__body">
+                    <div class="alert-bar">
+                        <span>Override Active:</span>
+                        <strong>Spa Mode</strong>
+                    </div>
+                    <div class="schedule-list">
+                        <div class="schedule-item">
+                            <div class="schedule-dot schedule-dot--active"></div>
+                            <div class="schedule-info">
+                                <span class="schedule-name">Morning Filter</span>
+                                <span class="schedule-times">6:00 AM - 10:00 AM (4 hrs)</span>
+                            </div>
+                            <span class="schedule-equipment">Main Pump<br/>Medium</span>
+                        </div>
+                        <div class="schedule-item">
+                            <div class="schedule-dot"></div>
+                            <div class="schedule-info">
+                                <span class="schedule-name">Afternoon Run</span>
+                                <span class="schedule-times">2:00 PM - 6:00 PM (4 hrs)</span>
+                            </div>
+                            <span class="schedule-equipment">Main Pump<br/>High</span>
+                        </div>
+                        <div class="schedule-item schedule-item--inactive">
+                            <div class="schedule-dot"></div>
+                            <div class="schedule-info">
+                                <span class="schedule-name">Night Filter</span>
+                                <span class="schedule-times">10:00 PM - 12:00 AM (2 hrs)</span>
+                            </div>
+                            <span class="schedule-equipment">Main Pump<br/>Low</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Chart Tile -->
+            <div class="tile tile--full">
+                <div class="tile__header">
+                    <h2 class="tile__title">Temperature History</h2>
+                    <div class="tile__badge">7 Days</div>
+                </div>
+                <div class="tile__body" style="padding: 0;">
+                    <div class="chart-area">
+                        <svg viewBox="0 0 400 100" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#1B4332"/>
+                                    <stop offset="100%" stop-color="#1B4332" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <path class="area" d="M0,70 C50,60 80,50 120,55 S180,45 220,50 S280,40 320,45 S380,35 400,40 L400,100 L0,100 Z"/>
+                            <path class="line" d="M0,70 C50,60 80,50 120,55 S180,45 220,50 S280,40 320,45 S380,35 400,40"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spa Controls Tile -->
+            <div class="tile">
+                <div class="tile__header">
+                    <h2 class="tile__title">Spa Controls</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="control-grid">
+                        <div class="control-card">
+                            <div class="control-card__label">Spa Mode</div>
+                            <div class="toggle-pill">
+                                <button class="toggle-pill__option">Off</button>
+                                <button class="toggle-pill__option toggle-pill__option--active">On</button>
+                            </div>
+                        </div>
+                        <div class="control-card">
+                            <div class="control-card__label">Heater</div>
+                            <div class="toggle-pill">
+                                <button class="toggle-pill__option">Off</button>
+                                <button class="toggle-pill__option toggle-pill__option--active">On</button>
+                            </div>
+                        </div>
+                        <div class="control-card" style="grid-column: span 2;">
+                            <div class="control-card__label">Target Temperature</div>
+                            <input type="number" class="input-number" value="102">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lights Tile -->
+            <div class="tile">
+                <div class="tile__header">
+                    <h2 class="tile__title">Lights</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="control-grid">
+                        <div class="control-card">
+                            <div class="control-card__label">Pool Light</div>
+                            <select class="select-minimal">
+                                <option>SAm Mode</option>
+                                <option>Party Mode</option>
+                                <option>Romance</option>
+                                <option>Caribbean</option>
+                                <option>Off</option>
+                            </select>
+                        </div>
+                        <div class="control-card">
+                            <div class="control-card__label">Spa Light</div>
+                            <select class="select-minimal">
+                                <option>Caribbean</option>
+                                <option>Party Mode</option>
+                                <option>Romance</option>
+                                <option>Off</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pumps Tile -->
+            <div class="tile">
+                <div class="tile__header">
+                    <h2 class="tile__title">Pumps</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="control-grid">
+                        <div class="control-card">
+                            <div class="control-card__label">Main Pump</div>
+                            <select class="select-minimal">
+                                <option>Medium</option>
+                                <option>Off</option>
+                                <option>Low</option>
+                                <option>High</option>
+                            </select>
+                        </div>
+                        <div class="control-card">
+                            <div class="control-card__label">Booster</div>
+                            <div class="toggle-pill">
+                                <button class="toggle-pill__option toggle-pill__option--active">Off</button>
+                                <button class="toggle-pill__option">On</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Valves Tile -->
+            <div class="tile">
+                <div class="tile__header">
+                    <h2 class="tile__title">Valves</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="control-grid">
+                        <div class="control-card">
+                            <div class="control-card__label">Pool Return</div>
+                            <div class="toggle-pill">
+                                <button class="toggle-pill__option">Off</button>
+                                <button class="toggle-pill__option toggle-pill__option--active">On</button>
+                            </div>
+                        </div>
+                        <div class="control-card">
+                            <div class="control-card__label">Spa Return</div>
+                            <div class="toggle-pill">
+                                <button class="toggle-pill__option toggle-pill__option--active">Off</button>
+                                <button class="toggle-pill__option">On</button>
+                            </div>
+                        </div>
+                        <div class="control-card">
+                            <div class="control-card__label">Solar</div>
+                            <div class="toggle-pill">
+                                <button class="toggle-pill__option">Off</button>
+                                <button class="toggle-pill__option toggle-pill__option--active">On</button>
+                            </div>
+                        </div>
+                        <div class="control-card">
+                            <div class="control-card__label">Water Feature</div>
+                            <div class="toggle-pill">
+                                <button class="toggle-pill__option toggle-pill__option--active">Off</button>
+                                <button class="toggle-pill__option">On</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pool Controls Tile -->
+            <div class="tile">
+                <div class="tile__header">
+                    <h2 class="tile__title">Pool Controls</h2>
+                </div>
+                <div class="tile__body">
+                    <div class="control-grid">
+                        <div class="control-card">
+                            <div class="control-card__label">Solar Heat</div>
+                            <div class="toggle-pill">
+                                <button class="toggle-pill__option">Off</button>
+                                <button class="toggle-pill__option toggle-pill__option--active">On</button>
+                            </div>
+                        </div>
+                        <div class="control-card">
+                            <div class="control-card__label">Target Temp</div>
+                            <input type="number" class="input-number" value="82">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

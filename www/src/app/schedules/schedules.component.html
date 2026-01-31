@@ -1,25 +1,49 @@
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Schedules</h3>
-        <button mat-button  [routerLink]="['/edit-schedule']">Edit</button>
+<div class="tile__header">
+    <h2 class="tile__title">Schedules</h2>
+    <div class="tile__actions">
+        <button class="btn" [routerLink]="['/edit-schedule']">Edit</button>
     </div>
-    <div class="panel-body">
-        <div id="schedule">
-            <span *ngIf="scheduleInfo.overrides.length > 0;">Overrides:</span>
-            <span *ngFor="let override of scheduleInfo.overrides" style='margin-left:2px;'>{{override.displayName}}</span>
-            
-        <table class="table">
-            <tr><th></th><th>Start</th><th>End</th><th>Pumps</th></tr>
-            <tr *ngFor="let row of scheduleInfo.schedules" id="schedule-{{row.id}}" [ngClass]="{'inactive-schedule': !row.isActive}">
-                <th><span *ngIf="row.isRunning" class="running-schedule"></span> {{row.name}} 
-                </th>
-                <td>{{datepipe.transform(row.scheduleStart, timeFormat)}}</td>
-                <td>{{datepipe.transform(row.scheduleEnd, timeFormat)}} ({{row.duration.toFixed(1)}}hrs)</td>
+</div>
+<div class="tile__body">
+    <div class="overrides-banner" *ngIf="scheduleInfo.overrides.length > 0">
+        <span class="overrides-banner__icon">!</span>
+        <span>Active Override: <strong *ngFor="let override of scheduleInfo.overrides">{{override.displayName}}</strong></span>
+    </div>
+
+    <table class="schedule-table">
+        <thead>
+            <tr>
+                <th>Schedule</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Equipment</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let row of scheduleInfo.schedules"
+                id="schedule-{{row.id}}"
+                [ngClass]="{'schedule-inactive': !row.isActive}">
                 <td>
-                    <div *ngFor="let pump of row.pumps" id="schdule-{{row.id}}-pump-{{pump.id}}">{{pump.displayName}} ({{pump.speedName}})</div>
+                    <div class="schedule-name">
+                        <div class="schedule-status"
+                             [ngClass]="{'schedule-status--active': row.isRunning, 'schedule-status--inactive': !row.isRunning}">
+                        </div>
+                        <span>{{row.name}}</span>
+                    </div>
+                </td>
+                <td>
+                    <span class="schedule-time">{{datepipe.transform(row.scheduleStart, timeFormat)}}</span>
+                </td>
+                <td>
+                    <span class="schedule-time">{{datepipe.transform(row.scheduleEnd, timeFormat)}}</span>
+                    <span class="schedule-duration">({{row.duration.toFixed(1)}} hrs)</span>
+                </td>
+                <td>
+                    <div *ngFor="let pump of row.pumps" id="schedule-{{row.id}}-pump-{{pump.id}}">
+                        {{pump.displayName}} ({{pump.speedName}})
+                    </div>
                 </td>
             </tr>
-        </table>
-    </div>
-    </div>
+        </tbody>
+    </table>
 </div>

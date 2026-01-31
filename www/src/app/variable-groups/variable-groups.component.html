@@ -1,22 +1,27 @@
-<div class="panel panel-default" *ngFor="let row of variableGroups">
-    <div class="panel-heading">
-        <h3 class="panel-title" id="{{row.isOnVariable}}">{{row.title}}</h3>
-    </div>
-    <div class="panel-body">
-        <div *ngFor="let variable of row.variables" class="form-group">
-            <label for="variable-{{variable.name}}">{{variable.displayName}}</label> 
-            <span style='margin-right:5px;'>
-                <mat-slide-toggle 
-                    *ngIf="variable.dataType == 'bool'; else allOthers" 
+<div class="tile__header">
+    <h2 class="tile__title">Controls</h2>
+</div>
+<div class="tile__body">
+    <div *ngFor="let row of variableGroups" class="variable-group">
+        <div class="variable-group__title" id="{{row.isOnVariable}}">{{row.title}}</div>
+        <div class="control-list">
+            <div *ngFor="let variable of row.variables" class="control-item">
+                <span class="control-label">{{variable.displayName}}</span>
+                <mat-slide-toggle
+                    *ngIf="variable.dataType == 'bool'; else allOthers"
                     id='variable-{{variable.name}}'
-                    (toggleChange)="variableChanged(variable, $event)" 
-                    [(ngModel)]="variable.value"
-                    class="form-control">
+                    (toggleChange)="variableChanged(variable, $event)"
+                    [(ngModel)]="variable.value">
                 </mat-slide-toggle>
                 <ng-template #allOthers>
-                    <input type='number' id='variable-{{variable.name}}' step='.5' class='form-control' value='{{variable.value}}' style='width:75px;'  (change)="variableChanged(variable, $event)" class="form-control">
+                    <input type='number'
+                           id='variable-{{variable.name}}'
+                           step='.5'
+                           class='variable-input'
+                           [value]='variable.value'
+                           (change)="variableChanged(variable, $event)">
                 </ng-template>
-            </span>
+            </div>
         </div>
     </div>
 </div>

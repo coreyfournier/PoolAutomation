@@ -7,8 +7,13 @@ import {
   ApexAxisChartSeries,
   ApexChart,
   ApexXAxis,
+  ApexYAxis,
   ApexTooltip,
-  ApexTitleSubtitle
+  ApexTitleSubtitle,
+  ApexStroke,
+  ApexGrid,
+  ApexLegend,
+  ApexMarkers
 } from "ng-apexcharts";
 import { DatePipe } from '@angular/common';
 import {FormGroup, FormControl} from '@angular/forms';
@@ -20,7 +25,14 @@ export type ChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
   xaxis: ApexXAxis;
+  yaxis: ApexYAxis;
   title: ApexTitleSubtitle;
+  stroke: ApexStroke;
+  colors: string[];
+  grid: ApexGrid;
+  legend: ApexLegend;
+  tooltip: ApexTooltip;
+  markers: ApexMarkers;
 };
 
 @Component({
@@ -42,51 +54,143 @@ export class StatsComponent {
     start : new FormControl(new Date(new Date()).toISOString().slice(0, -1))
   });
 
-  constructor(private http: HttpClient, public zone: NgZone) { 
+  constructor(private http: HttpClient, public zone: NgZone) {
     this.chartOptions = this.getChart([], []);
   }
 
   getChart(categoryData:any, seriesData:any):any{
     return {
       chart: {
-        width:'100%',
-        height:200,
-        id: 'temperature-chart',                
         type: 'line',
+        height: 200,
+        width: '100%',
+        id: 'temperature-chart',
+        background: 'transparent',
+        fontFamily: "'Martian Mono', 'Courier New', monospace",
+        toolbar: {
+          show: false
+        },
         zoom: {
           enabled: false
+        },
+        animations: {
+          enabled: true,
+          easing: 'easeinout',
+          speed: 800,
+          animateGradually: {
+            enabled: true,
+            delay: 150
+          },
+          dynamicAnimation: {
+            enabled: true,
+            speed: 350
+          }
         }
       },
       series: seriesData,
-      xaxis:{
-        categories: categoryData,
-        tickAmount: 1 ,
-        type:'category',
-        labels: {
-          show: true          
+      colors: ['#00CED1', '#F4A460', '#20B2AA', '#FFD93D'],
+      stroke: {
+        curve: 'smooth',
+        width: 2
+      },
+      markers: {
+        size: 0,
+        hover: {
+          size: 5
         }
       },
-      title:{text:"Avg Temperature by Hour"}
+      xaxis: {
+        categories: categoryData,
+        tickAmount: 1,
+        type: 'category',
+        labels: {
+          show: true,
+          style: {
+            colors: '#8BA9B3',
+            fontSize: '10px',
+            fontFamily: "'Martian Mono', monospace"
+          }
+        },
+        axisBorder: {
+          color: 'rgba(0, 206, 209, 0.15)'
+        },
+        axisTicks: {
+          color: 'rgba(0, 206, 209, 0.15)'
+        }
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: '#8BA9B3',
+            fontSize: '10px',
+            fontFamily: "'Martian Mono', monospace"
+          },
+          formatter: function(val: number) {
+            return val + '°F';
+          }
+        }
+      },
+      grid: {
+        borderColor: 'rgba(0, 206, 209, 0.1)',
+        strokeDashArray: 3
+      },
+      legend: {
+        position: 'top',
+        horizontalAlign: 'right',
+        floating: true,
+        offsetY: -8,
+        labels: {
+          colors: '#8BA9B3'
+        },
+        markers: {
+          width: 8,
+          height: 8,
+          radius: 2
+        },
+        itemMargin: {
+          horizontal: 12
+        }
+      },
+      tooltip: {
+        theme: 'dark',
+        x: {
+          show: true
+        },
+        y: {
+          formatter: function(val: number) {
+            return val + '°F';
+          }
+        }
+      },
+      title: {
+        text: 'Avg Temperature by Hour',
+        align: 'left',
+        style: {
+          fontSize: '12px',
+          fontWeight: 400,
+          fontFamily: "'Young Serif', Georgia, serif",
+          color: '#E8F4F8'
+        }
+      }
     };
-
   }
-  
-  updateTemperatureChart(value:Date) : void{    
+
+  updateTemperatureChart(value:Date) : void{
     this.lastDate = value;
     this.getChartData(this.chartOptions, value);
-  } 
+  }
 
   ngOnInit(): void {
-    this.getChartData(this.chartOptions, new Date());     
+    this.getChartData(this.chartOptions, new Date());
 
     this.eventsSubscription = this.events.subscribe((d) => {
-      
+
       if(d.dataType == "TemperatureChangeEvent")
       {
-        console.log("Reloading the temp chart");      
+        console.log("Reloading the temp chart");
         this.getChartData(this.chartOptions, this.lastDate);
       }
-    });           
+    });
   }
 
   getChartData(options:any, now:Date):Observable<any>{
@@ -98,13 +202,13 @@ export class StatsComponent {
 
     req.subscribe(response=> {
       var list = [];
-      
+
       for(var d=0;d < response.data.length; d++)
       {
-          list.push({name: response.data[d].name, data: response.data[d].data});     
-      }     
-      
-      options.series = list;       
+          list.push({name: response.data[d].name, data: response.data[d].data});
+      }
+
+      options.series = list;
 
       ApexCharts.exec("temperature-chart", "updateOptions", {
         xaxis: {
@@ -113,7 +217,6 @@ export class StatsComponent {
       });
     });
 
-    //options.chart.updateOptions(options);
-    return req; 
-  } 
+    return req;
+  }
 }

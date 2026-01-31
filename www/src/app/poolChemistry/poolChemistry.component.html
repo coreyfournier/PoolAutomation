@@ -1,13 +1,40 @@
 <ng-template [ngIf]="chemistry != undefined">
-    
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Chemistry</h3>
-        </div>
-        <div class="panel-body" id="chemistry">
-            <div class="panel-body form-group" >
-                <span id="ph" style="padding-right: 20px;">PH {{chemistry.ph}}</span>
-                <span id="orp">ORP {{chemistry.orp}}</span>
+    <div class="tile__header">
+        <h2 class="tile__title">Chemistry</h2>
+    </div>
+    <div class="tile__body">
+        <div class="gauge-row">
+            <div class="gauge-item">
+                <div class="gauge-container">
+                    <apx-chart
+                        [series]="phChartOptions.series"
+                        [chart]="phChartOptions.chart"
+                        [plotOptions]="phChartOptions.plotOptions"
+                        [fill]="phChartOptions.fill"
+                        [stroke]="phChartOptions.stroke"
+                        [labels]="phChartOptions.labels"
+                    ></apx-chart>
+                </div>
+                <div class="gauge-info">
+                    <span class="gauge-unit">pH</span>
+                    <span class="gauge-range">Optimal: 7.2 - 7.6</span>
+                </div>
+            </div>
+            <div class="gauge-item">
+                <div class="gauge-container">
+                    <apx-chart
+                        [series]="orpChartOptions.series"
+                        [chart]="orpChartOptions.chart"
+                        [plotOptions]="orpChartOptions.plotOptions"
+                        [fill]="orpChartOptions.fill"
+                        [stroke]="orpChartOptions.stroke"
+                        [labels]="orpChartOptions.labels"
+                    ></apx-chart>
+                </div>
+                <div class="gauge-info">
+                    <span class="gauge-unit">mV</span>
+                    <span class="gauge-range">Optimal: 700 - 750 mV</span>
+                </div>
             </div>
         </div>
     </div>
