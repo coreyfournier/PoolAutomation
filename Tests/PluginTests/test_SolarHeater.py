@@ -119,9 +119,9 @@ def test_turnOn():
     ))    
     
        
-    #When the roof is hot enough and the pool temp is 
+    #When the roof is hot enough and the pool temp is
     roofTemp.set(49) #120F
-    solarTemp.set(0)
+    solarTemp.set(25)
     #Current pool temp
     poolTemp.set(26) #80F
 
@@ -129,21 +129,72 @@ def test_turnOn():
         {"roof" : roofTemp,
         "solar-heat" : solarTemp,
         "pool-temp" : poolTemp}
-    )) 
- 
+    ))
+
 
     heaterAction = sh.getAction()
 
     sh.evaluateSolarStatus(
         TemperatureChangeEvent("", False, heaterAction, TemperatureBase(1,"roof","","",1))
                                )
-    
+
     #Then:
     #Solar heater value should now be on
     assert solarHeaterValve.isOn, "Heater was not on as expected."
 
     #Pump should now be on.
     assert mainPump.currentSpeed != Speed.OFF, "Pump was not on as expected"
+
+
+def test_badPoolTempReading_ignored():
+    """When pool temp deviates too far from solar heat temp, the reading should be ignored.
+    """
+    GPIO = GpioStub()
+
+    DependencyContainer.variables = Variables(None, VariableRepoStub())
+
+    mainPump = Pump(1,"main","", Speed.OFF)
+    solarHeaterValve = Valve("solar","",1, False, GpioController(GPIO, 1))
+    roofTemp = TemperatureStub(1, "roof", "Roof","roof", 1)
+    solarTemp = TemperatureStub(1, "solar-heat", "solar-heat","solar-heat", 2)
+    poolTemp = TemperatureStub(1, "pool-temp", "pool-temp","pool-temp", 3)
+
+    sh = SolarHeater()
+
+    for var in sh.getVariables():
+        DependencyContainer.variables.addVariable(var)
+
+    DependencyContainer.variables.get("solar-heat-enabled").value = True
+    DependencyContainer.variables.get("solar-heat-temperature").value = 90
+    DependencyContainer.temperatureUnit = 'f'
+
+    DependencyContainer.valves = Valves(ValveRepoStub(
+        [solarHeaterValve]
+    ))
+    DependencyContainer.pumps = Pumps(PumpRepoStub(
+        [mainPump]
+    ))
+
+    roofTemp.set(fToC(100))
+    solarTemp.set(fToC(75))
+    #Pool temp sensor returns 32F (0C) - a known bad reading
+    poolTemp.set(0)
+
+    DependencyContainer.temperatureDevices = TemperatureSensors(TemperatureRepoStub(
+        {"roof" : roofTemp,
+        "solar-heat" : solarTemp,
+        "pool-temp" : poolTemp}
+    ))
+
+    heaterAction = sh.getAction()
+
+    sh.evaluateSolarStatus(
+        TemperatureChangeEvent("", False, heaterAction, TemperatureBase(1,"roof","","",1))
+                               )
+
+    #Then: The bad reading should be ignored, heater should NOT turn on
+    assert not solarHeaterValve.isOn, "Heater should not have turned on with a bad pool temp reading."
+    assert mainPump.currentSpeed == Speed.OFF, "Pump should not have turned on with a bad pool temp reading."
 
 
 def test_turnOff():
@@ -181,9 +232,9 @@ def test_turnOff():
     ))    
     
        
-    #When the roof is hot enough and the pool temp is 
+    #When the roof is hot enough and the pool temp is
     roofTemp.set(49) #120F
-    solarTemp.set(0)
+    solarTemp.set(34)
     #Current pool temp
     poolTemp.set(targetTemp)
 

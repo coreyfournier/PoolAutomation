@@ -25,6 +25,9 @@ class SolarHeater(IPlugin):
         #How much the temperature needs to over come before a state change occurs.
         #This is necessary because the sensor isn't very accurate
         self._temperatureMargin:float = .3
+        #Max allowed deviation between pool temp and solar heat temp (in local units).
+        #If pool temp deviates more than this from solar heat, the reading is considered bad.
+        self._maxPoolTempDeviation:float = 20
 
     def getAction(self)-> Action:
         return Action("solar-heat", "Solar Heater",
@@ -84,6 +87,11 @@ class SolarHeater(IPlugin):
             roofTemp = round(DependencyContainer.temperatureDevices.get("roof").getAsLocal(True), 1)
             poolTemp = round(DependencyContainer.temperatureDevices.get("pool-temp").getAsLocal(True), 1)
             isSolarHeatOn = DependencyContainer.variables.get("solar-heat-on", False).value
+
+            #Validate pool temp against solar heat temp. If the deviation is too large, the pool sensor likely returned a bad reading.
+            if(abs(poolTemp - solarHeatTemp) > self._maxPoolTempDeviation):
+                logger.warning(f"Pool temp {poolTemp} deviates more than {self._maxPoolTempDeviation} from solar heat temp {solarHeatTemp}. Ignoring bad reading.")
+                return
 
             solarShouldBeOn = False
             pumpForSolar:Pump = DependencyContainer.pumps.get("main")
