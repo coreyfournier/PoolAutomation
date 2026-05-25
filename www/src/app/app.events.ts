@@ -120,8 +120,8 @@ export class EventInfo{
         this.data.isActive = jsonParsed.isActive;
         this.data.isRunning = jsonParsed.isRunning;
         this.data.duration = jsonParsed.duration;
-        this.data.scheduleStart = jsonParsed.scheduleStart;
-        this.data.scheduleEnd = jsonParsed.scheduleEnd;
+        this.data.startTime = jsonParsed.startTime;
+        this.data.endTime = jsonParsed.endTime;
         this.data.pumps = jsonParsed.pumps;
       }
   }

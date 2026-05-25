@@ -83,26 +83,15 @@ class PumpSchedule(Control):
         default= None
     )
 
-    scheduleStart:str = None
-    scheduleEnd:str = None
-
     @property
-    def scheduleStart(self):
+    def effectiveStart(self):
         now = datetime.datetime.now()
         return self.getScheduleStart(now)
 
-    @scheduleStart.setter
-    def scheduleStart(self, stuff):
-        pass
-
     @property
-    def scheduleEnd(self):
+    def effectiveEnd(self):
         now = datetime.datetime.now()
         return self.getScheduleEnd(now)
-
-    @scheduleEnd.setter
-    def scheduleEnd(self, stuff):
-        pass        
 
     @property
     def duration(self) -> float:
@@ -140,8 +129,8 @@ class PumpSchedule(Control):
         """
         return {
             "id":self.id,
-            "scheduleStart": toLocalTime(self.startTime),
-            "scheduleEnd": toLocalTime(self.endTime),
+            "startTime": toLocalTime(self.startTime),
+            "endTime": toLocalTime(self.endTime),
             "name":self.name,
             "pumps": [] if self.pumps == None else [p.to_dict() for p in self.pumps] ,
             "valves": [] if self.valves == None else [v.to_dict() for v in self.valves],

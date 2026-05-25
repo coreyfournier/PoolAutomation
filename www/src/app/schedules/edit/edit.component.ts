@@ -111,9 +111,7 @@ export class ScheduleEditComponent {
     newSchedule.id = nextId;
     newSchedule.name = 'New Schedule';
     newSchedule.startTime = new Date(`${this.scheduleInfo.MIN_YEAR}-01-01T08:00:00`);
-    newSchedule.scheduleStart = newSchedule.startTime ; 
     newSchedule.endTime = new Date(`${this.scheduleInfo.MAX_YEAR}-01-01T09:00:00`);
-    newSchedule.scheduleEnd = newSchedule.endTime;
     newSchedule.pumps[0] = this.avaliablePumps[0];
 
     let speeds = this.getSpeedsForPump(newSchedule.pumps[0].name);

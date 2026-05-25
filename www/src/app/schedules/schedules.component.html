@@ -13,8 +13,8 @@
             <tr *ngFor="let row of scheduleInfo.schedules" id="schedule-{{row.id}}" [ngClass]="{'inactive-schedule': !row.isActive}">
                 <th><span *ngIf="row.isRunning" class="running-schedule"></span> {{row.name}} 
                 </th>
-                <td>{{datepipe.transform(row.scheduleStart, timeFormat)}}</td>
-                <td>{{datepipe.transform(row.scheduleEnd, timeFormat)}} ({{row.duration.toFixed(1)}}hrs)</td>
+                <td>{{datepipe.transform(row.startTime, timeFormat)}}</td>
+                <td>{{datepipe.transform(row.endTime, timeFormat)}} ({{row.duration.toFixed(1)}}hrs)</td>
                 <td>
                     <div *ngFor="let pump of row.pumps" id="schdule-{{row.id}}-pump-{{pump.id}}">{{pump.displayName}} ({{pump.speedName}})</div>
                 </td>

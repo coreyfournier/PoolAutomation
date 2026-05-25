@@ -1,4 +1,4 @@
-FROM arm64v8/node:20.5.0-slim AS node_base
+FROM node:20.5.0-slim AS node_base
 #Only copy over the packages so we don't change the layer unless the packages change.
 WORKDIR /app
 COPY www/package.json package.json
@@ -19,7 +19,7 @@ RUN npm run build -- --configuration production
 #remove all of the node modules as it's no longer need in the final layer. This makes the file really small.
 RUN rm -r /app/node_modules
 
-FROM arm64v8/python:3.14.2-slim AS python_base
+FROM python:3.13-slim AS python_base
 WORKDIR /app/
 RUN pip install --upgrade pip setuptools wheel
 

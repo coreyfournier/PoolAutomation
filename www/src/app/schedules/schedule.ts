@@ -17,10 +17,8 @@ export interface ScheduleInfo {
     isActive:boolean = false;
     isRunning:boolean = false;
     duration:number = 0;
-    scheduleStart:Date = new Date();
-    scheduleEnd:Date = new Date();
-    endTime:Date = new Date();
     startTime:Date = new Date();
+    endTime:Date = new Date();
     pumps:Pump[] = [];    
   }
 

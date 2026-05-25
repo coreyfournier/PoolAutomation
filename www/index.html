@@ -263,8 +263,8 @@
                 $.each(result.schedules, function(scheduleIndex, schedule) {                         
                     var row = "<tr id='schedule-" + schedule.id + "'>";
                     format = "hh:mm p";
-                    startTime = $.format.date(new Date(schedule.scheduleStart),format);
-                    endTime = $.format.date(new Date(schedule.scheduleEnd),format);
+                    startTime = $.format.date(new Date(schedule.startTime),format);
+                    endTime = $.format.date(new Date(schedule.endTime),format);
 
                     row += "<th class='" + (schedule.isRunning? "status-on" : "") + "'>" + schedule.name + "</th>";
                     row += "<td>"+startTime + "</td><td>" + endTime + " (" + schedule.duration.toFixed(1) + "hrs)</td>";
