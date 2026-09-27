@@ -135,5 +135,7 @@ class PumpSchedule(Control):
             "pumps": [] if self.pumps == None else [p.to_dict() for p in self.pumps] ,
             "valves": [] if self.valves == None else [v.to_dict() for v in self.valves],
             "isActive": self.isActive,
+            #The worker sets this as the schedule starts and stops, so the UI can show which one has the pumps.
+            "isRunning": False if self.isRunning == None else self.isRunning,
             "duration": self.duration
         }

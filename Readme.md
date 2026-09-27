@@ -40,6 +40,12 @@ Created to run on a raspberry pi
 
 All devices are stubbed out when it can't find the pi libraries.
 
+The state logger is stubbed out the same way. Running locally without a database, it invents a few
+days of readings in memory so the stats chart and the temperature and chemistry trends have
+something to show. Nothing is written to disk and the history starts over on every restart. To see
+what an install with no database at all looks like, where the trends drop off the panels entirely,
+set the environment variable NO_STATE_LOGGER.
+
 ## Docker on pi
 1. Follow the directions here: https://www.simplilearn.com/tutorials/docker-tutorial/raspberry-pi-docker
 2. Add your local repo as a trusted repository on both the build and destination machine: https://stackoverflow.com/questions/49674004/docker-repository-server-gave-http-response-to-https-client

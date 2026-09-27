@@ -1,0 +1,49 @@
+:host {
+    display: inline-flex;
+    min-width: 0;
+}
+
+.trend-list {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0 9px;
+}
+
+/*
+  Sized in em, against the 14px the panel body already uses. Not rem: bootstrap sets the root
+  font to 10px, so a rem here lands a third smaller than it looks like it should.
+*/
+.trend {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    font-size: 0.9em;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+.trend-arrow {
+    font-size: 0.8em;
+}
+
+.trend-change {
+    font-weight: 600;
+}
+
+/* The window is context, not the number being read, so it stays quiet. */
+.trend-window {
+    color: #888;
+    font-size: 0.85em;
+}
+
+.trend.rising {
+    color: #b35c00;
+}
+
+.trend.falling {
+    color: #1f6feb;
+}
+
+.trend.flat {
+    color: #777;
+}

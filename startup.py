@@ -66,10 +66,12 @@ if __name__ == '__main__':
         temperatureFile = os.path.join(dataPath, "temperature-devices.json")
         #temperatureFile = os.path.join(dataPath, "sample-temperature-devices.json")
         config_root['tools.CORS.on'] = False
+        usingStubs = False
     except Exception as e:
         print(f"Running locally - {e}")
         from IO.GpioStub import GpioStub
         #Running locally
+        usingStubs = True
         GPIO = GpioStub()
         logger.info("Using GPIO Stub. Live pins will NOT be used.")
         import IO.SmbusStub as smbus2        
@@ -106,6 +108,13 @@ if __name__ == '__main__':
     if("PoolAutomationSqlConnection" in os.environ):
         logger.debug(f'PoolAutomationSqlConnection={os.environ["PoolAutomationSqlConnection"]}')
         DependencyContainer.stateLogger = StateLoggerMsSqlRepo(os.environ["PoolAutomationSqlConnection"])
+    elif(usingStubs and "NO_STATE_LOGGER" not in os.environ):
+        #Same idea as the GPIO and temperature stubs. Keeps the stats chart and the trends working
+        #locally without asking for a database. Set NO_STATE_LOGGER to see what an install without
+        #one looks like.
+        from IO.StateLoggerStub import StateLoggerStub
+        logger.info("Using the state logger stub. Everything it reports is made up.")
+        DependencyContainer.stateLogger = StateLoggerStub()
     else:
         logger.warn(f"Missing environment variable for sql connection (PoolAutomationSqlConnection)")
 

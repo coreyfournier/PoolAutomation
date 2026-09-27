@@ -46,13 +46,15 @@ export class SchedulesComponent {
         {            
             if(scheduleCopy[i].id == d.data.id)
             {              
-              console.log("Changing schedule "+ d.data.id + " " + d.data.name);
-              scheduleCopy[i] = d.data;
+              console.log("Changing schedule "+ d.data.id + " " + d.data.name + " running to " + d.data.isRunning);
+              //Only the state is taken from the event. The event knows nothing about the pump display
+              //names, those are filled in by the schedules endpoint, and replacing the whole row loses them.
+              scheduleCopy[i].isRunning = d.data.isRunning;
+              scheduleCopy[i].isActive = d.data.isActive;
             }
         }
-        console.log("resetting array");
 
-        //this.zone.run(() => this.sensors = sensorCopy)
+        this.zone.run(() => this.scheduleInfo.schedules = scheduleCopy);
       }
       else if(d.dataType == "OverrideChangeEvent")
       {

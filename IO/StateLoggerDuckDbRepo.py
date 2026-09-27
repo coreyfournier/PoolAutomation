@@ -143,6 +143,44 @@ class StateLoggerDuckDbRepo():
         conn.execute(f"SELECT {select} FROM StateLogs WHERE {where}")
         return conn.fetchall()
 
+    def averageBetween(self, column:str, start:datetime.datetime, end:datetime.datetime, pumpStateColumn:str = None, pumpOffValue:str = "OFF") -> float:
+        """Averages a single column over a window of time.
+
+        Args:
+            column (str): Column to average. Validated against the schema.
+            start (datetime): Start of the window. Inclusive.
+            end (datetime): End of the window. Exclusive.
+            pumpStateColumn (str, optional): When given, readings taken while that pump was off are skipped.
+                The water has to be moving for a reading to mean anything. Validated against the schema.
+            pumpOffValue (str, optional): Value the pump column holds when it is off. Defaults to "OFF".
+
+        Raises:
+            Exception: Columns not found
+
+        Returns:
+            float: None when nothing was logged in the window.
+        """
+        self._validateColumn(column)
+
+        filters = f'"{column}" IS NOT NULL AND CreatedDate >= ? AND CreatedDate < ?'
+
+        if(pumpStateColumn != None):
+            self._validateColumn(pumpStateColumn)
+            filters += f' AND "{pumpStateColumn}" IS NOT NULL AND "{pumpStateColumn}" != ?'
+            parameters = [start, end, pumpOffValue]
+        else:
+            parameters = [start, end]
+
+        conn = self.__connection.cursor()
+        conn.execute(f'SELECT AVG("{column}") FROM StateLogs WHERE {filters}', parameters)
+        row = conn.fetchone()
+        return None if row == None else row[0]
+
+    def _validateColumn(self, column:str) -> None:
+        """The column ends up in the statement, so it never gets there without being checked first."""
+        if(column == None or column.lower() not in self.__tblColumns):
+            raise Exception(f"Unknown column {column}")
+
     def agg(self, where:str=None,columns:"list[str]" = None) -> list:
         conn = self.__connection.cursor()
         conn.execute(f"SELECT ROUND(AVG(temperature1),1), ROUND(AVG(temperature2),1), ROUND(AVG(temperature3),1), ROUND(AVG(temperature4),1), date_part('hour', CreatedDate) AS Hour FROM StateLogs GROUP BY date_part('hour', CreatedDate)")

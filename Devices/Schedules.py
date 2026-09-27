@@ -67,7 +67,7 @@ class Schedules:
                 if(hasOverride):
                     #If it is running, indicate that it's off
                     if(item.isRunning):
-                        item.isRunning = False
+                        self._setRunning(item, False)
                 #Only run a schedule that is marked active
                 elif(item.isActive):
                     #run the schedule
@@ -76,16 +76,29 @@ class Schedules:
                             logger.debug(f"Running schedule {item.name} - {now}")
                             #run the set speed for each pump listed
                             self._setPumpSpeed(item, item.pumps, False)
-                            item.isRunning = True
-                            DependencyContainer.actions.nofityListners(ScheduleChangeEvent(None, False, None, item))
+                            self._setRunning(item, True)
                         
                     elif(item.isRunning):
                         #Turn all the pumps off
                         self._setPumpSpeed(item, item.pumps, True)
-                        item.isRunning = False
+                        self._setRunning(item, False)
                     else:
                         item.isRunning = False
                         #self.bus.log(f"Schedule {item.name} not ready - {now}")                
+
+    def _setRunning(self, schedule:PumpSchedule, isRunning:bool):
+        """Changes the running state and tells anyone listening.
+
+        The UI shows which schedule is running, so it has to hear about a schedule stopping
+        just as much as it hears about one starting.
+        """
+        if(schedule.isRunning == isRunning):
+            return
+
+        schedule.isRunning = isRunning
+
+        if(DependencyContainer.actions != None):
+            DependencyContainer.actions.nofityListners(ScheduleChangeEvent(None, False, None, schedule))
 
     
     def _setPumpSpeed(self, schedule:PumpSchedule, pumps:"list[Pump]", allOff:bool):

@@ -1,0 +1,13 @@
+.reading-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 40px;
+}
+
+/* The reading and its trends read as one line, the way they do on the temperature cards. */
+.reading {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0 10px;
+}

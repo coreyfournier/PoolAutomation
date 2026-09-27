@@ -10,8 +10,13 @@
             
         <table class="table">
             <tr><th></th><th>Start</th><th>End</th><th>Pumps</th></tr>
-            <tr *ngFor="let row of scheduleInfo.schedules" id="schedule-{{row.id}}" [ngClass]="{'inactive-schedule': !row.isActive}">
-                <th><span *ngIf="row.isRunning" class="running-schedule"></span> {{row.name}} 
+            <tr *ngFor="let row of scheduleInfo.schedules" id="schedule-{{row.id}}" [ngClass]="{'inactive-schedule': !row.isActive, 'active-schedule': row.isRunning}">
+                <th>
+                    <span class="schedule-name">{{row.name}}</span>
+                    <!-- The dot and the word both say it, so it still reads without color. -->
+                    <span *ngIf="row.isRunning" class="running-badge" title="This schedule has the pumps right now">
+                        <span class="running-schedule"></span>Running
+                    </span>
                 </th>
                 <td>{{datepipe.transform(row.startTime, timeFormat)}}</td>
                 <td>{{datepipe.transform(row.endTime, timeFormat)}} ({{row.duration.toFixed(1)}}hrs)</td>

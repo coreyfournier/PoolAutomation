@@ -1,3 +1,47 @@
+/*
+  The sensors lay themselves out rather than sitting in fixed grid columns. Each card asks for
+  enough room to keep its reading and its trends on one line, and they wrap to a new row when
+  there are too many to fit.
+*/
+:host {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    /* Matches the gap bootstrap leaves under the panels above and below this row. */
+    margin-bottom: 20px;
+}
+
+.sensor {
+    flex: 1 1 170px;
+    /* Stops a long sensor name from stretching one card past its share. */
+    min-width: 0;
+}
+
+.sensor .panel {
+    height: 100%;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* A name long enough to wrap makes one heading taller. Pushing the readings down keeps them in line. */
+.sensor .panel-body {
+    margin-top: auto;
+}
+
+.sensor-reading {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0 10px;
+}
+
+/* The trends sit off to the right, against the far edge of the card. */
+.sensor-reading app-trend-indicator {
+    margin-left: auto;
+}
+
 /* HeroesComponent's private CSS styles */
 .heroes {
     margin: 0 0 2em 0;

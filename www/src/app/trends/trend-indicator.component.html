@@ -1,0 +1,7 @@
+<div class="trend-list" *ngIf="measured.length > 0">
+    <span class="trend" *ngFor="let trend of measured" [ngClass]="direction(trend)" [title]="describe(trend)">
+        <span class="trend-arrow" aria-hidden="true">{{arrow(trend)}}</span>
+        <span class="trend-change">{{magnitude(trend) | number:digits}}{{unit}}</span>
+        <span class="trend-window">{{window(trend)}}</span>
+    </span>
+</div>

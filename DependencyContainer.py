@@ -26,6 +26,42 @@ timeFormat = "%H:%M"
 MAX_YEAR:int = 2100
 MIN_YEAR:int = 1970
 
+#-----------------------------------------------------------------------------
+# Trend configuration
+# Trends are optional. They are only calculated when a state logger (database)
+# has been configured. Every value used to calculate a trend lives here so an
+# install only has to change it in one place.
+#-----------------------------------------------------------------------------
+
+#How many hours the short term trend looks back.
+trendHours:int = 3
+#How many days the long term trend looks back. The same block of hours (trendHours)
+#is compared on both days, because the temperature swings from night to day.
+trendDays:int = 3
+#Size in hours of the window averaged at each end of the short term trend.
+trendBucketHours:int = 1
+#Id used by the environmental sensor. It is not a physical one wire device, so it gets its own id.
+environmentalSensorId:int = 99
+#Column in the state log that holds the pump state. Trends ignore any reading taken while this pump was off,
+#because the water has to move for the readings to mean anything.
+trendPumpStateColumn:str = "pumpState1"
+#Value stored in trendPumpStateColumn when the pump is not running.
+trendPumpOffValue:str = "OFF"
+#Maps a temperature sensor id to the column it is logged to. This has to agree with Plugins/StateLogging.py.
+#A sensor that is missing from here simply has no trend.
+trendTemperatureColumns:"dict[int,str]" = {
+    1: "temperature1",
+    2: "temperature2",
+    3: "temperature3",
+    4: "temperature4",
+    environmentalSensorId: "temperature5"
+}
+#Maps a chemistry reading to the column it is logged to. Keys are the property names of Devices.PoolChemistry.
+trendChemistryColumns:"dict[str,str]" = {
+    "ph": "PH1",
+    "orp": "Orp1"
+}
+
 logServerName = 'ENV_LOG_SERVER_NAME'
 logServerPort = 'ENV_LOG_SERVER_PORT'
 

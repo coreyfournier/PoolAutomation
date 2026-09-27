@@ -215,6 +215,48 @@ class StateLoggerMsSqlRepo():
                 cursor.execute(f"SELECT {select} FROM StateLogs WHERE {where}")
                 return cursor.fetchall()
 
+    def averageBetween(self, column:str, start:datetime.datetime, end:datetime.datetime, pumpStateColumn:str = None, pumpOffValue:str = "OFF") -> float:
+        """Averages a single column over a window of time.
+
+        Args:
+            column (str): Column to average. Validated against the schema.
+            start (datetime): Start of the window. Inclusive.
+            end (datetime): End of the window. Exclusive.
+            pumpStateColumn (str, optional): When given, readings taken while that pump was off are skipped.
+                The water has to be moving for a reading to mean anything. Validated against the schema.
+            pumpOffValue (str, optional): Value the pump column holds when it is off. Defaults to "OFF".
+
+        Raises:
+            Exception: Columns not found
+
+        Returns:
+            float: None when nothing was logged in the window.
+        """
+        self._validateColumn(column)
+
+        filters = f"[{column}] IS NOT NULL AND [CreatedDate] >= %s AND [CreatedDate] < %s"
+
+        if(pumpStateColumn != None):
+            self._validateColumn(pumpStateColumn)
+            filters += f" AND [{pumpStateColumn}] IS NOT NULL AND [{pumpStateColumn}] != %s"
+            parameters = [start, end, pumpOffValue]
+        else:
+            parameters = [start, end]
+
+        query = f"SELECT AVG([{column}]) FROM StateLogs WHERE {filters}"
+
+        with pytds.connect(self._server, self._databaseName, self._userName, self._userPassword, autocommit=True) as connection:
+            with connection.cursor() as cursor:
+                logger.debug(f"{query} {parameters}")
+                cursor.execute(query, parameters)
+                row = cursor.fetchone()
+                return None if row == None else row[0]
+
+    def _validateColumn(self, column:str) -> None:
+        """The column ends up in the statement, so it never gets there without being checked first."""
+        if(column == None or column.lower() not in self.__tblColumns):
+            raise Exception(f"Unknown column {column}")
+
     def agg(self, where:str=None,columns:"list[str]" = None) -> list:
         with pytds.connect(self._server, self._databaseName, self._userName, self._userPassword, autocommit=True) as connection:
             with connection.cursor() as cursor:

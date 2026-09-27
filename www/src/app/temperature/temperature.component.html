@@ -1,10 +1,13 @@
-<div class="col-sm-2"  *ngFor="let sensor of sensors">
+<div class="sensor"  *ngFor="let sensor of sensors">
   <div class="panel panel-default">
       <div class="panel-heading">
           <h3 class="panel-title">{{sensor.name}}</h3>
       </div>
       <div class="panel-body">
-          <div>{{sensor.temp}} {{sensor.unit}}</div>
+          <div class="sensor-reading">
+            <span class="sensor-value">{{sensor.temp}} {{sensor.unit}}</span>
+            <app-trend-indicator [trends]="trendsFor(sensor.id)"></app-trend-indicator>
+          </div>
       </div>
   </div>  
 </div>

@@ -20,3 +20,37 @@
   display: inline-block;
 
 }
+
+/* The schedule that currently has the pumps. Highlighted so it is obvious at a glance. */
+.active-schedule {
+  background-color: #eaf6ea;
+}
+
+/* On the first cell rather than the row, so the bar sits beside the name instead of over it. */
+.active-schedule th:first-child,
+.active-schedule td:first-child {
+  box-shadow: inset 3px 0 0 green;
+  padding-left: 11px;
+}
+
+.active-schedule .schedule-name {
+  font-weight: 700;
+}
+
+.running-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  padding: 1px 7px 1px 5px;
+  border-radius: 10px;
+  background-color: #d8eed8;
+  color: #1c661c;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+  /* A running schedule is never struck through, even while the row is. */
+  text-decoration: none;
+}

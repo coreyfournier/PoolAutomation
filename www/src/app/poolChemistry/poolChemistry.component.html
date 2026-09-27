@@ -5,9 +5,15 @@
             <h3 class="panel-title">Chemistry</h3>
         </div>
         <div class="panel-body" id="chemistry">
-            <div class="panel-body form-group" >
-                <span id="ph" style="padding-right: 20px;">PH {{chemistry.ph}}</span>
-                <span id="orp">ORP {{chemistry.orp}}</span>
+            <div class="panel-body form-group reading-list" >
+                <div id="ph" class="reading">
+                    <span class="reading-value">PH {{chemistry.ph}}</span>
+                    <app-trend-indicator [trends]="trendsFor('ph')" digits="1.2-2"></app-trend-indicator>
+                </div>
+                <div id="orp" class="reading">
+                    <span class="reading-value">ORP {{chemistry.orp}}</span>
+                    <app-trend-indicator [trends]="trendsFor('orp')" digits="1.1-1"></app-trend-indicator>
+                </div>
             </div>
         </div>
     </div>

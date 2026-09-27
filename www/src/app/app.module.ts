@@ -20,6 +20,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { AppRoutingModule } from './app-routing.module';
 import { IndexComponent } from './index/index.component';
 import { PoolChemistryComponent } from './poolChemistry/poolChemistry.component'
+import { TrendIndicatorComponent } from './trends/trend-indicator.component';
 import {MatSelectModule} from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -39,7 +40,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
     StatsComponent,
     ScheduleEditComponent,
     IndexComponent,
-    PoolChemistryComponent
+    PoolChemistryComponent,
+    TrendIndicatorComponent
   ],
   imports: [
     HttpClientModule,
