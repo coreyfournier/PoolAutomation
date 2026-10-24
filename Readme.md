@@ -78,7 +78,7 @@ and `{prefix}/status` is online/offline.
 Install docker by following the directions here: https://www.simplilearn.com/tutorials/docker-tutorial/raspberry-pi-docker
 
 ### Automated deployment
-Every push to master runs the tests, builds the arm64 image on GitHub (.github/workflows/publish.yml) and publishes it to
+Every push to master runs the tests, builds the 32 bit arm (arm/v7) image on GitHub (.github/workflows/publish.yml) and publishes it to
 ghcr.io/coreyfournier/pool-automation, tagged latest and with the commit sha. Publishing waits for someone to approve
 it in the production environment (Actions > the run > Review deployments), so nothing reaches the pi without a person
 saying so.
@@ -107,7 +107,7 @@ To roll back, change the image tag in docker-compose.yml to an older sha tag (sh
 ### Manual deployment
 Still works if GitHub isn't an option. Add your local repo as a trusted repository on both the build and destination machine: https://stackoverflow.com/questions/49674004/docker-repository-server-gave-http-response-to-https-client
 #### Locally
-1. docker build -f "Dockerfile" . -t "pool-automation:latest" --platform=linux/arm64/v8
+1. docker build -f "Dockerfile" . -t "pool-automation:latest" --platform=linux/arm/v7
 2. docker tag "pool-automation:latest" "192.168.1.4:5050/pool-automation:latest"
 3. docker push 192.168.1.4:5050/pool-automation:latest
 

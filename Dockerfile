@@ -1,4 +1,5 @@
-FROM node:20.5.0-slim AS node_base
+#The angular output is plain html/js, so build it on the machine doing the build instead of emulating the pi
+FROM --platform=$BUILDPLATFORM node:20.5.0-slim AS node_base
 #Only copy over the packages so we don't change the layer unless the packages change.
 WORKDIR /app
 COPY www/package.json package.json

@@ -43,7 +43,8 @@ class HomeAssistant(IPlugin):
         MQTT_DISCOVERY_PREFIX - defaults to homeassistant, which is what Home Assistant uses out of the box
     """
     def __init__(self) -> None:
-        self._host:str = os.environ.get("MQTT_HOST")
+        #An empty value (MQTT_HOST= in the .env file) means it's turned off
+        self._host:str = os.environ.get("MQTT_HOST") or None
         self._port:int = int(os.environ.get("MQTT_PORT", "1883"))
         self._prefix:str = os.environ.get("MQTT_TOPIC_PREFIX", "pool-automation")
         self._discoveryPrefix:str = os.environ.get("MQTT_DISCOVERY_PREFIX", "homeassistant")

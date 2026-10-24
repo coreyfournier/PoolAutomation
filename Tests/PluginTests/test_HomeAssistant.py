@@ -72,6 +72,10 @@ def test_disabledWithoutHost(monkeypatch):
     monkeypatch.delenv("MQTT_HOST", raising=False)
     assert HomeAssistant().getAction() is None
 
+    #Left empty in the .env file
+    monkeypatch.setenv("MQTT_HOST", "")
+    assert HomeAssistant().getAction() is None
+
 def test_publishAllSendsDiscoveryAndState(plugin:HomeAssistant):
     plugin._publishAll()
     published = plugin._client.published
