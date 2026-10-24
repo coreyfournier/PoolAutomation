@@ -33,21 +33,42 @@ jobs:
       - run: pip install -r requirements.txt pytest
       - run: python -m pytest Tests -q
 
+  #Builds one image per architecture, each with its own tags (latest-armv7, sha-abc1234-armv7, latest-arm64 ...)
+  #so a specific one can be pinned. The merge job then combines them under latest / sha-abc1234, which pulls
+  #the right one for whatever pi it's on.
   publish:
     needs: test
     #Never publish from a pull request. Only what has been merged to master gets deployed.
     if: github.event_name != 'pull_request'
     #Waits for approval before publishing, because a published image is deployed straight to the pi.
-    #Reviewers are set in GitHub > Settings > Environments > production.
+    #Reviewers are set in GitHub > Settings > Environments > production. One approval covers both architectures.
     environment: production
-    runs-on: ubuntu-latest
+    strategy:
+      #A failure in one architecture shouldn't throw away the other
+      fail-fast: false
+      matrix:
+        include:
+          #32 bit pi OS. GitHub has no runner for it, so the python layer is built under emulation (slow).
+          #Uses the default cache scope so it keeps the cache from builds made before the matrix existed.
+          - platform: linux/arm/v7
+            suffix: armv7
+            runner: ubuntu-latest
+            emulate: true
+            cacheScope: buildkit
+          #64 bit pi OS. Builds natively on an arm runner (fast).
+          - platform: linux/arm64
+            suffix: arm64
+            runner: ubuntu-24.04-arm
+            emulate: false
+            cacheScope: arm64
+    runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
       packages: write
     steps:
       - uses: actions/checkout@v4
-      #The pi is 32 bit arm and GitHub has no runner for that, so the python layer is built under emulation
-      - uses: docker/setup-qemu-action@v3
+      - if: matrix.emulate
+        uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
@@ -58,15 +79,41 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE }}
+          flavor: |
+            latest=false
+            suffix=-${{ matrix.suffix }}
           tags: |
             type=raw,value=latest
             type=sha
       - uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: linux/arm/v7
+          platforms: ${{ matrix.platform }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.cacheScope }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.cacheScope }}
+
+  merge:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Combine the architectures under one tag
+        run: |
+          SHA_TAG="sha-${GITHUB_SHA::7}"
+          docker buildx imagetools create \
+            -t "$IMAGE:latest" \
+            -t "$IMAGE:$SHA_TAG" \
+            "$IMAGE:$SHA_TAG-armv7" \
+            "$IMAGE:$SHA_TAG-arm64"
+          docker buildx imagetools inspect "$IMAGE:latest"

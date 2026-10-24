@@ -78,8 +78,17 @@ and `{prefix}/status` is online/offline.
 Install docker by following the directions here: https://www.simplilearn.com/tutorials/docker-tutorial/raspberry-pi-docker
 
 ### Automated deployment
-Every push to master runs the tests, builds the 32 bit arm (arm/v7) image on GitHub (.github/workflows/publish.yml) and publishes it to
-ghcr.io/coreyfournier/pool-automation, tagged latest and with the commit sha. Publishing waits for someone to approve
+Every push to master runs the tests, builds the image on GitHub (.github/workflows/publish.yml) for both 32 bit
+(arm/v7) and 64 bit (arm64) Raspberry Pi OS, and publishes it to ghcr.io/coreyfournier/pool-automation.
+
+| Tag | What you get |
+|---|---|
+| latest, sha-abc1234 | Both architectures. Docker pulls the one that matches the pi. Use this unless you have a reason not to. |
+| latest-armv7, sha-abc1234-armv7 | 32 bit only |
+| latest-arm64, sha-abc1234-arm64 | 64 bit only |
+
+The 32 bit build has to be emulated on GitHub, so it is slow (an hour or more) whenever requirements.txt or the apt-get
+lines in the Dockerfile change. Otherwise it reuses the cache and takes a few minutes. Publishing waits for someone to approve
 it in the production environment (Actions > the run > Review deployments), so nothing reaches the pi without a person
 saying so.
 

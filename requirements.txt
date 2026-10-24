@@ -9,10 +9,10 @@ board==1.0
 python-tds==1.17.1
 odata-query==0.8.0
 #Packages only for the pi
-smbus2==0.4.2 ; sys_platform == "linux" and platform_machine == "armv7l"
+smbus2==0.4.2 ; sys_platform == "linux" and platform_machine in "armv7l aarch64"
 numpy==2.2.3
-adafruit-circuitpython-ssd1306==2.12.16 ; sys_platform == "linux" and platform_machine == "armv7l"
-RPi.GPIO==0.7.1 ; sys_platform == "linux" and platform_machine == "armv7l"
+adafruit-circuitpython-ssd1306==2.12.16 ; sys_platform == "linux" and platform_machine in "armv7l aarch64"
+RPi.GPIO==0.7.1 ; sys_platform == "linux" and platform_machine in "armv7l aarch64"
 requests==2.28.1
 paho-mqtt==2.1.0
 syslog-rfc5424-formatter==1.2.3
