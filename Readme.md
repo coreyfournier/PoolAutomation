@@ -75,9 +75,37 @@ and `{prefix}/status` is online/offline.
     docker run ... -e 'MQTT_HOST=192.168.1.10' -e 'MQTT_USERNAME=pool' -e 'MQTT_PASSWORD=*****' ...
 
 ## Docker on pi
-1. Follow the directions here: https://www.simplilearn.com/tutorials/docker-tutorial/raspberry-pi-docker
-2. Add your local repo as a trusted repository on both the build and destination machine: https://stackoverflow.com/questions/49674004/docker-repository-server-gave-http-response-to-https-client
-### Testing on the pi with docker
+Install docker by following the directions here: https://www.simplilearn.com/tutorials/docker-tutorial/raspberry-pi-docker
+
+### Automated deployment
+Every push to master runs the tests, builds the arm64 image on GitHub (.github/workflows/publish.yml) and publishes it to
+ghcr.io/coreyfournier/pool-automation, tagged latest and with the commit sha. Publishing waits for someone to approve
+it in the production environment (Actions > the run > Review deployments), so nothing reaches the pi without a person
+saying so.
+
+Master can't be pushed to directly. Changes go through a pull request, which runs the tests and can only be merged once
+they pass. Force pushes and deleting master are blocked. Watchtower runs on the pi, checks for a new
+image every 5 minutes and restarts the container when it finds one. The pi only ever pulls, so nothing on the network
+has to be opened up. Secrets live in a .env file on the pi and never go in git or the image.
+
+One time setup on the pi:
+1. Copy deploy/docker-compose.yml and deploy/.env.example to /home/pi/pool. Rename .env.example to .env and fill it in.
+2. Remove the container started by the old docker run command: sudo docker container rm pool-automation -f
+3. cd /home/pi/pool && sudo docker compose up -d
+
+The image is private the first time it's published. Either make it public (GitHub > Packages > pool-automation >
+Package settings > Change visibility), which is fine because the image holds no secrets, or keep it private and run
+"sudo docker login ghcr.io" on the pi with a personal access token that has read:packages, then uncomment the
+config.json volume on watchtower in docker-compose.yml.
+
+To roll back, change the image tag in docker-compose.yml to an older sha tag (shown on the package page) and run
+"sudo docker compose up -d". Watchtower only follows the tag that is in the file.
+
+* Deploy now instead of waiting on watchtower: sudo docker compose pull && sudo docker compose up -d
+* See what watchtower did: docker logs watchtower
+
+### Manual deployment
+Still works if GitHub isn't an option. Add your local repo as a trusted repository on both the build and destination machine: https://stackoverflow.com/questions/49674004/docker-repository-server-gave-http-response-to-https-client
 #### Locally
 1. docker build -f "Dockerfile" . -t "pool-automation:latest" --platform=linux/arm64/v8
 2. docker tag "pool-automation:latest" "192.168.1.4:5050/pool-automation:latest"
