@@ -46,6 +46,34 @@ something to show. Nothing is written to disk and the history starts over on eve
 what an install with no database at all looks like, where the trends drop off the panels entirely,
 set the environment variable NO_STATE_LOGGER.
 
+## Home Assistant (MQTT)
+The HomeAssistant plugin pushes every change to an MQTT broker, so Home Assistant gets updates as they happen
+instead of polling. It uses Home Assistant MQTT discovery, so everything shows up on its own under a single
+"Pool Automation" device once the MQTT integration is set up in Home Assistant.
+
+It is off unless MQTT_HOST is set.
+
+| Environment variable | Default | |
+|---|---|---|
+| MQTT_HOST | | Broker host name. Required to turn it on. |
+| MQTT_PORT | 1883 | |
+| MQTT_USERNAME / MQTT_PASSWORD | | Only needed if the broker requires a login. |
+| MQTT_TOPIC_PREFIX | pool-automation | Root of every state and command topic. |
+| MQTT_DISCOVERY_PREFIX | homeassistant | Must match the discovery prefix in Home Assistant. |
+
+What shows up in Home Assistant:
+* Pumps - select (speed), can be changed
+* Valves - switch, can be changed
+* Lights - select (scene or OFF), can be changed
+* Variables shown in the UI - switch (bool) or number (int/float), can be changed. Hidden variables are read only.
+* Temperature sensors, pH, ORP - sensors
+* Schedule overrides per action and the running schedule - read only
+
+All state is published retained to `{prefix}/{type}/{name}/state`, commands are read from `{prefix}/{type}/{name}/set`
+and `{prefix}/status` is online/offline.
+
+    docker run ... -e 'MQTT_HOST=192.168.1.10' -e 'MQTT_USERNAME=pool' -e 'MQTT_PASSWORD=*****' ...
+
 ## Docker on pi
 1. Follow the directions here: https://www.simplilearn.com/tutorials/docker-tutorial/raspberry-pi-docker
 2. Add your local repo as a trusted repository on both the build and destination machine: https://stackoverflow.com/questions/49674004/docker-repository-server-gave-http-response-to-https-client

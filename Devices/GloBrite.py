@@ -3,6 +3,7 @@ import threading
 import DependencyContainer
 from Devices.IDeviceController import IDeviceController
 from Devices.Light import *
+from Events.LightChangeEvent import LightChangeEvent
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -75,12 +76,17 @@ class GloBrite(Light):
 			#Always end with on
 			logger.debug(f'on')
 			self.controller.on()
+			self.currentScene = selected_scene[1]
 
 			if(DependencyContainer.actions != None):
-				DependencyContainer.actions.nofityListners(LightChangeEvent(dataType=None, data=self))	
-	
+				DependencyContainer.actions.nofityListners(LightChangeEvent(dataType=None, data=self))
+
 
 	#turns the pin off
-	def off(self):		
+	def off(self):
 		with self.lock:
 			self.controller.off()
+			self.currentScene = None
+
+			if(DependencyContainer.actions != None):
+				DependencyContainer.actions.nofityListners(LightChangeEvent(dataType=None, data=self))

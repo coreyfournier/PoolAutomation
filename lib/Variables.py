@@ -71,3 +71,13 @@ class Variables:
 
     def getVariablesForUi(self) -> "list[VariableGroup]":
         return self._repo.getGroups()
+
+    def getAll(self) -> "list[Variable]":
+        """Gets every variable, including the ones hidden from the UI
+        """
+        return list(self._repo.get().values())
+
+    def getGroups(self) -> "list[VariableGroup]":
+        """Gets every group, including the ones hidden from the UI
+        """
+        return self._repo.getGroups(False)
