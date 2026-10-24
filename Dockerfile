@@ -20,34 +20,46 @@ RUN npm run build -- --configuration production
 #remove all of the node modules as it's no longer need in the final layer. This makes the file really small.
 RUN rm -r /app/node_modules
 
-FROM python:3.13-slim AS python_base
-WORKDIR /app/
-RUN pip install --upgrade pip setuptools wheel
-
-RUN apt update
-RUN apt-get -y install cmake
 ##############################################################
-#Necessary for pillow (images for display)
+#Compiles the python packages. The compilers stay in this stage and never reach the pi.
 ##############################################################
-RUN apt -y install build-essential libwrap0-dev libssl-dev libc-ares-dev uuid-dev xsltproc
-RUN apt-get update -qq \
+FROM python:3.13-slim AS python_build
+#The -dev packages are the headers pillow needs to build with jpeg, png and font support (images for the display)
+RUN apt-get update \
     && apt-get install --no-install-recommends --yes \
         build-essential \
-        gcc \
-        python3-dev \
-        mosquitto \
-        mosquitto-clients
-RUN apt-get install libjpeg-dev -y
-RUN apt-get install zlib1g-dev -y
-RUN apt-get install libfreetype6-dev -y
-RUN apt-get install libopenjp2-7 -y
-RUN apt-get install libtiff6 -y
-RUN apt-get install unzip
+        cmake \
+        libjpeg-dev \
+        zlib1g-dev \
+        libfreetype6-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --upgrade pip
+RUN python -m venv /opt/venv
+ENV PATH=/opt/venv/bin:$PATH
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+
+#Slow packages first, in their own layer, so a change to requirements.txt doesn't recompile them
+COPY requirements-compiled.txt /app/
+RUN pip install --no-cache-dir -r /app/requirements-compiled.txt
 
 COPY requirements.txt /app/
-RUN pip install -r /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+##############################################################
+#What runs on the pi
+##############################################################
+FROM python:3.13-slim AS python_base
+WORKDIR /app/
+#Libraries pillow links against at runtime. These match the -dev packages in python_build.
+RUN apt-get update \
+    && apt-get install --no-install-recommends --yes \
+        libjpeg62-turbo \
+        zlib1g \
+        libfreetype6 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=python_build /opt/venv /opt/venv
+ENV PATH=/opt/venv/bin:$PATH
 
 COPY --from=node_final /app /app/www
 #Set the directory that contains the built angular app

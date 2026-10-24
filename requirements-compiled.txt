@@ -1,0 +1,10 @@
+#Packages that have no prebuilt wheel for the 32 bit pi (arm/v7), so pip compiles them from source.
+#Under emulation on GitHub that takes an hour or more. The Dockerfile installs this file in its own layer
+#before requirements.txt, so changing anything in requirements.txt doesn't recompile these.
+#Only add a package here if it has to be compiled.
+numpy==2.2.3
+pillow==12.0.0
+#Packages only for the pi
+RPi.GPIO==0.7.1 ; sys_platform == "linux" and platform_machine in "armv7l aarch64"
+#Not used directly. Adafruit-Blinka (from adafruit-circuitpython-ssd1306) needs it, and it compiles.
+sysv_ipc==1.2.0 ; sys_platform == "linux" and platform_machine in "armv7l aarch64"
