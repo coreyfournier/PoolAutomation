@@ -56,6 +56,8 @@ def configure(variableRepo:VariableRepo, GPIO, i2cBus, rootFolder:str):
             #Create an instance of the plugin class and add it to the list.
             pluginList.append(pluginClass())
 
+    DependencyContainer.plugins = pluginList
+
     logger.debug("Loading variables")
     DependencyContainer.variables = Variables([], variableRepo)        
 

@@ -5,9 +5,15 @@ from Plugins.HomeAssistant import *
 from IO.GpioStub import *
 from IO.GpioController import GpioController
 from Devices.Pumps import *
+from Devices.Pump import Speed
+from Devices.Valve import Valve
 from Devices.RelayPump import RelayPump
 from Devices.Valves import *
 from Devices.Lights import Lights
+from Devices.Light import LIGHT_OFF
+from IO.AtlasScientificStub import AtlasScientificStub
+from Events.TimerEvent import TimerEvent
+from lib.Entity import Entity
 from Devices.GloBrite import GloBrite
 from Devices.TemperatureSensors import *
 from Tests.IO.VariableRepoStub import VariableRepoStub
@@ -23,9 +29,12 @@ class MqttClientStub:
     """
     def __init__(self) -> None:
         self.published:"dict[str,str]" = {}
+        #Every publish in order, to check nothing is sent twice
+        self.history:"list[str]" = []
 
     def publish(self, topic:str, payload:str, retain:bool = False):
         self.published[topic] = payload
+        self.history.append(topic)
 
     def is_connected(self) -> bool:
         return True
@@ -60,11 +69,14 @@ def plugin(monkeypatch):
     poolTemp.set(25)
     DependencyContainer.temperatureDevices = TemperatureSensors(TemperatureRepoStub({"pool-temp": poolTemp}))
     DependencyContainer.schedules = None
-    DependencyContainer.enviromentalSensor = None
+    DependencyContainer.enviromentalSensor = AtlasScientificStub()
+    DependencyContainer.plugins = [homeAssistant]
 
     yield homeAssistant
 
     DependencyContainer.actions = None
+    DependencyContainer.plugins = []
+    DependencyContainer.enviromentalSensor = None
 
 def test_disabledWithoutHost(monkeypatch):
     """Nothing is registered when no broker is configured
@@ -101,6 +113,13 @@ def test_publishAllSendsDiscoveryAndState(plugin:HomeAssistant):
     assert "homeassistant/binary_sensor/pool-automation_variable_freeze-prevention-on/config" in published
     assert published["pool-automation/variable/freeze-prevention-temperature/state"] == "35.0"
 
+    phConfig = json.loads(published["homeassistant/sensor/pool-automation_chemistry_ph/config"])
+    assert phConfig["device_class"] == "ph"
+    assert published["pool-automation/chemistry/ph/state"] == "0"
+
+    #This plugin doesn't override the schedule, so it isn't published
+    assert "homeassistant/binary_sensor/pool-automation_override_home-assistant/config" not in published
+
     assert published["pool-automation/status"] == "online"
 
 def test_commandsChangeDevices(plugin:HomeAssistant):
@@ -121,6 +140,9 @@ def test_commandsChangeDevices(plugin:HomeAssistant):
 def test_changesArePublished(plugin:HomeAssistant):
     """Changes made anywhere in the app are pushed out, not just the ones from Home Assistant
     """
+    #What happens on connect
+    plugin._publishAll()
+
     DependencyContainer.pumps.get("main").on(Speed.SPEED_1)
     DependencyContainer.valves.on("solar")
     DependencyContainer.lights.get("main").change(7)
@@ -134,3 +156,44 @@ def test_changesArePublished(plugin:HomeAssistant):
 
     DependencyContainer.lights.get("main").off()
     assert published["pool-automation/light/main/state"] == LIGHT_OFF
+
+def test_changesWithoutAnEventArePublished(plugin:HomeAssistant):
+    """Anything that changes is picked up on the next event, even if nothing raised an event for it
+    """
+    plugin._publishAll()
+
+    DependencyContainer.temperatureDevices.get("pool-temp").set(30)
+    DependencyContainer.actions.nofityListners(TimerEvent())
+
+    assert plugin._client.published["pool-automation/temperature/pool-temp/state"] == "86.0"
+
+def test_onlyChangesArePublished(plugin:HomeAssistant):
+    plugin._publishAll()
+    plugin._client.history.clear()
+
+    DependencyContainer.actions.nofityListners(TimerEvent())
+    assert plugin._client.history == [], "Nothing changed, so nothing should be sent"
+
+    DependencyContainer.valves.on("solar")
+    assert plugin._client.history == ["pool-automation/valve/solar/state"]
+
+class EntityPluginStub(IPlugin):
+    def __init__(self) -> None:
+        self.alert = False
+
+    def getEntities(self) -> "list[Entity]":
+        return [Entity("alert", "ph-high", "pH High", bool, lambda: self.alert)]
+
+def test_pluginEntitiesArePublished(plugin:HomeAssistant):
+    """Plugins can expose their own entities without the Home Assistant plugin knowing about them
+    """
+    alertPlugin = EntityPluginStub()
+    DependencyContainer.plugins.append(alertPlugin)
+    plugin._publishAll()
+
+    assert "homeassistant/binary_sensor/pool-automation_alert_ph-high/config" in plugin._client.published
+    assert plugin._client.published["pool-automation/alert/ph-high/state"] == "OFF"
+
+    alertPlugin.alert = True
+    DependencyContainer.actions.nofityListners(TimerEvent())
+    assert plugin._client.published["pool-automation/alert/ph-high/state"] == "ON"

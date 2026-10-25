@@ -1,6 +1,7 @@
 from Events.Event import Event
 from lib.Actions import *
 from lib.Variables import *
+from lib.Entity import Entity
 
 class IPlugin:
     def __init__(self) -> None:
@@ -23,6 +24,15 @@ class IPlugin:
             list[Variable|VariableGroup]: _description_
         """
         pass
+
+    def getEntities(self) -> "list[Entity]":
+        """Values this plugin exposes outside the app (Home Assistant ...), beyond its variables and action,
+        which are exposed already.
+
+        Returns:
+            list[Entity]: Entities defined
+        """
+        return []
 
     def startup(self, GPIO:any, i2cBus:any) -> None:
         """Any logic that needs to run on startup

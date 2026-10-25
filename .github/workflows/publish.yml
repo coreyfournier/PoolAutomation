@@ -1,5 +1,7 @@
-#Builds the 32 bit arm (arm/v7) image for the raspberry pi and publishes it to the GitHub container registry.
+#Builds the image for the raspberry pi (32 and 64 bit) and publishes it to the GitHub container registry.
 #Watchtower on the pi picks up the new image and restarts the container. See deploy/ and the Readme.
+#Every build gets a build number (year.month.day.run, ex: 2026.10.25.42). It's a tag on the image and is shown
+#at the bottom of the web page, so it's easy to see which build the pi is running.
 name: Build and publish
 
 #Pull requests only run the tests. Master requires them to pass before a merge.
@@ -24,7 +26,12 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
+      #Worked out once so every job uses the same number. The 32 bit build can run past midnight.
+      - id: version
+        run: echo "version=$(date -u +%Y.%m.%d).${{ github.run_number }}" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
@@ -84,11 +91,13 @@ jobs:
             suffix=-${{ matrix.suffix }}
           tags: |
             type=raw,value=latest
+            type=raw,value=${{ needs.test.outputs.version }}
             type=sha
       - uses: docker/build-push-action@v6
         with:
           context: .
           platforms: ${{ matrix.platform }}
+          build-args: APP_VERSION=${{ needs.test.outputs.version }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -96,7 +105,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=${{ matrix.cacheScope }}
 
   merge:
-    needs: publish
+    needs: [test, publish]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -109,10 +118,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Combine the architectures under one tag
+        env:
+          VERSION: ${{ needs.test.outputs.version }}
         run: |
           SHA_TAG="sha-${GITHUB_SHA::7}"
           docker buildx imagetools create \
             -t "$IMAGE:latest" \
+            -t "$IMAGE:$VERSION" \
             -t "$IMAGE:$SHA_TAG" \
             "$IMAGE:$SHA_TAG-armv7" \
             "$IMAGE:$SHA_TAG-arm64"

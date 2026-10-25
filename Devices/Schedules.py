@@ -4,6 +4,7 @@ from datetime import datetime
 import logging
 from Devices.Schedule import *
 import DependencyContainer
+from lib.Entity import Entity
 from Devices.Pump import *
 from Devices.Pumps import Pumps
 from IO.ScheduleRepo import *
@@ -41,6 +42,15 @@ class Schedules:
         else:
             return None
 
+
+    def getEntities(self) -> "list[Entity]":
+        def runningNames() -> str:
+            running = self.getRunning()
+            return ", ".join([x.name for x in running]) if len(running) > 0 else "None"
+
+        return [
+            Entity("schedule", "running", "Running Schedule", str, runningNames, icon = "mdi:calendar-clock")
+        ]
 
     def getRunning(self) -> "list[PumpSchedule]" :
         """Gets the currently running schedule

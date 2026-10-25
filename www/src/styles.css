@@ -111,6 +111,16 @@ label
   display: inline;
 
 }
+/*Build number at the bottom of every page*/
+.app-version {
+  margin-top: 2rem;
+  padding: 1rem 0;
+  border-top: 1px solid #e8e8e8;
+  color: #888;
+  font-size: .8rem;
+  text-align: center;
+}
+
 /*Moves the edit button to the right of the header*/
 .panel-heading input{
   float:right;

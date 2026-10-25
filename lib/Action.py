@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import DependencyContainer
+from lib.Entity import Entity
 from typing import Callable
 import typing
 
@@ -42,6 +43,13 @@ class Action:
             if(DependencyContainer.actions != None):
                 DependencyContainer.actions.nofityListners(OverrideChangeEvent(data=self))
     
+    def getEntities(self) -> "list[Entity]":
+        return [
+            Entity("override", self.name, f"{self.displayName} Override", bool,
+                lambda: self.overrideSchedule,
+                icon = "mdi:calendar-remove")
+        ]
+
     def to_dict(self):
         return {
             "name":self.name,

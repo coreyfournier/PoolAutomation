@@ -84,6 +84,12 @@ ENV FONT_PATH=/app/www/fonts/
 ENV ROOT_FOLDER=/app
 
 RUN cd /app
+
+#Build number from the GitHub workflow, shown at the bottom of the web page. It's different on every build,
+#so it has to stay at the end. Anything after it would never come from the cache.
+ARG APP_VERSION=dev
+ENV APP_VERSION=$APP_VERSION
+
 #Use for troubleshooting
 #ENTRYPOINT ["tail", "-f", "/dev/null"]
 

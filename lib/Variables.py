@@ -5,6 +5,7 @@ import DependencyContainer
 import time
 import datetime
 from Events.VariableChangeEvent import VariableChangeEvent
+from lib.Entity import Entity
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -81,3 +82,33 @@ class Variables:
         """Gets every group, including the ones hidden from the UI
         """
         return self._repo.getGroups(False)
+
+    def getEntities(self) -> "list[Entity]":
+        """Variables shown in the UI can be changed from outside the app. Hidden ones are state the plugins
+        manage, so they are read only.
+        """
+        changeable:"set[str]" = set()
+        for group in self.getVariablesForUi():
+            changeable.update([x.name for x in group.variables])
+
+        #Names like "Enabled" mean nothing without the group, so prefix them with the group title
+        groupTitles:"dict[str,str]" = {}
+        for group in self.getGroups():
+            for variable in group.variables:
+                groupTitles[variable.name] = group.title
+
+        entities:"list[Entity]" = []
+        for variable in self.getAll():
+            displayName = variable.displayName
+            if(variable.name in groupTitles):
+                displayName = f"{groupTitles[variable.name]} {displayName}"
+
+            setValue = None
+            if(variable.name in changeable):
+                setValue = lambda value, variable=variable: setattr(variable, "value", value)
+
+            entities.append(Entity("variable", variable.name, displayName, variable.dataType,
+                lambda variable=variable: variable.value,
+                setValue))
+
+        return entities

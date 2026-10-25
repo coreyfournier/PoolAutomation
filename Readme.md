@@ -69,6 +69,12 @@ What shows up in Home Assistant:
 * Temperature sensors, pH, ORP - sensors
 * Schedule overrides per action and the running schedule - read only
 
+The plugin doesn't know about any of these directly. Each device, the variables, the actions and the schedules describe
+what they expose with getEntities() (see lib/Entity.py), and the plugin publishes whatever DependencyContainer.getEntities()
+returns. A plugin can expose more, like an alert, by overriding getEntities() from IPlugin. Anything that can be changed
+(an entity with a setValue) can be controlled from Home Assistant. Changes are found by comparing each value to what was
+last published, after every event.
+
 All state is published retained to `{prefix}/{type}/{name}/state`, commands are read from `{prefix}/{type}/{name}/set`
 and `{prefix}/status` is online/offline.
 
@@ -83,9 +89,14 @@ Every push to master runs the tests, builds the image on GitHub (.github/workflo
 
 | Tag | What you get |
 |---|---|
-| latest, sha-abc1234 | Both architectures. Docker pulls the one that matches the pi. Use this unless you have a reason not to. |
-| latest-armv7, sha-abc1234-armv7 | 32 bit only |
-| latest-arm64, sha-abc1234-arm64 | 64 bit only |
+| latest, 2026.10.25.42, sha-abc1234 | Both architectures. Docker pulls the one that matches the pi. Use this unless you have a reason not to. |
+| latest-armv7, 2026.10.25.42-armv7, sha-abc1234-armv7 | 32 bit only |
+| latest-arm64, 2026.10.25.42-arm64, sha-abc1234-arm64 | 64 bit only |
+
+Every build gets a build number: the date it was built and the GitHub run number (2026.10.25.42). It is shown at the
+bottom of the web page, in the container log when it starts ("Starting build ...") and as the software version on
+the Pool Automation device in Home Assistant, so it's easy to tell whether a new build has been deployed. Running
+locally it shows "dev".
 
 The 32 bit build has to be emulated on GitHub, so it is slow (an hour or more) whenever requirements.txt or the apt-get
 lines in the Dockerfile change. Otherwise it reuses the cache and takes a few minutes. Publishing waits for someone to approve

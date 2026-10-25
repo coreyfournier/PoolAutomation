@@ -13,8 +13,11 @@ log_level:int = None
 #This must be set BEFORE any imports of custom code because it calls get_logger
 log_to_file:str = None
 
-#f= fahrenheit c=celsius 
+#f= fahrenheit c=celsius
 temperatureUnit = "f"
+
+#Build number set by the GitHub workflow (ex: 2026.10.25.42). dev when running locally.
+appVersion:str = os.environ.get("APP_VERSION") or "dev"
 
 #format to show when it hours and minutes
 short_time_format = "%I:%M%p"
@@ -144,6 +147,7 @@ from IO.StateLoggerDuckDbRepo import StateLoggerDuckDbRepo
 from IO.SeverSentEvents import *
 from Devices.AtlasScientific import *
 from IO.GeneratorRepo import *
+from lib.Entity import Entity
 
 
 
@@ -172,3 +176,32 @@ stateLogger:StateLoggerDuckDbRepo = None
 enviromentalSensor:AtlasScientific = None
 
 generator:GeneratorRepo = None
+
+#Plugins that were loaded. Set by Configuration.
+plugins:"list" = []
+
+def getEntities() -> "list[Entity]":
+    """Gets everything the devices, variables, actions, schedules and plugins expose outside the app.
+    Consumers (Home Assistant ...) use this instead of knowing about each kind of device.
+    """
+    entities:"list[Entity]" = []
+    sources = []
+
+    for collection in [pumps, valves, lights, temperatureDevices]:
+        if(collection != None):
+            sources.extend(collection.getAll())
+
+    if(enviromentalSensor != None):
+        sources.append(enviromentalSensor)
+    if(variables != None):
+        sources.append(variables)
+    if(actions != None):
+        sources.extend(actions.get())
+    if(schedules != None):
+        sources.append(schedules)
+    sources.extend(plugins)
+
+    for source in sources:
+        entities.extend(source.getEntities() or [])
+
+    return entities

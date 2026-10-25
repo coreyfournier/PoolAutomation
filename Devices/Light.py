@@ -2,6 +2,10 @@ from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json
 from dataclass_wizard import JSONWizard
 from Events.Event import Event
+from lib.Entity import Entity
+
+#Value of the light's entity when no scene is on
+LIGHT_OFF = "OFF"
 
 @dataclass_json
 @dataclass
@@ -28,6 +32,23 @@ class Light:
         pass
     def off(self):
         pass
+
+    def changeByName(self, sceneName:str):
+        """Changes the scene using the scene name, or turns the light off with LIGHT_OFF
+        """
+        if(sceneName == LIGHT_OFF):
+            self.off()
+        else:
+            self.change([x.name for x in self.lightScenes()].index(sceneName))
+
+    def getEntities(self) -> "list[Entity]":
+        return [
+            Entity("light", self.name, self.displayName, str,
+                lambda: self.currentScene or LIGHT_OFF,
+                self.changeByName,
+                options = [LIGHT_OFF] + [x.name for x in self.lightScenes()],
+                icon = "mdi:lightbulb")
+        ]
 
     def to_dict(self):
         return {

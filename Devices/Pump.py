@@ -2,6 +2,7 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import Callable
 from Events.Event import Event
+from lib.Entity import Entity
 
 class Speed(Enum):
     OFF = 0
@@ -33,6 +34,25 @@ class Pump:
 
     def speeds(self) ->"list[SpeedDisplay]":
         pass
+
+    def setSpeedByName(self, speedName:str):
+        """Changes the speed using the name of the speed. ex: SPEED_2 or OFF
+        """
+        if(Speed[speedName] == Speed.OFF):
+            self.off()
+        else:
+            self.on(Speed[speedName])
+
+    def getEntities(self) -> "list[Entity]":
+        speeds = self.speeds()
+        options = [x.name for x in speeds] if speeds != None else [x.name for x in Speed]
+        return [
+            Entity("pump", self.name, self.displayName, str,
+                lambda: self.currentSpeed.name,
+                self.setSpeedByName,
+                options = options,
+                icon = "mdi:pump")
+        ]
 
     def to_dict(self):
         return {

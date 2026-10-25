@@ -6,5 +6,8 @@ from Devices.PoolChemistry import PoolChemistry
 class AtlasScientificStub(AtlasScientific):
     def __init__(self) -> None:
         pass
-    def get(self, allowCached:bool = True) -> PoolChemistry:      
+    def get(self, allowCached:bool = True) -> PoolChemistry:
         return PoolChemistry(0, 0, 0)
+
+    def getLast(self) -> PoolChemistry:
+        return self.get()

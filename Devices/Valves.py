@@ -30,27 +30,17 @@ class Valves:
         return [item for key, item in self._valves.items()]
     
     def on(self, name:"str|int"):
-        from Events.ValveChangeEvent import ValveChangeEvent
         #Allow a lookup by id
         if(type(name) == int):
             name = self._byId[name].name
 
-        self._valves[name].controller.on()
-        self._valves[name].isOn = True
-        
-        if(DependencyContainer.actions != None):
-            DependencyContainer.actions.nofityListners(ValveChangeEvent(None, False,None, self._valves[name]))
+        self._valves[name].on()
 
     def off(self, name:"str|int"):
-        from Events.ValveChangeEvent import ValveChangeEvent
         #Allow a lookup by id
         if(type(name) == int):
             name = self._byId[name].name
-            
-        self._valves[name].controller.off()
-        self._valves[name].isOn = False
 
-        if(DependencyContainer.actions != None):
-            DependencyContainer.actions.nofityListners(ValveChangeEvent(None, False, None, self._valves[name]))
+        self._valves[name].off()
 
         

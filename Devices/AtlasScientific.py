@@ -4,6 +4,7 @@ import DependencyContainer
 from Devices.PoolChemistry import *
 from Events.OrpChangeEvent import *
 from Events.PhChangeEvent import *
+from lib.Entity import Entity
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -21,6 +22,23 @@ This is the kit https://atlas-scientific.com/kits/wi-fi-pool-kit/
         
         self.__phDigitsForChange = phDigitsForChange
         self.__orpDigitsForChange = orpDigitsForChange
+
+    def getLast(self) -> PoolChemistry:
+        """Last reading taken, without asking the sensor. None until the first reading.
+        """
+        return self.__lastValue
+
+    def getEntities(self) -> "list[Entity]":
+        def reading(field:str):
+            return lambda: None if self.getLast() == None else getattr(self.getLast(), field)
+
+        return [
+            Entity("chemistry", "ph", "pH", float, reading("ph"), measurement = "ph"),
+            Entity("chemistry", "orp", "ORP", float, reading("orp"), unit = "mV", measurement = "orp", icon = "mdi:flask"),
+            Entity("chemistry", "temperature", "Chemistry Temperature", float, reading("temperature"),
+                unit = f"°{DependencyContainer.temperatureUnit.upper()}",
+                measurement = "temperature")
+        ]
 
     def get(self, allowCached:bool = True) -> PoolChemistry:
         try:

@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 import DependencyContainer
 from Events.Event import Event
+from lib.Entity import Entity
 
 @dataclass
 class TemperatureDevice:
@@ -97,7 +98,15 @@ class TemperatureBase(TemperatureDevice):
         
     def __str__(self) -> str:
         return f"{self.name} - {self.get()}"
-    
+
+    def getEntities(self) -> "list[Entity]":
+        return [
+            Entity("temperature", self.name, self.displayName, float,
+                self.getLastAsLocal,
+                unit = f"°{self.unit}",
+                measurement = "temperature")
+        ]
+
     def to_dict(self):
         return {
                 "id": self.id,

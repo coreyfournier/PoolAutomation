@@ -45,6 +45,7 @@ server_config = {'server.socket_host': '0.0.0.0',  'server.socket_port' : int(os
   
 if __name__ == '__main__':
    
+    logger.info(f"Starting build {DependencyContainer.appVersion}")
     logger.info(f"Using root folder:'{rootFolder}'. Port#:{os.environ['HOSTING_PORT']} Static directory:'{WEB_ROOT}'. This should never contain code!!! ")
 
     import Configuration    

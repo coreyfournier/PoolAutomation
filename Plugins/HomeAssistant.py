@@ -5,36 +5,27 @@ import json
 import os
 import re
 import threading
-from typing import Callable
 import cherrypy
 import paho.mqtt.client as mqtt
 
 from lib.Actions import *
 from lib.Variables import *
-from Devices.Pump import *
-from Devices.Light import Light
-from Devices.Valve import Valve
-from Devices.TemperatureBase import *
-from Devices.PoolChemistry import PoolChemistry
-from Events.PumpChangeEvent import PumpChangeEvent
-from Events.ValveChangeEvent import ValveChangeEvent
-from Events.LightChangeEvent import LightChangeEvent
-from Events.VariableChangeEvent import VariableChangeEvent
-from Events.OverrideChangeEvent import OverrideChangeEvent
-from Events.ScheduleChangeEvent import ScheduleChangeEvent
-from Events.OrpChangeEvent import OrpChangeEvent
-from Events.PhChangeEvent import PhChangeEvent
+from lib.Entity import Entity
 
 logger = DependencyContainer.get_logger(__name__)
 
-#Value published for the light when no scene is on.
-LIGHT_OFF = "OFF"
 ACTION_NAME = "home-assistant"
+#Home Assistant device classes for the measurements it knows. Anything else is shown without one.
+DEVICE_CLASSES:"dict[str,str]" = {
+    "temperature": "temperature",
+    "ph": "ph"
+}
 
 class HomeAssistant(IPlugin):
     """Pushes every change to an MQTT broker so Home Assistant does not have to poll.
-    Uses Home Assistant MQTT discovery, so the devices show up on their own. Pumps, valves, lights and the
-    variables shown in the UI can also be controlled from Home Assistant.
+    Uses Home Assistant MQTT discovery, so everything shows up on its own. Publishes whatever the devices,
+    variables and plugins expose as entities (DependencyContainer.getEntities), so it doesn't need to know
+    about any of them. Entities that can be changed can also be controlled from Home Assistant.
 
     Only runs when MQTT_HOST is set. Other settings (all optional):
         MQTT_PORT - defaults to 1883
@@ -49,8 +40,14 @@ class HomeAssistant(IPlugin):
         self._prefix:str = os.environ.get("MQTT_TOPIC_PREFIX", "pool-automation")
         self._discoveryPrefix:str = os.environ.get("MQTT_DISCOVERY_PREFIX", "homeassistant")
         self._client:mqtt.Client = None
-        #Maps a command topic to the function that handles the payload
-        self._commands:"dict[str,Callable]" = {}
+        #Everything being published, found when discovery was last sent
+        self._entities:"list[Entity]" = []
+        #Maps a command topic to the entity it changes
+        self._commands:"dict[str,Entity]" = {}
+        #Last payload published to each state topic. Used to only publish what changed.
+        self._published:"dict[str,str]" = {}
+        #Events and (re)connects come in on different threads
+        self._lock = threading.Lock()
 
     def getAction(self)-> Action:
         if(self._host is None):
@@ -98,7 +95,6 @@ class HomeAssistant(IPlugin):
         client.subscribe(f"{self._prefix}/+/+/set")
         #Home Assistant announces itself when it restarts. Discovery needs to be sent again when that happens.
         client.subscribe(f"{self._discoveryPrefix}/status")
-        #Reading the devices can be slow (the chemistry sensor is a web call), so don't hold up the network thread
         threading.Thread(target=self._publishAll, daemon=True).start()
 
     def _onMessage(self, client, userdata, message:mqtt.MQTTMessage):
@@ -116,7 +112,8 @@ class HomeAssistant(IPlugin):
 
     def _runCommand(self, topic:str, payload:str):
         try:
-            self._commands[topic](payload)
+            entity = self._commands[topic]
+            entity.setValue(self._parse(entity, payload))
         except Exception as err:
             logger.exception(f"Failed running command {topic}={payload}. Error:{err}")
 
@@ -125,261 +122,132 @@ class HomeAssistant(IPlugin):
             #Everything gets published when it connects
             return
 
-        if(isinstance(event, PumpChangeEvent)):
-            self._publishPump(event.data)
-        elif(isinstance(event, ValveChangeEvent)):
-            self._publishValve(event.data)
-        elif(isinstance(event, LightChangeEvent)):
-            self._publishLight(event.data)
-        elif(isinstance(event, TemperatureChangeEvent)):
-            self._publishTemperature(event.data)
-        elif(isinstance(event, (OrpChangeEvent, PhChangeEvent))):
-            self._publishChemistry(event.data)
-        elif(isinstance(event, VariableChangeEvent)):
-            self._publishVariable(event.data)
-        elif(isinstance(event, OverrideChangeEvent)):
-            self._publishOverride(event.data)
-        elif(isinstance(event, ScheduleChangeEvent)):
-            self._publishSchedule()
-
-    def _publishAll(self):
-        try:
-            self._publishDiscovery()
-            self._client.publish(self._availabilityTopic(), "online", retain=True)
-
-            for pump in DependencyContainer.pumps.getAll():
-                self._publishPump(pump)
-            for valve in DependencyContainer.valves.getAll():
-                self._publishValve(valve)
-            for light in DependencyContainer.lights.getAll():
-                self._publishLight(light)
-            for device in DependencyContainer.temperatureDevices.getAll():
-                self._publishTemperature(device)
-            for variable in DependencyContainer.variables.getAll():
-                self._publishVariable(variable)
-            for action in DependencyContainer.actions.get():
-                if(action.name != ACTION_NAME):
-                    self._publishOverride(action)
-            self._publishSchedule()
-
-            if(DependencyContainer.enviromentalSensor != None):
-                self._publishChemistry(DependencyContainer.enviromentalSensor.get())
-        except Exception as err:
-            logger.exception(f"Failed publishing to MQTT. Error:{err}")
+        #No need to know what the event was about. Anything whose value changed gets published, which also
+        #catches changes that don't raise an event. The timer event fires every few seconds as a backstop.
+        self._publishChanges()
 
     #-------------------------------------------------------------------------
     # State
     #-------------------------------------------------------------------------
 
-    def _publishPump(self, pump:Pump):
-        self._publishState("pump", pump.name, pump.currentSpeed.name)
+    def _publishAll(self):
+        try:
+            with self._lock:
+                self._entities = [x for x in DependencyContainer.getEntities()
+                    #Overriding the schedule isn't something this plugin does
+                    if not (x.group == "override" and x.name == ACTION_NAME)]
+                self._commands = {}
+                self._published = {}
 
-    def _publishValve(self, valve:Valve):
-        self._publishState("valve", valve.name, "ON" if valve.isOn else "OFF")
+                for entity in self._entities:
+                    self._discover(entity)
 
-    def _publishLight(self, light:Light):
-        self._publishState("light", light.name, light.currentScene or LIGHT_OFF)
+                self._client.publish(self._availabilityTopic(), "online", retain=True)
+                self._publishChangesLocked()
+        except Exception as err:
+            logger.exception(f"Failed publishing to MQTT. Error:{err}")
 
-    def _publishTemperature(self, device:TemperatureBase):
-        temp = device.getLastAsLocal()
-        if(temp != None):
-            self._publishState("temperature", device.name, temp)
+    def _publishChanges(self):
+        with self._lock:
+            self._publishChangesLocked()
 
-    def _publishChemistry(self, chemistry:PoolChemistry):
-        if(chemistry != None):
-            self._publishState("chemistry", "sensor", json.dumps(chemistry.to_dict()))
+    def _publishChangesLocked(self):
+        for entity in self._entities:
+            try:
+                value = entity.getValue()
+            except Exception as err:
+                logger.debug(f"Failed reading {entity.group}/{entity.name}. Error:{err}")
+                continue
 
-    def _publishVariable(self, variable:Variable):
-        value = variable.value
-        if(variable.dataType is bool):
-            value = "ON" if value else "OFF"
-        elif(value is None):
-            value = ""
-        self._publishState("variable", variable.name, value)
+            #Unknown values are left alone. Home Assistant shows them as unknown until there is a value.
+            if(value is None):
+                continue
 
-    def _publishOverride(self, action:Action):
-        self._publishState("override", action.name, "ON" if action.overrideSchedule else "OFF")
-
-    def _publishSchedule(self):
-        if(DependencyContainer.schedules == None):
-            return
-        running = DependencyContainer.schedules.getRunning()
-        self._publishState("schedule", "running", ", ".join([x.name for x in running]) if len(running) > 0 else "None")
-
-    def _publishState(self, kind:str, name:str, value:any):
-        self._client.publish(self._stateTopic(kind, name), str(value), retain=True)
+            topic = self._stateTopic(entity)
+            payload = self._format(entity, value)
+            if(self._published.get(topic) != payload):
+                self._client.publish(topic, payload, retain=True)
+                self._published[topic] = payload
 
     #-------------------------------------------------------------------------
     # Discovery
     #-------------------------------------------------------------------------
 
-    def _publishDiscovery(self):
-        self._commands = {}
-
-        for pump in DependencyContainer.pumps.getAll():
-            speeds = pump.speeds()
-            options = [x.name for x in speeds] if speeds != None else [x.name for x in Speed]
-            self._discover("select", "pump", pump.name, pump.displayName, {
-                "options": options,
-                "icon": "mdi:pump"
-            }, lambda payload, pump=pump: self._setPumpSpeed(pump, payload))
-
-        for valve in DependencyContainer.valves.getAll():
-            self._discover("switch", "valve", valve.name, valve.displayName, {
-                "icon": "mdi:valve"
-            }, lambda payload, valve=valve: self._setValve(valve, payload))
-
-        for light in DependencyContainer.lights.getAll():
-            self._discover("select", "light", light.name, light.displayName, {
-                "options": [LIGHT_OFF] + [x.name for x in light.lightScenes()],
-                "icon": "mdi:lightbulb"
-            }, lambda payload, light=light: self._setLight(light, payload))
-
-        for device in DependencyContainer.temperatureDevices.getAll():
-            self._discover("sensor", "temperature", device.name, device.displayName, {
-                "device_class": "temperature",
-                "state_class": "measurement",
-                "unit_of_measurement": f"°{DependencyContainer.temperatureUnit.upper()}"
-            })
-
-        if(DependencyContainer.enviromentalSensor != None):
-            self._discover("sensor", "chemistry", "ph", "pH", {
-                "state_topic": self._stateTopic("chemistry", "sensor"),
-                "value_template": "{{ value_json.ph }}",
-                "device_class": "ph",
-                "state_class": "measurement"
-            })
-            self._discover("sensor", "chemistry", "orp", "ORP", {
-                "state_topic": self._stateTopic("chemistry", "sensor"),
-                "value_template": "{{ value_json.orp }}",
-                "unit_of_measurement": "mV",
-                "state_class": "measurement",
-                "icon": "mdi:flask"
-            })
-            self._discover("sensor", "chemistry", "temperature", "Chemistry Temperature", {
-                "state_topic": self._stateTopic("chemistry", "sensor"),
-                "value_template": "{{ value_json.temperature }}",
-                "device_class": "temperature",
-                "state_class": "measurement",
-                "unit_of_measurement": f"°{DependencyContainer.temperatureUnit.upper()}"
-            })
-
-        for action in DependencyContainer.actions.get():
-            if(action.name == ACTION_NAME):
-                continue
-            self._discover("binary_sensor", "override", action.name, f"{action.displayName} Override", {
-                "icon": "mdi:calendar-remove"
-            })
-
-        self._discover("sensor", "schedule", "running", "Running Schedule", {
-            "icon": "mdi:calendar-clock"
-        })
-
-        self._discoverVariables()
-
-    def _discoverVariables(self):
-        #Variables shown in the UI can be changed from Home Assistant. Hidden ones are internal state the plugins
-        #manage, so they are read only.
-        controllable:"set[str]" = set()
-        for group in DependencyContainer.variables.getVariablesForUi():
-            controllable.update([x.name for x in group.variables])
-
-        #Names like "Enabled" mean nothing without the group, so prefix them with the group title
-        groupTitles:"dict[str,str]" = {}
-        for group in DependencyContainer.variables.getGroups():
-            for variable in group.variables:
-                groupTitles[variable.name] = group.title
-
-        for variable in DependencyContainer.variables.getAll():
-            displayName = variable.displayName
-            if(variable.name in groupTitles):
-                displayName = f"{groupTitles[variable.name]} {displayName}"
-
-            isControllable = variable.name in controllable
-
-            if(variable.dataType is bool):
-                component = "switch" if isControllable else "binary_sensor"
-                config = {}
-            elif(variable.dataType in (int, float) and isControllable):
-                component = "number"
-                config = {
-                    "min": -100000,
-                    "max": 100000,
-                    "step": 1 if variable.dataType is int else 0.1,
-                    "mode": "box"
-                }
-            else:
-                component = "sensor"
-                config = {}
-
-            command = (lambda payload, variable=variable: self._setVariable(variable, payload)) if isControllable else None
-            self._discover(component, "variable", variable.name, displayName, config, command)
-
-    def _discover(self, component:str, kind:str, name:str, displayName:str, config:dict, command:Callable = None):
-        """Publishes the Home Assistant discovery config for one entity
-
-        Args:
-            component (str): Home Assistant entity type (sensor, switch, select ...)
-            kind (str): Type of device in this app. Used to build the topics.
-            name (str): api name of the device
-            displayName (str): What Home Assistant shows
-            config (dict): Extra config for the entity. Overrides the defaults.
-            command (Callable, optional): Called with the payload when Home Assistant sends a command.
+    def _component(self, entity:Entity) -> str:
+        """Which Home Assistant entity type to show it as
         """
-        uniqueId = f"{self._safe(self._prefix)}_{kind}_{self._safe(name)}"
+        if(entity.dataType is bool):
+            return "binary_sensor" if entity.readOnly else "switch"
+        if(entity.readOnly):
+            return "sensor"
+        if(entity.options != None):
+            return "select"
+        if(entity.dataType in (int, float)):
+            return "number"
+        #Free text that can be changed is shown read only. Nothing needs to change one from Home Assistant yet.
+        return "sensor"
+
+    def _discover(self, entity:Entity):
+        """Publishes the Home Assistant discovery config for one entity
+        """
+        component = self._component(entity)
+        uniqueId = f"{self._safe(self._prefix)}_{entity.group}_{self._safe(entity.name)}"
         payload = {
-            "name": displayName,
+            "name": entity.displayName,
             "unique_id": uniqueId,
-            "state_topic": self._stateTopic(kind, name),
+            "state_topic": self._stateTopic(entity),
             "availability_topic": self._availabilityTopic(),
             "device": {
                 "identifiers": [self._safe(self._prefix)],
                 "name": "Pool Automation",
-                "manufacturer": "Pool Automation"
+                "manufacturer": "Pool Automation",
+                #Shown as the firmware version on the device page
+                "sw_version": DependencyContainer.appVersion
             }
         }
 
-        if(command != None):
-            commandTopic = self._commandTopic(kind, name)
+        if(component in ("switch", "select", "number")):
+            commandTopic = self._commandTopic(entity)
             payload["command_topic"] = commandTopic
-            self._commands[commandTopic] = command
+            self._commands[commandTopic] = entity
 
-        payload.update(config)
+        if(component == "select"):
+            payload["options"] = entity.options
+        if(component == "number"):
+            payload["min"] = entity.minValue if entity.minValue != None else -100000
+            payload["max"] = entity.maxValue if entity.maxValue != None else 100000
+            payload["step"] = entity.step if entity.step != None else (1 if entity.dataType is int else 0.1)
+            payload["mode"] = "box"
+        if(entity.unit != None):
+            payload["unit_of_measurement"] = entity.unit
+        if(entity.measurement != None and component == "sensor"):
+            payload["state_class"] = "measurement"
+            if(entity.measurement in DEVICE_CLASSES):
+                payload["device_class"] = DEVICE_CLASSES[entity.measurement]
+        if(entity.icon != None):
+            payload["icon"] = entity.icon
 
         self._client.publish(f"{self._discoveryPrefix}/{component}/{uniqueId}/config", json.dumps(payload), retain=True)
 
     #-------------------------------------------------------------------------
-    # Commands
+    # Payloads
     #-------------------------------------------------------------------------
 
-    def _setPumpSpeed(self, pump:Pump, payload:str):
-        if(Speed[payload] == Speed.OFF):
-            pump.off()
-        else:
-            pump.on(Speed[payload])
+    @staticmethod
+    def _format(entity:Entity, value:any) -> str:
+        if(entity.dataType is bool):
+            return "ON" if value else "OFF"
+        return str(value)
 
-    def _setValve(self, valve:Valve, payload:str):
-        if(payload == "ON"):
-            DependencyContainer.valves.on(valve.name)
-        else:
-            DependencyContainer.valves.off(valve.name)
-
-    def _setLight(self, light:Light, payload:str):
-        if(payload == LIGHT_OFF):
-            light.off()
-        else:
-            sceneIndex = [x.name for x in light.lightScenes()].index(payload)
-            light.change(sceneIndex)
-
-    def _setVariable(self, variable:Variable, payload:str):
-        if(variable.dataType is bool):
-            variable.value = payload == "ON"
-        elif(variable.dataType is int):
-            variable.value = int(float(payload))
-        elif(variable.dataType is float):
-            variable.value = float(payload)
-        else:
-            variable.value = payload
+    @staticmethod
+    def _parse(entity:Entity, payload:str) -> any:
+        if(entity.dataType is bool):
+            return payload == "ON"
+        if(entity.dataType is int):
+            return int(float(payload))
+        if(entity.dataType is float):
+            return float(payload)
+        return payload
 
     #-------------------------------------------------------------------------
     # Topics
@@ -388,11 +256,11 @@ class HomeAssistant(IPlugin):
     def _availabilityTopic(self) -> str:
         return f"{self._prefix}/status"
 
-    def _stateTopic(self, kind:str, name:str) -> str:
-        return f"{self._prefix}/{kind}/{self._safe(name)}/state"
+    def _stateTopic(self, entity:Entity) -> str:
+        return f"{self._prefix}/{entity.group}/{self._safe(entity.name)}/state"
 
-    def _commandTopic(self, kind:str, name:str) -> str:
-        return f"{self._prefix}/{kind}/{self._safe(name)}/set"
+    def _commandTopic(self, entity:Entity) -> str:
+        return f"{self._prefix}/{entity.group}/{self._safe(entity.name)}/set"
 
     @staticmethod
     def _safe(name:str) -> str:
