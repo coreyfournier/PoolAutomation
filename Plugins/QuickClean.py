@@ -1,4 +1,4 @@
-from IPlugin import IPlugin
+from Plugins.IPlugin import IPlugin
 import DependencyContainer
 from Events.Event import Event
 from datetime import timedelta

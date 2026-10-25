@@ -60,10 +60,16 @@ class Schedules:
         """
         return [x for x in DependencyContainer.schedules.get() if x.isRunning]
 
-    def checkSchedule(self):
+    def checkSchedule(self, now:datetime = None):
+        """Starts and stops the schedules based on the time
+
+        Args:
+            now (datetime, optional): Time to check against. Defaults to the current time. Lets tests pick the time.
+        """
         #Make sure no one else tries to modify anything
         with self.lock:
-            now = datetime.now()
+            if(now == None):
+                now = datetime.now()
             if(DependencyContainer.actions == None):
                 hasOverride = False
             else:        

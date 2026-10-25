@@ -1,4 +1,4 @@
-from IPlugin import IPlugin
+from Plugins.IPlugin import IPlugin
 from Events.TimerEvent import TimerEvent
 import DependencyContainer
 from Events.Event import Event
@@ -38,7 +38,10 @@ class GeneratorLockout(IPlugin):
             logger.debug(f"Checking the generator state")
             self.generatorLockoutDefaultState = DependencyContainer.generator.isOn()
 
-        DependencyContainer.variables.get("generator-lockout-activated").setValueNoNotify(self.generatorLockoutDefaultState)
+        #Set it with a notification, so onChange applies it. getAction ran before the generator was checked, so the
+        #schedule override only gets set from here. Nothing happens if it's the same as the saved value, which the
+        #action already started with.
+        DependencyContainer.variables.get("generator-lockout-activated").value = self.generatorLockoutDefaultState
 
     def getAction(self)-> Action:
         return Action("generator-lockout",

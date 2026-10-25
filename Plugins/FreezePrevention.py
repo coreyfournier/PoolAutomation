@@ -1,4 +1,4 @@
-from IPlugin import IPlugin
+from Plugins.IPlugin import IPlugin
 import DependencyContainer
 from Events.Event import Event
 
@@ -7,6 +7,7 @@ from lib.Actions import *
 from lib.Variables import *
 from Devices.Pump import *
 from Devices.IDeviceController import IDeviceController
+from Plugins.SolarHeater import SolarHeater
 
 logger = DependencyContainer.get_logger(__name__)
 
@@ -62,5 +63,8 @@ class FreezePrevention(IPlugin):
                 #If it's on, but no longer freezing turn it off
                 elif(DependencyContainer.variables.get("freeze-prevention-on",False).value):
                     logger.info("Turning off freeze prevention")
+                    #Lifting the override lets a schedule that should be running start again
                     action.overrideSchedule = False
                     DependencyContainer.variables.get("freeze-prevention-on").value = False
+                    #Without a schedule or another override wanting the pump, nothing else would turn it off
+                    SolarHeater.turnOffPumpIfNoActiveSchedule(DependencyContainer.pumps.get("main"))
